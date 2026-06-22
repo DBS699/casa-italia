@@ -14,13 +14,13 @@ import Footer from '../components/Footer.astro';
 <Base>
   <Header />
   <main>
-    {/* HANDOFF order: Hero → Über den Club → Komitee → Touren/Saison → Aktuelles → Galerie → Sponsoren → Footer */}
+    {/* Flow: Hero → Verein → Komitee → Touren → Galerie → Aktuelles (CTA) → Sponsoren → Footer */}
     <Hero />
     <About />
     <Committee />
     <Season />
-    <News />
     <Gallery />
+    <News />
     <Sponsors />
   </main>
   <Footer />

@@ -57,7 +57,7 @@ export const NEWS_LINKS = {
 // All translatable text, per language. Lifted verbatim from the design's T object.
 export const I18N = {
   de: {
-    nav: { komitee: 'Komitee', sponsoren: 'Sponsoren', touren: 'Touren', galerie: 'Galerie', mitglieder: 'Mitglieder' },
+    nav: { club: 'Verein', komitee: 'Komitee', touren: 'Touren', galerie: 'Galerie', sponsoren: 'Sponsoren', aktuelles: 'Aktuelles' },
     heroKicker: 'Velo-Club · seit 1968',
     heroSub: 'Leidenschaft auf zwei Rädern',
     heroIntro: "Seit 1968 vereint der Velo-Club Casa d'Italia in Bern die Liebe zum Radsport und zur italienischen Lebensart. Gemeinsame Ausfahrten, Touren und Freundschaft – die ganze Saison hindurch.",
@@ -86,7 +86,7 @@ export const I18N = {
     ],
   },
   fr: {
-    nav: { komitee: 'Comité', sponsoren: 'Sponsors', touren: 'Sorties', galerie: 'Galerie', mitglieder: 'Membres' },
+    nav: { club: 'Club', komitee: 'Comité', touren: 'Sorties', galerie: 'Galerie', sponsoren: 'Sponsors', aktuelles: 'Actualités' },
     heroKicker: 'Vélo-Club · depuis 1968',
     heroSub: 'La passion sur deux roues',
     heroIntro: "Depuis 1968, le Vélo-Club Casa d'Italia réunit à Berne l'amour du cyclisme et de l'art de vivre italien. Sorties, tours et amitié – tout au long de la saison.",
@@ -115,7 +115,7 @@ export const I18N = {
     ],
   },
   it: {
-    nav: { komitee: 'Comitato', sponsoren: 'Sponsor', touren: 'Uscite', galerie: 'Galleria', mitglieder: 'Soci' },
+    nav: { club: 'Club', komitee: 'Comitato', touren: 'Uscite', galerie: 'Galleria', sponsoren: 'Sponsor', aktuelles: 'Novità' },
     heroKicker: 'Velo-Club · dal 1968',
     heroSub: 'La passione su due ruote',
     heroIntro: "Dal 1968 il Velo-Club Casa d'Italia unisce a Berna l'amore per il ciclismo e per lo stile di vita italiano. Uscite, gite e amicizia – per tutta la stagione.",
@@ -144,7 +144,7 @@ export const I18N = {
     ],
   },
   en: {
-    nav: { komitee: 'Committee', sponsoren: 'Sponsors', touren: 'Tours', galerie: 'Gallery', mitglieder: 'Members' },
+    nav: { club: 'Club', komitee: 'Committee', touren: 'Tours', galerie: 'Gallery', sponsoren: 'Sponsors', aktuelles: 'Latest' },
     heroKicker: 'Velo-Club · since 1968',
     heroSub: 'Passion on two wheels',
     heroIntro: "Since 1968, Velo-Club Casa d'Italia has brought together a love of cycling and Italian living in Bern. Group rides, tours and friendship – all season long.",
