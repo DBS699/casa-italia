@@ -56,6 +56,9 @@ img { display: block; }
 /* ── Shared atoms ─────────────────────────────────────────────────────────── */
 .container { max-width: var(--container); margin: 0 auto; }
 
+/* Anchor targets clear the sticky header (≈70px) when reached via nav links. */
+section[id], footer[id] { scroll-margin-top: 84px; }
+
 .tricolore-bar { display: flex; height: 4px; width: 100%; }
 .tricolore-bar > span { flex: 1; }
 .tricolore-bar .g { background: var(--green); }
@@ -108,7 +111,7 @@ img { display: block; }
   max-width: 1180px; margin: 0 auto; padding: 0 clamp(18px, 5vw, 32px);
   min-height: 66px; display: flex; align-items: center; justify-content: space-between; gap: 16px;
 }
-.brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; }
+.brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; flex: 0 0 auto; }
 .brand .emblem {
   width: 42px; height: 42px; border-radius: 50%; background: #fff;
   border: 1px solid rgba(27, 26, 22, 0.14);

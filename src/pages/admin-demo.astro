@@ -125,6 +125,9 @@ const TABS = [
       .tour-row .date { width: 120px; } .tour-row .grow { min-width: 150px; }
       .tour-img { flex: none; }
       .tour-slot { width: 84px; height: 56px; }
+      .member-row { align-items: flex-end; }
+      .member-img { flex: none; }
+      .member-slot { width: 72px; height: 72px; }
 
       /* file upload (Broschüre) */
       .upload { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; border: 1px dashed rgba(27, 26, 22, 0.28); border-radius: 6px; padding: 16px; background: #fcfaf5; }
@@ -210,25 +213,9 @@ const TABS = [
         <!-- Komitee -->
         <section class="panel" data-panel="komitee" hidden>
           <h2>Komitee</h2>
-          <p class="hint">Foto per Drag &amp; Drop, Name und Funktion eintragen.</p>
-          <div class="stack">
-            {DEFAULTS.members.map((m, i) => (
-              <div class="row">
-                <div class="slot circle has-img" data-slot={m.slot} style={`width:64px;height:64px;flex:none;background-image:url('${m.src}')`}>
-                  <span class="ph">Foto</span>
-                  <input type="file" accept="image/*" />
-                </div>
-                <div class="grow">
-                  <label class="field">Name</label>
-                  <input class="txt" data-field={`members.${i}.name`} />
-                </div>
-                <div class="grow">
-                  <label class="field">Funktion</label>
-                  <input class="txt" data-field={`members.${i}.role`} />
-                </div>
-              </div>
-            ))}
-          </div>
+          <p class="hint">Foto per Drag &amp; Drop, Name und Funktion. Mitglieder hinzufügen oder entfernen.</p>
+          <div class="stack" id="membersList"></div>
+          <button class="btn-add" id="addMember">+ Mitglied hinzufügen</button>
         </section>
 
         <!-- Sponsoren -->
@@ -408,6 +395,52 @@ const TABS = [
           content.tours.push({ date: '', title: '', url: '' }); markDirty(); renderTours();
         });
 
+        // ── committee (dynamic list, add/remove) ──────────────
+        function renderMembers() {
+          const list = $('#membersList');
+          list.innerHTML = '';
+          content.members.forEach((m, i) => {
+            const row = document.createElement('div');
+            row.className = 'row member-row';
+            row.innerHTML = `
+              <div class="member-img">
+                <label class="field">Foto</label>
+                <div class="slot circle member-slot"><span class="ph">Foto</span><input type="file" accept="image/*"></div>
+              </div>
+              <div class="grow"><label class="field">Name</label><input class="txt" data-k="name" value=""></div>
+              <div class="grow"><label class="field">Funktion</label><input class="txt" data-k="role" value=""></div>
+              <button class="btn-del" type="button">Entfernen</button>`;
+            row.querySelectorAll('input.txt').forEach((inp) => {
+              const k = inp.getAttribute('data-k');
+              inp.value = m[k] || '';
+              inp.addEventListener('input', () => { content.members[i][k] = inp.value; markDirty(); });
+            });
+            // photo slot — stored on the member object so it follows add/remove
+            const slot = row.querySelector('.member-slot');
+            const fileInput = slot.querySelector('input[type=file]');
+            const initImg = m.img || m.src;
+            if (initImg) { slot.style.backgroundImage = `url('${initImg}')`; slot.classList.add('has-img'); }
+            const readImg = (file) => {
+              if (!file || !file.type.startsWith('image/')) return;
+              const fr = new FileReader();
+              fr.onload = () => { content.members[i].img = fr.result; slot.style.backgroundImage = `url('${fr.result}')`; slot.classList.add('has-img'); markDirty(); };
+              fr.readAsDataURL(file);
+            };
+            slot.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', (e) => readImg(e.target.files[0]));
+            ['dragenter', 'dragover'].forEach((ev) => slot.addEventListener(ev, (e) => { e.preventDefault(); slot.classList.add('drag'); }));
+            ['dragleave', 'drop'].forEach((ev) => slot.addEventListener(ev, (e) => { e.preventDefault(); slot.classList.remove('drag'); }));
+            slot.addEventListener('drop', (e) => readImg(e.dataTransfer.files[0]));
+            row.querySelector('.btn-del').addEventListener('click', () => {
+              content.members.splice(i, 1); markDirty(); renderMembers();
+            });
+            list.appendChild(row);
+          });
+        }
+        $('#addMember').addEventListener('click', () => {
+          content.members.push({ name: '', role: '', img: '' }); markDirty(); renderMembers();
+        });
+
         // ── tabs ──────────────────────────────────────────────
         $$('.tabbar button').forEach((btn) => {
           btn.addEventListener('click', () => {
@@ -499,7 +532,7 @@ const TABS = [
         function showEditor() {
           $('#login').hidden = true;
           $('#editor').hidden = false;
-          bindFields(); bindSlots(); renderTours(); bindBrochure(); bindVideo();
+          bindFields(); bindSlots(); renderTours(); renderMembers(); bindBrochure(); bindVideo();
         }
         function login() {
           const pass = $('#pass').value || '';
