@@ -15,7 +15,7 @@ const t = I18N[DEFAULT_LANG];
     </div>
     <div class="gallery-images">
       {GALLERY.map((s) => (
-        <span class="frame"><img id={s.id} src={s.image} alt="" loading="lazy" /></span>
+        <span class="frame"><img id={s.id} src={s.image} alt="" width="300" height="170" loading="lazy" decoding="async" /></span>
       ))}
     </div>
   </div>

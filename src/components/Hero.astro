@@ -5,13 +5,26 @@ const t = I18N[DEFAULT_LANG];
 
 <section id="hero" class="hero" aria-label="Intro">
   <!--
-    Background video plays muted on load. Currently a free placeholder clip
-    (Mixkit Free License, cycling). Replace /public/assets/hero.mp4 (+ hero-poster.jpg)
-    with the real club video anytime — filenames are fixed.
+    Background video. The poster shows immediately; the (~5 MB) video is only
+    fetched on larger screens when the visitor hasn't asked to reduce motion —
+    so phones / data-savers get the poster only. Replace /public/assets/hero.mp4
+    (+ hero-poster.jpg) with the real club video anytime — filenames are fixed.
   -->
-  <video autoplay muted loop playsinline preload="auto" poster={SITE.heroPoster}>
-    <source src={SITE.heroVideo} type="video/mp4" />
-  </video>
+  <video class="hero-video" autoplay muted loop playsinline preload="none" poster={SITE.heroPoster} data-src={SITE.heroVideo}></video>
+  <script is:inline>
+    (function () {
+      var v = document.querySelector('.hero-video');
+      if (!v || !v.dataset.src) return;
+      var big = window.matchMedia('(min-width: 768px)').matches;
+      var motionOk = window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
+      if (big && motionOk) {
+        var s = document.createElement('source');
+        s.src = v.dataset.src; s.type = 'video/mp4';
+        v.appendChild(s); v.load();
+        var p = v.play(); if (p && p.catch) p.catch(function () {});
+      }
+    })();
+  </script>
   <div class="scrim"></div>
   <div class="inner">
     <img class="laurel" src="/assets/laurel-cut.png" alt="Velo Club Casa d'Italia – seit 1985" />

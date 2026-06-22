@@ -16,7 +16,7 @@ const t = I18N[DEFAULT_LANG];
     <div class="members">
       {MEMBERS.map((m) => (
         <div class="member">
-          <span class="photo"><img id={m.slot} src={m.src} alt={m.name} loading="lazy" /></span>
+          <span class="photo"><img id={m.slot} src={m.src} alt={m.name} width="128" height="128" loading="lazy" decoding="async" /></span>
           <span class="name">{m.name}</span>
           <span class="role">{m.role}</span>
         </div>

@@ -14,7 +14,7 @@ const t = I18N[DEFAULT_LANG];
     <div class="sponsor-grid">
       {SPONSORS.map((s) => (
         <div class="sponsor">
-          <span class="logo"><img id={s.slot} src={s.src} alt={s.name} loading="lazy" /></span>
+          <span class="logo"><img id={s.slot} src={s.src} alt={s.name} width="150" height="92" loading="lazy" decoding="async" /></span>
           <a href={s.url} target="_blank" rel="noopener">{s.name}</a>
         </div>
       ))}

@@ -1,12 +1,32 @@
 ---
 import '../styles/global.css';
-import { I18N, DEFAULT_LANG } from '../data/content.js';
+import { I18N, DEFAULT_LANG, CLUB } from '../data/content.js';
 
 interface Props { title?: string; description?: string }
 const {
   title = "Velo-Club Casa d'Italia Bern — Passione su due ruote",
-  description = "Velo-Club Casa d'Italia in Bern — seit 1968. Gemeinsame Ausfahrten, Touren und Freundschaft die ganze Saison.",
+  description = "Velo-Club Casa d'Italia in Bern — seit 1985. Gemeinsame Ausfahrten, Touren und Freundschaft die ganze Saison.",
 } = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImage = new URL('/assets/hero-poster.jpg', Astro.site).href;
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SportsClub',
+  name: "Velo-Club Casa d'Italia",
+  sport: 'Cycling',
+  foundingDate: '1985',
+  url: Astro.site?.href,
+  email: CLUB.email,
+  logo: new URL('/assets/emblem.png', Astro.site).href,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: CLUB.address.line1,
+    postalCode: '3012',
+    addressLocality: 'Bern',
+    addressCountry: 'CH',
+  },
+};
 ---
 
 <!doctype html>
@@ -16,7 +36,27 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <title>{title}</title>
+    <link rel="canonical" href={canonical} />
     <link rel="icon" type="image/png" href="/assets/emblem.png" />
+    <link rel="apple-touch-icon" href="/assets/emblem.png" />
+    <meta name="theme-color" content="#1f7a43" />
+
+    <!-- Social sharing (Open Graph + Twitter) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Velo-Club Casa d'Italia" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="720" />
+    <meta property="og:locale" content="de_CH" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

@@ -9,6 +9,17 @@ const nav = [
   { key: 'aktuelles', href: '#aktuelles' },
   { key: 'sponsoren', href: '#sponsoren' },
 ];
+
+const ICONS = {
+  instagram: '<rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/>',
+  facebook: '<path d="M14 8.5h2V5.5h-2.3C11.4 5.5 10 6.9 10 9v1.6H8V13.5h2V21h3v-7.5h2.2L16 10.6h-3V9.2c0-.5.2-.7.8-.7Z" fill="currentColor" stroke="none"/>',
+  strava: '<path d="M9.8 3 4.4 13.5h3.2L9.8 9l2.2 4.5h3.1L9.8 3Zm4.5 10.5L12.8 16l-1.5-2.5H9l3.8 7 3.7-7h-2.2Z" fill="currentColor" stroke="none"/>',
+};
+const socials = [
+  { key: 'instagram', url: CLUB.social?.instagram, label: 'Instagram' },
+  { key: 'facebook', url: CLUB.social?.facebook, label: 'Facebook' },
+  { key: 'strava', url: CLUB.social?.strava, label: 'Strava' },
+].filter((s) => s.url);
 ---
 
 <footer id="kontakt" class="site-footer" aria-label="Footer">
@@ -17,6 +28,15 @@ const nav = [
     <div>
       <img class="laurel" src="/assets/laurel.png" alt="Velo Club Casa d'Italia – seit 1985" />
       <p class="motto">Passione su due ruote.</p>
+      {socials.length > 0 && (
+        <div class="socials">
+          {socials.map((s) => (
+            <a href={s.url} target="_blank" rel="noopener" aria-label={s.label}>
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" set:html={ICONS[s.key]} />
+            </a>
+          ))}
+        </div>
+      )}
     </div>
     <div>
       <h4 data-i18n="footAddrLabel">{t.footAddrLabel}</h4>

@@ -22,7 +22,7 @@ const t = I18N[DEFAULT_LANG];
             target={tour.url ? '_blank' : undefined}
             rel={tour.url ? 'noopener' : undefined}
           >
-            <div class="tour-photo"><img src={tour.img} alt={tour.title} loading="lazy" /></div>
+            <div class="tour-photo"><img src={tour.img} alt={tour.title} width="800" height="520" loading="lazy" decoding="async" /></div>
             <div class="tour-meta">
               <span class="tour-date"><span class="dot"></span>{tour.date}</span>
               <h3 class="tour-title">{tour.title}</h3>

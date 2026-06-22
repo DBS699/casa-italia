@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin-demo
+
+Sitemap: https://casa-italia.vercel.app/sitemap-index.xml

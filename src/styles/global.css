@@ -332,6 +332,9 @@ a.tour-card:hover .tour-photo img { transform: scale(1.04); }
 }
 .site-footer .laurel { width: 200px; height: auto; margin-bottom: 18px; }
 .site-footer .motto { font-family: var(--serif); font-style: italic; font-size: 18px; color: #e9e5da; margin: 0; }
+.site-footer .socials { display: flex; gap: 12px; margin-top: 18px; }
+.site-footer .socials a { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 50%; color: #cfcabd; transition: color .2s ease, border-color .2s ease, background .2s ease; }
+.site-footer .socials a:hover { color: #fff; border-color: #fff; background: rgba(255, 255, 255, 0.06); }
 .site-footer h4 { font-family: var(--label); text-transform: uppercase; letter-spacing: 0.16em; font-size: 12px; font-weight: 600; color: #8f897b; margin: 0 0 14px; }
 .site-footer p { font-size: 15px; line-height: 1.7; color: #cfcabd; margin: 0; }
 .site-footer a { color: #cfcabd; text-decoration: none; transition: color .2s ease; }
