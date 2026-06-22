@@ -48,10 +48,14 @@ collections:
             widget: list
             summary: "{{fields.date}} — {{fields.title}}"
             fields:
-              - { name: date, label: "Datum", widget: string }
+              - { name: date, label: "Datum", widget: string, hint: "z. B. 04. Mai" }
               - { name: title, label: "Titel", widget: string }
-              - { name: url, label: "Link (optional, z. B. Komoot)", widget: string, required: false, default: "" }
               - { name: img, label: "Bild", widget: image }
+              - { name: description, label: "Beschreibung", widget: text, required: false, default: "" }
+              - { name: distance, label: "Distanz", widget: string, required: false, default: "" }
+              - { name: elevation, label: "Höhenmeter", widget: string, required: false, default: "" }
+              - { name: meet, label: "Treffpunkt", widget: string, required: false, default: "" }
+              - { name: url, label: "Routen-Link (optional, z. B. Komoot)", widget: string, required: false, default: "" }
 
   - name: committee
     label: "Komitee"

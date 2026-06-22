@@ -1,10 +1,64 @@
 {
   "tours": [
-    { "date": "12. April", "title": "Saison-Auftakt Aaretal", "url": "", "img": "/assets/tours/tour-2.jpg" },
-    { "date": "04. Mai", "title": "Gurnigel-Runde", "url": "", "img": "/assets/tours/tour-1.jpg" },
-    { "date": "08. Juni", "title": "Emmental-Tour", "url": "", "img": "/assets/tours/tour-6.jpg" },
-    { "date": "13. Juli", "title": "Drei-Seen-Fahrt", "url": "", "img": "/assets/tours/tour-4.jpg" },
-    { "date": "17. August", "title": "Gantrisch-Pass", "url": "", "img": "/assets/tours/tour-3.jpg" },
-    { "date": "14. September", "title": "Saison-Abschluss & Fest", "url": "", "img": "/assets/tours/tour-5.jpg" }
+    {
+      "date": "12. April",
+      "title": "Saison-Auftakt Aaretal",
+      "url": "",
+      "img": "/assets/tours/tour-2.jpg",
+      "description": "Lockerer Einstieg in die Saison: dem Lauf der Aare entlang ins Grüne, mit gemütlichem Kaffeehalt unterwegs. Ideal zum Reinkommen.",
+      "distance": "55 km",
+      "elevation": "650 hm",
+      "meet": "08:30 · Casa d'Italia"
+    },
+    {
+      "date": "04. Mai",
+      "title": "Gurnigel-Runde",
+      "url": "",
+      "img": "/assets/tours/tour-1.jpg",
+      "description": "Die erste Bergwertung des Jahres – die lange Rampe hoch zum Gurnigel, belohnt mit weitem Blick auf die Berner Alpen.",
+      "distance": "85 km",
+      "elevation": "1’400 hm",
+      "meet": "08:00 · Casa d'Italia"
+    },
+    {
+      "date": "08. Juni",
+      "title": "Emmental-Tour",
+      "url": "",
+      "img": "/assets/tours/tour-6.jpg",
+      "description": "Sanfte Hügel, Hofläden und frische Luft – die klassische Emmental-Schlaufe durch sattes Grün.",
+      "distance": "95 km",
+      "elevation": "1’100 hm",
+      "meet": "08:30 · Casa d'Italia"
+    },
+    {
+      "date": "13. Juli",
+      "title": "Drei-Seen-Fahrt",
+      "url": "",
+      "img": "/assets/tours/tour-4.jpg",
+      "description": "Flach und schnell rund um Bieler-, Murten- und Neuenburgersee, mit Badehalt bei sommerlichen Temperaturen.",
+      "distance": "120 km",
+      "elevation": "700 hm",
+      "meet": "07:30 · Casa d'Italia"
+    },
+    {
+      "date": "17. August",
+      "title": "Gantrisch-Pass",
+      "url": "",
+      "img": "/assets/tours/tour-3.jpg",
+      "description": "Die Königsetappe der Saison – die lange Steigung hinauf zum Gantrisch im gleichnamigen Naturpark.",
+      "distance": "110 km",
+      "elevation": "1’900 hm",
+      "meet": "07:30 · Casa d'Italia"
+    },
+    {
+      "date": "14. September",
+      "title": "Saison-Abschluss & Fest",
+      "url": "",
+      "img": "/assets/tours/tour-5.jpg",
+      "description": "Gemütliche Ausfahrt zum Saisonende, danach Apéro und Risotto bei der Casa d'Italia. Familien und Gäste willkommen.",
+      "distance": "45 km",
+      "elevation": "400 hm",
+      "meet": "10:00 · Casa d'Italia"
+    }
   ]
 }

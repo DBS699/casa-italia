@@ -27,56 +27,104 @@ const tours = TOURS.map((tour) => {
     </div>
 
     <div class="tour-track" role="list" tabindex="0" aria-label="Touren der Saison">
-      {tours.map((tour) => {
-        const Card = tour.url ? 'a' : 'div';
-        return (
-          <Card
-            class="tour-card"
-            role="listitem"
-            href={tour.url || undefined}
-            target={tour.url ? '_blank' : undefined}
-            rel={tour.url ? 'noopener' : undefined}
-          >
-            <div class="tour-photo">
-              <img src={tour.img} alt={tour.title} width="800" height="520" loading="lazy" decoding="async" />
-              <span class="tour-badge"><span class="d">{tour.day}</span><span class="m">{tour.monthLabel}</span></span>
-            </div>
-            <div class="tour-meta">
-              <h3 class="tour-title">{tour.title}</h3>
-              {tour.url && <span class="tour-link">Route ansehen <span class="arrow">→</span></span>}
-            </div>
-          </Card>
-        );
-      })}
+      {tours.map((tour) => (
+        <button
+          type="button"
+          class="tour-card"
+          role="listitem"
+          data-title={tour.title}
+          data-day={tour.day}
+          data-month={tour.monthLabel}
+          data-img={tour.img}
+          data-desc={tour.description ?? ''}
+          data-distance={tour.distance ?? ''}
+          data-elev={tour.elevation ?? ''}
+          data-meet={tour.meet ?? ''}
+          data-url={tour.url ?? ''}
+        >
+          <div class="tour-photo">
+            <img src={tour.img} alt={tour.title} width="800" height="520" loading="lazy" decoding="async" />
+            <span class="tour-badge"><span class="d">{tour.day}</span><span class="m">{tour.monthLabel}</span></span>
+          </div>
+          <div class="tour-meta">
+            <h3 class="tour-title">{tour.title}</h3>
+            <span class="tour-more">Details <span class="arrow">→</span></span>
+          </div>
+        </button>
+      ))}
     </div>
   </div>
+
+  <!-- Tour detail dialog (filled on click, zooms in) -->
+  <dialog class="tour-modal" aria-labelledby="tm-title">
+    <button class="tm-close" type="button" aria-label="Schliessen">×</button>
+    <div class="tm-photo">
+      <img alt="" />
+      <span class="tour-badge"><span class="d"></span><span class="m"></span></span>
+    </div>
+    <div class="modal-body">
+      <h3 id="tm-title" class="tm-title"></h3>
+      <p class="tm-desc"></p>
+      <div class="tm-facts">
+        <div><span class="k">Distanz</span><span class="v tm-distance"></span></div>
+        <div><span class="k">Höhenmeter</span><span class="v tm-elev"></span></div>
+        <div><span class="k">Treffpunkt</span><span class="v tm-meet"></span></div>
+      </div>
+      <a class="btn btn-green tm-route" target="_blank" rel="noopener" hidden>Route ansehen <span class="arrow" style="font-size:16px">→</span></a>
+    </div>
+  </dialog>
 </section>
 
 <script is:inline>
   (function () {
-    const track = document.querySelector('#touren .tour-track');
-    if (!track) return;
-    const arrows = document.querySelectorAll('#touren .season-arrow');
+    const root = document.querySelector('#touren');
+    if (!root) return;
+    const track = root.querySelector('.tour-track');
+    const dlg = root.querySelector('.tour-modal');
+
+    // ── carousel arrows ───────────────────────────────────
     const step = () => {
       const card = track.querySelector('.tour-card');
       return card ? card.getBoundingClientRect().width + 24 : 320;
     };
-    arrows.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        track.scrollBy({ left: step() * Number(btn.dataset.dir), behavior: 'smooth' });
-      });
-    });
-    // dim arrows at the track ends
-    const update = () => {
+    const arrows = root.querySelectorAll('.season-arrow');
+    arrows.forEach((btn) => btn.addEventListener('click', () =>
+      track.scrollBy({ left: step() * Number(btn.dataset.dir), behavior: 'smooth' })));
+    const updateArrows = () => {
       const max = track.scrollWidth - track.clientWidth - 2;
       arrows.forEach((b) => {
-        const dir = Number(b.dataset.dir);
-        const atEdge = dir < 0 ? track.scrollLeft <= 2 : track.scrollLeft >= max;
+        const atEdge = Number(b.dataset.dir) < 0 ? track.scrollLeft <= 2 : track.scrollLeft >= max;
         b.classList.toggle('is-disabled', atEdge || max <= 0);
       });
     };
-    track.addEventListener('scroll', update, { passive: true });
-    window.addEventListener('resize', update);
-    update();
+    track.addEventListener('scroll', updateArrows, { passive: true });
+    window.addEventListener('resize', updateArrows);
+    updateArrows();
+
+    // ── detail dialog ─────────────────────────────────────
+    const set = (sel, val) => { const el = dlg.querySelector(sel); if (el) el.textContent = val || ''; };
+    root.querySelectorAll('.tour-card').forEach((card) => {
+      card.addEventListener('click', () => {
+        const d = card.dataset;
+        const img = dlg.querySelector('.tm-photo img');
+        img.src = d.img; img.alt = d.title;
+        set('.tm-photo .tour-badge .d', d.day);
+        set('.tm-photo .tour-badge .m', d.month);
+        set('.tm-title', d.title);
+        set('.tm-desc', d.desc);
+        set('.tm-distance', d.distance);
+        set('.tm-elev', d.elev);
+        set('.tm-meet', d.meet);
+        const route = dlg.querySelector('.tm-route');
+        if (d.url) { route.href = d.url; route.hidden = false; } else { route.hidden = true; }
+        dlg.showModal();
+      });
+    });
+    dlg.querySelector('.tm-close').addEventListener('click', () => dlg.close());
+    // click on the backdrop (outside the dialog box) closes
+    dlg.addEventListener('click', (e) => {
+      const r = dlg.getBoundingClientRect();
+      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) dlg.close();
+    });
   })();
 </script>
