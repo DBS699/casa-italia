@@ -9,10 +9,10 @@ const DEFAULTS = {
   heroIntro: base.heroIntro,
   heroVideo: '/assets/hero.mp4',
   brochureUrl: '',
-  members: MEMBERS.map((m, i) => ({ name: m.name, role: base.roles[i], slot: m.slot, src: m.src })),
+  members: MEMBERS.map((m) => ({ name: m.name, role: m.role, slot: m.slot, src: m.src })),
   sponsors: SPONSORS.map((s) => ({ name: s.name, url: s.url, slot: s.slot, src: s.src })),
   gallery: [1, 2, 3, 4].map((i) => ({ slot: 'vcgal' + i, src: `/assets/gallery/gallery-${i}.jpg` })),
-  tours: TOURS.map((t) => ({ date: t.date, title: t.title, url: t.url, img: t.img })),
+  tours: TOURS.map((t) => ({ ...t })),
 };
 
 const TABS = [
@@ -359,12 +359,16 @@ const TABS = [
                 <label class="field">Bild</label>
                 <div class="slot rounded tour-slot"><span class="ph">Bild</span><input type="file" accept="image/*"></div>
               </div>
-              <div class="date"><label class="field">Datum</label><input class="txt" data-k="date" value=""></div>
+              <div class="date"><label class="field">Datum</label><input class="txt" data-k="date" placeholder="04. Mai" value=""></div>
               <div class="grow"><label class="field">Titel</label><input class="txt" data-k="title" value=""></div>
-              <div class="grow"><label class="field">Link</label><input class="txt" data-k="url" placeholder="https://…" value=""></div>
-              <button class="btn-del" type="button">Entfernen</button>`;
+              <button class="btn-del" type="button">Entfernen</button>
+              <div style="flex:1 0 100%"><label class="field">Beschreibung</label><textarea class="txt" data-k="description" rows="2"></textarea></div>
+              <div style="width:120px"><label class="field">Distanz</label><input class="txt" data-k="distance" placeholder="55 km" value=""></div>
+              <div style="width:130px"><label class="field">Höhenmeter</label><input class="txt" data-k="elevation" placeholder="650 hm" value=""></div>
+              <div class="grow"><label class="field">Treffpunkt</label><input class="txt" data-k="meet" placeholder="08:30 · Casa d'Italia" value=""></div>
+              <div class="grow"><label class="field">Routen-Link</label><input class="txt" data-k="url" placeholder="https://…" value=""></div>`;
             // text fields (exclude the file input)
-            row.querySelectorAll('input.txt').forEach((inp) => {
+            row.querySelectorAll('input.txt, textarea.txt').forEach((inp) => {
               const k = inp.getAttribute('data-k');
               inp.value = t[k] || '';
               inp.addEventListener('input', () => { content.tours[i][k] = inp.value; markDirty(); });
@@ -392,7 +396,8 @@ const TABS = [
           });
         }
         $('#addTour').addEventListener('click', () => {
-          content.tours.push({ date: '', title: '', url: '' }); markDirty(); renderTours();
+          content.tours.push({ date: '', title: '', img: '', description: '', distance: '', elevation: '', meet: '', url: '' });
+          markDirty(); renderTours();
         });
 
         // ── committee (dynamic list, add/remove) ──────────────
