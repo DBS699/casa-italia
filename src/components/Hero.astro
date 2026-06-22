@@ -5,9 +5,10 @@ const t = I18N[DEFAULT_LANG];
 
 <section id="hero" class="hero" aria-label="Intro">
   <!--
-    Background video. The poster shows immediately; the (~5 MB) video is only
-    fetched on larger screens when the visitor hasn't asked to reduce motion —
-    so phones / data-savers get the poster only. Replace /public/assets/hero.mp4
+    Background video. The poster shows instantly; the video is then loaded and
+    autoplayed (muted) — on desktop AND mobile. We only skip the fetch when the
+    visitor has data-saver on, is on a very slow (2G) connection, or asked to
+    reduce motion — those get the poster only. Replace /public/assets/hero.mp4
     (+ hero-poster.jpg) with the real club video anytime — filenames are fixed.
   -->
   <video class="hero-video" autoplay muted loop playsinline preload="none" poster={SITE.heroPoster} data-src={SITE.heroVideo}></video>
@@ -15,9 +16,10 @@ const t = I18N[DEFAULT_LANG];
     (function () {
       var v = document.querySelector('.hero-video');
       if (!v || !v.dataset.src) return;
-      var big = window.matchMedia('(min-width: 768px)').matches;
       var motionOk = window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
-      if (big && motionOk) {
+      var conn = navigator.connection || {};
+      var thrifty = conn.saveData === true || /(^|-)2g$/.test(conn.effectiveType || '');
+      if (motionOk && !thrifty) {
         var s = document.createElement('source');
         s.src = v.dataset.src; s.type = 'video/mp4';
         v.appendChild(s); v.load();
@@ -28,11 +30,6 @@ const t = I18N[DEFAULT_LANG];
   <div class="scrim"></div>
   <div class="inner">
     <img class="laurel" src="/assets/laurel-cut.png" alt="Velo Club Casa d'Italia – seit 1985" />
-    <div class="hero-kicker">
-      <span class="mini-tri"><span class="g"></span><span class="w"></span><span class="r"></span></span>
-      <span data-i18n="heroKicker">{t.heroKicker}</span>
-      <span class="mini-tri"><span class="g"></span><span class="w"></span><span class="r"></span></span>
-    </div>
     <h1>{SITE.heroMotto}</h1>
     <p class="hero-sub" data-i18n="heroSub">{t.heroSub}</p>
     <p class="hero-intro" data-i18n="heroIntro">{t.heroIntro}</p>

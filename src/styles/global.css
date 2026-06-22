@@ -241,6 +241,8 @@ section[id], footer[id] { scroll-margin-top: 98px; }
   display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: clamp(28px, 4vw, 40px) 24px; max-width: 920px; margin: 0 auto;
 }
+/* Phones: 2 compact columns instead of 9 stacked members. */
+@media (max-width: 560px) { .members { grid-template-columns: 1fr 1fr; gap: 26px 16px; } }
 .member { display: flex; flex-direction: column; align-items: center; text-align: center; }
 .member .photo {
   width: 128px; height: 128px; border-radius: 50%; background: var(--paper);
