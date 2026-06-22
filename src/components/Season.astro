@@ -1,30 +1,47 @@
 ---
 import { I18N, DEFAULT_LANG, TOURS } from '../data/content.js';
 const t = I18N[DEFAULT_LANG];
+
+// Split "04. Mai" → day "04", month "Mai" for the calendar-style date badge.
+const tours = TOURS.map((tour) => {
+  const m = String(tour.date).match(/^\s*(\d{1,2})\.?\s+(.+)$/);
+  return { ...tour, day: m ? m[1] : '', monthLabel: m ? m[2] : tour.date };
+});
 ---
 
 <section id="touren" class="section white bordered reveal season" aria-label="Touren / Saison">
   <div class="container">
-    <div class="kicker">
-      <span class="swatch"><span style="background:#1f7a43"></span><span style="background:#fff"></span><span style="background:#c0202a"></span></span>
-      <span data-i18n="seasonKicker">{t.seasonKicker}</span>
+    <div class="season-head">
+      <div>
+        <div class="kicker">
+          <span class="swatch"><span style="background:#1f7a43"></span><span style="background:#fff"></span><span style="background:#c0202a"></span></span>
+          <span data-i18n="seasonKicker">{t.seasonKicker}</span>
+        </div>
+        <h2 data-i18n="seasonTitle">{t.seasonTitle}</h2>
+        <p class="lead" data-i18n="seasonBody">{t.seasonBody}</p>
+      </div>
+      <div class="season-arrows" aria-hidden="true">
+        <button type="button" class="season-arrow" data-dir="-1" aria-label="Vorherige Touren">‹</button>
+        <button type="button" class="season-arrow" data-dir="1" aria-label="Weitere Touren">›</button>
+      </div>
     </div>
-    <h2 data-i18n="seasonTitle">{t.seasonTitle}</h2>
-    <p class="lead" data-i18n="seasonBody">{t.seasonBody}</p>
 
-    <div class="tours">
-      {TOURS.map((tour) => {
+    <div class="tour-track" role="list" tabindex="0" aria-label="Touren der Saison">
+      {tours.map((tour) => {
         const Card = tour.url ? 'a' : 'div';
         return (
           <Card
             class="tour-card"
+            role="listitem"
             href={tour.url || undefined}
             target={tour.url ? '_blank' : undefined}
             rel={tour.url ? 'noopener' : undefined}
           >
-            <div class="tour-photo"><img src={tour.img} alt={tour.title} width="800" height="520" loading="lazy" decoding="async" /></div>
+            <div class="tour-photo">
+              <img src={tour.img} alt={tour.title} width="800" height="520" loading="lazy" decoding="async" />
+              <span class="tour-badge"><span class="d">{tour.day}</span><span class="m">{tour.monthLabel}</span></span>
+            </div>
             <div class="tour-meta">
-              <span class="tour-date"><span class="dot"></span>{tour.date}</span>
               <h3 class="tour-title">{tour.title}</h3>
               {tour.url && <span class="tour-link">Route ansehen <span class="arrow">→</span></span>}
             </div>
@@ -34,3 +51,32 @@ const t = I18N[DEFAULT_LANG];
     </div>
   </div>
 </section>
+
+<script is:inline>
+  (function () {
+    const track = document.querySelector('#touren .tour-track');
+    if (!track) return;
+    const arrows = document.querySelectorAll('#touren .season-arrow');
+    const step = () => {
+      const card = track.querySelector('.tour-card');
+      return card ? card.getBoundingClientRect().width + 24 : 320;
+    };
+    arrows.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        track.scrollBy({ left: step() * Number(btn.dataset.dir), behavior: 'smooth' });
+      });
+    });
+    // dim arrows at the track ends
+    const update = () => {
+      const max = track.scrollWidth - track.clientWidth - 2;
+      arrows.forEach((b) => {
+        const dir = Number(b.dataset.dir);
+        const atEdge = dir < 0 ? track.scrollLeft <= 2 : track.scrollLeft >= max;
+        b.classList.toggle('is-disabled', atEdge || max <= 0);
+      });
+    };
+    track.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  })();
+</script>

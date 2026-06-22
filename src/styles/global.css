@@ -255,23 +255,52 @@ section[id], footer[id] { scroll-margin-top: 98px; }
 /* Season */
 .season h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(30px, 4.5vw, 46px); line-height: 1.08; margin: 0 0 16px; }
 .season .lead { max-width: 620px; font-size: 18px; line-height: 1.7; color: var(--ink-soft); margin: 0 0 36px; text-wrap: pretty; }
-.tours { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
+/* Season — horizontal scroll carousel of dated tour cards */
+.season-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 30px; }
+.season-head .lead { margin-bottom: 0; }
+.season-arrows { display: flex; gap: 10px; flex: none; }
+.season-arrow {
+  width: 46px; height: 46px; border-radius: 50%; cursor: pointer; flex: none;
+  background: #fff; border: 1px solid var(--line); color: var(--ink);
+  font-size: 22px; line-height: 1; display: flex; align-items: center; justify-content: center;
+  transition: border-color .2s ease, color .2s ease, opacity .2s ease;
+}
+.season-arrow:hover { border-color: var(--green); color: var(--green); }
+.season-arrow.is-disabled { opacity: 0.3; pointer-events: none; }
+
+.tour-track {
+  display: flex; gap: 24px; overflow-x: auto; scroll-snap-type: x mandatory;
+  scroll-behavior: smooth; -webkit-overflow-scrolling: touch;
+  padding: 4px 4px 8px; margin: 0 -4px; scrollbar-width: none;
+}
+.tour-track::-webkit-scrollbar { display: none; }
+.tour-track:focus-visible { outline: 2px solid var(--green); outline-offset: 4px; }
+
 .tour-card {
+  flex: 0 0 min(320px, 82vw); scroll-snap-align: start;
   display: flex; flex-direction: column; overflow: hidden;
   background: var(--card-warm); border: 1px solid var(--line); border-radius: 4px;
   text-decoration: none; color: inherit;
   transition: transform .2s ease, box-shadow .2s ease;
 }
 a.tour-card:hover { transform: translateY(-4px); box-shadow: 0 16px 36px rgba(27, 26, 22, 0.12); }
-.tour-photo { aspect-ratio: 3 / 2; overflow: hidden; background: var(--paper); }
+.tour-photo { position: relative; aspect-ratio: 3 / 2; overflow: hidden; background: var(--paper); }
 .tour-photo img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }
 a.tour-card:hover .tour-photo img { transform: scale(1.04); }
+.tour-badge {
+  position: absolute; top: 14px; left: 14px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-width: 54px; padding: 8px 10px; border-radius: 4px; line-height: 1;
+  background: rgba(255, 255, 255, 0.95); box-shadow: 0 4px 14px rgba(27, 26, 22, 0.18);
+}
+.tour-badge .d { font-family: var(--serif); font-size: 24px; color: var(--ink); }
+.tour-badge .m { font-family: var(--label); text-transform: uppercase; letter-spacing: 0.12em; font-size: 10px; font-weight: 600; color: var(--green); margin-top: 3px; }
 .tour-meta { padding: 18px 20px 22px; }
-.tour-date { display: inline-flex; align-items: center; gap: 8px; font-family: var(--label); text-transform: uppercase; letter-spacing: 0.14em; font-size: 12px; font-weight: 600; color: var(--green); }
-.tour-date .dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; }
-.tour-title { font-family: var(--serif); font-weight: 400; font-size: 23px; line-height: 1.15; margin: 10px 0 0; color: var(--ink); }
+.tour-title { font-family: var(--serif); font-weight: 400; font-size: 22px; line-height: 1.15; margin: 0; color: var(--ink); }
 .tour-link { display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; font-family: var(--label); text-transform: uppercase; letter-spacing: 0.1em; font-size: 13px; font-weight: 600; color: var(--green); }
 .tour-link .arrow { font-size: 16px; }
+
+@media (max-width: 640px) { .season-arrows { display: none; } }
 
 /* News */
 .news h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(28px, 4vw, 42px); line-height: 1.1; margin: 0 0 40px; }
