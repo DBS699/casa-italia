@@ -56,8 +56,8 @@ img { display: block; }
 /* ── Shared atoms ─────────────────────────────────────────────────────────── */
 .container { max-width: var(--container); margin: 0 auto; }
 
-/* Anchor targets clear the sticky header (≈70px) when reached via nav links. */
-section[id], footer[id] { scroll-margin-top: 84px; }
+/* Anchor targets clear the sticky header (≈86px) when reached via nav links. */
+section[id], footer[id] { scroll-margin-top: 98px; }
 
 .tricolore-bar { display: flex; height: 4px; width: 100%; }
 .tricolore-bar > span { flex: 1; }
@@ -109,11 +109,11 @@ section[id], footer[id] { scroll-margin-top: 84px; }
 }
 .site-header .bar {
   max-width: 1180px; margin: 0 auto; padding: 0 clamp(18px, 5vw, 32px);
-  min-height: 66px; display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  min-height: 82px; display: flex; align-items: center; justify-content: space-between; gap: 16px;
 }
 .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; flex: 0 0 auto; }
 .brand .emblem {
-  width: 42px; height: 42px; border-radius: 50%; background: #fff;
+  width: 50px; height: 50px; border-radius: 50%; background: #fff;
   border: 1px solid rgba(27, 26, 22, 0.14);
   display: flex; align-items: center; justify-content: center; overflow: hidden; flex: none;
 }
@@ -121,14 +121,14 @@ section[id], footer[id] { scroll-margin-top: 84px; }
 .brand .word { display: flex; flex-direction: column; line-height: 1; }
 .brand .word .pre {
   font-family: var(--label); text-transform: uppercase; letter-spacing: 0.2em;
-  font-size: 10px; font-weight: 600; color: var(--green);
+  font-size: 11px; font-weight: 600; color: var(--green);
 }
-.brand .word .name { font-family: var(--serif); font-size: 18px; margin-top: 3px; }
+.brand .word .name { font-family: var(--serif); font-size: 21px; margin-top: 3px; }
 
 .nav { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; justify-content: flex-end; }
 .nav a {
   font-family: var(--label); text-transform: uppercase; letter-spacing: 0.13em;
-  font-size: 14px; font-weight: 600; color: #3a3833; text-decoration: none;
+  font-size: 15px; font-weight: 600; color: #3a3833; text-decoration: none;
   transition: color .2s ease;
 }
 .nav a:hover { color: var(--green); }
