@@ -1,13 +1,11 @@
 {
   "members": [
-    { "name": "Luca Rossi", "role": "Präsident", "photo": "/assets/people/member-1.jpg" },
-    { "name": "Giovanni Santoro", "role": "Vize-Präsident", "photo": "/assets/people/member-2.jpg" },
-    { "name": "Marco Bianchi", "role": "Kassier", "photo": "/assets/people/member-3.jpg" },
-    { "name": "Antonio Conti", "role": "Sekretär", "photo": "/assets/people/member-4.jpg" },
-    { "name": "Franco Tedesco", "role": "Tourenchef", "photo": "/assets/people/member-5.jpg" },
-    { "name": "Diego Verdi", "role": "Eventchef", "photo": "/assets/people/member-6.jpg" },
-    { "name": "Paolo Marino", "role": "Materialwart", "photo": "/assets/people/member-7.jpg" },
-    { "name": "Salvatore Catania", "role": "Beisitzer", "photo": "/assets/people/member-8.jpg" },
-    { "name": "Roberto Neri", "role": "Revisor", "photo": "/assets/people/member-9.jpg" }
+    { "name": "Salvatore Schiavano", "role": "Präsident", "photo": "" },
+    { "name": "Marco Pavesi", "role": "Vizepräsident", "photo": "" },
+    { "name": "Pasquale Scafuri", "role": "Sportchef", "photo": "" },
+    { "name": "Maurizio Passani", "role": "Material", "photo": "" },
+    { "name": "Beatrice Frey", "role": "Sekretariat", "photo": "" },
+    { "name": "Beat Aeschlimann", "role": "Kassier", "photo": "" },
+    { "name": "Francesco De Luca", "role": "Beisitzer", "photo": "" }
   ]
 }

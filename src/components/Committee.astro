@@ -1,6 +1,12 @@
 ---
 import { I18N, DEFAULT_LANG, MEMBERS } from '../data/content.js';
 const t = I18N[DEFAULT_LANG];
+
+// First + last initial, e.g. "Salvatore Schiavano" → "SS" (placeholder until a real photo is uploaded).
+const initials = (name) => {
+  const p = String(name).trim().split(/\s+/);
+  return ((p[0]?.[0] || '') + (p.length > 1 ? p[p.length - 1][0] : '')).toUpperCase();
+};
 ---
 
 <section id="komitee" class="section white reveal" aria-label="Komitee">
@@ -16,7 +22,11 @@ const t = I18N[DEFAULT_LANG];
     <div class="members">
       {MEMBERS.map((m) => (
         <div class="member">
-          <span class="photo"><img id={m.slot} src={m.src} alt={m.name} width="128" height="128" loading="lazy" decoding="async" /></span>
+          <span class="photo">
+            {m.src
+              ? <img id={m.slot} src={m.src} alt={m.name} width="128" height="128" loading="lazy" decoding="async" />
+              : <span class="initials" id={m.slot} aria-hidden="true">{initials(m.name)}</span>}
+          </span>
           <span class="name">{m.name}</span>
           <span class="role">{m.role}</span>
         </div>
