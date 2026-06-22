@@ -1,0 +1,27 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import About from '../components/About.astro';
+import Committee from '../components/Committee.astro';
+import Season from '../components/Season.astro';
+import News from '../components/News.astro';
+import Gallery from '../components/Gallery.astro';
+import Sponsors from '../components/Sponsors.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Base>
+  <Header />
+  <main>
+    {/* HANDOFF order: Hero → Über den Club → Komitee → Touren/Saison → Aktuelles → Galerie → Sponsoren → Footer */}
+    <Hero />
+    <About />
+    <Committee />
+    <Season />
+    <News />
+    <Gallery />
+    <Sponsors />
+  </main>
+  <Footer />
+</Base>

@@ -1,0 +1,26 @@
+---
+import { I18N, DEFAULT_LANG, SPONSORS, CLUB } from '../data/content.js';
+const t = I18N[DEFAULT_LANG];
+---
+
+<section id="sponsoren" class="section paper reveal sponsors" aria-label="Sponsoren">
+  <div class="container">
+    <div class="kicker">
+      <span class="swatch"><span style="background:#1f7a43"></span><span style="background:#f6f2e9"></span><span style="background:#c0202a"></span></span>
+      <span data-i18n="sponsorsKicker">{t.sponsorsKicker}</span>
+    </div>
+    <h2 data-i18n="sponsorsTitle">{t.sponsorsTitle}</h2>
+    <p class="lead" data-i18n="sponsorsBody">{t.sponsorsBody}</p>
+    <div class="sponsor-grid">
+      {SPONSORS.map((s) => (
+        <div class="sponsor">
+          <span class="logo"><img id={s.slot} src={s.src} alt={s.name} loading="lazy" /></span>
+          <a href={s.url} target="_blank" rel="noopener">{s.name}</a>
+        </div>
+      ))}
+    </div>
+    <a class="btn btn-dark" href={`mailto:${CLUB.email}`}>
+      <span data-i18n="sponsorsCta">{t.sponsorsCta}</span> <span class="arrow" style="font-size:17px">→</span>
+    </a>
+  </div>
+</section>

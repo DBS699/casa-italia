@@ -1,0 +1,53 @@
+---
+import { I18N, DEFAULT_LANG, LANGS } from '../data/content.js';
+const t = I18N[DEFAULT_LANG];
+const nav = [
+  { key: 'komitee', href: '#komitee' },
+  { key: 'sponsoren', href: '#sponsoren' },
+  { key: 'touren', href: '#touren' },
+  { key: 'galerie', href: '#gallery' },
+  { key: 'mitglieder', href: '#mitglieder' },
+];
+---
+
+<header class="site-header" id="top">
+  <div class="tricolore-bar"><span class="g"></span><span class="w"></span><span class="r"></span></div>
+  <div class="bar">
+    <a href="#top" class="brand">
+      <span class="emblem"><img src="/assets/emblem.png" alt="Velo Club Casa d'Italia" /></span>
+      <span class="word">
+        <span class="pre">Velo-Club</span>
+        <span class="name">Casa d'Italia</span>
+      </span>
+    </a>
+
+    <nav class="nav only-desktop" aria-label="Hauptnavigation">
+      {nav.map((item) => (
+        <a href={item.href} data-i18n={`nav.${item.key}`}>{t.nav[item.key]}</a>
+      ))}
+      <span class="divider"></span>
+      <span class="langs">
+        {LANGS.map((l) => (
+          <button data-lang-btn={l.code} aria-current={l.code === DEFAULT_LANG ? 'true' : 'false'}>{l.label}</button>
+        ))}
+      </span>
+    </nav>
+
+    <button class="hamburger only-mobile" data-burger aria-label="Menü">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  <div class="mobile-panel">
+    <div class="links">
+      {nav.map((item) => (
+        <a href={item.href} data-i18n={`nav.${item.key}`}>{t.nav[item.key]}</a>
+      ))}
+    </div>
+    <div class="langs">
+      {LANGS.map((l) => (
+        <button data-lang-btn={l.code} aria-current={l.code === DEFAULT_LANG ? 'true' : 'false'}>{l.label}</button>
+      ))}
+    </div>
+  </div>
+</header>

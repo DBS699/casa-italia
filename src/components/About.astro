@@ -1,0 +1,28 @@
+---
+import { I18N, DEFAULT_LANG } from '../data/content.js';
+const t = I18N[DEFAULT_LANG];
+---
+
+<section id="club" class="section paper reveal" aria-label="Über den Club">
+  <div class="container about-grid">
+    <div>
+      <div class="kicker">
+        <span class="swatch"><span style="background:#1f7a43"></span><span style="background:#f6f2e9"></span><span style="background:#c0202a"></span></span>
+        <span data-i18n="aboutKicker">{t.aboutKicker}</span>
+      </div>
+      <h2 class="section-title" data-i18n="aboutTitle">{t.aboutTitle}</h2>
+    </div>
+    <div class="about-body">
+      <p data-i18n="aboutBody1">{t.aboutBody1}</p>
+      <p data-i18n="aboutBody2">{t.aboutBody2}</p>
+      <div class="stats">
+        {t.stat.map((s, i) => (
+          <div class="stat">
+            <span class="n" data-i18n={`stat.${i}.n`}>{s.n}</span>
+            <span class="l" data-i18n={`stat.${i}.l`}>{s.l}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>

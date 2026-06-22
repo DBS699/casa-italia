@@ -1,0 +1,25 @@
+---
+import { I18N, DEFAULT_LANG, NEWS_LINKS } from '../data/content.js';
+const t = I18N[DEFAULT_LANG];
+---
+
+<section id="mitglieder" class="section paper reveal news" aria-label="Aktuelles">
+  <div class="container">
+    <div class="kicker">
+      <span class="swatch"><span style="background:#1f7a43"></span><span style="background:#f6f2e9"></span><span style="background:#c0202a"></span></span>
+      <span data-i18n="newsKicker">{t.newsKicker}</span>
+    </div>
+    <h2 data-i18n="newsTitle">{t.newsTitle}</h2>
+    <div class="news-grid">
+      {t.cards.map((c, i) => (
+        <a class="news-card" href={NEWS_LINKS[c.n]}>
+          <span class="top-bar"><span class="g"></span><span class="w"></span><span class="r"></span></span>
+          <span class="num" data-i18n={`cards.${i}.n`}>{c.n}</span>
+          <h3 data-i18n={`cards.${i}.title`}>{c.title}</h3>
+          <p data-i18n={`cards.${i}.body`}>{c.body}</p>
+          <span class="cta"><span data-i18n={`cards.${i}.cta`}>{c.cta}</span> <span class="arrow">→</span></span>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>

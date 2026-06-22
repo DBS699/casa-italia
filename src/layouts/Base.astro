@@ -1,0 +1,76 @@
+---
+import '../styles/global.css';
+import { I18N, DEFAULT_LANG } from '../data/content.js';
+
+interface Props { title?: string; description?: string }
+const {
+  title = "Velo-Club Casa d'Italia Bern — Passione su due ruote",
+  description = "Velo-Club Casa d'Italia in Bern — seit 1968. Gemeinsame Ausfahrten, Touren und Freundschaft die ganze Saison.",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang={DEFAULT_LANG}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <link rel="icon" type="image/png" href="/assets/emblem.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Libre+Caslon+Display&family=Saira+Condensed:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <slot />
+
+    <!-- Live language switching (no reload), mirroring the original T-object behaviour. -->
+    <script is:inline define:vars={{ I18N, DEFAULT_LANG }}>
+      (function () {
+        const resolve = (obj, path) =>
+          path.split('.').reduce((o, k) => (o == null ? undefined : o[Array.isArray(o) ? Number(k) : k]), obj);
+
+        const STORE_KEY = 'vcci-lang';
+        const valid = Object.keys(I18N);
+        let lang = localStorage.getItem(STORE_KEY);
+        if (!valid.includes(lang)) lang = DEFAULT_LANG;
+
+        function apply(next) {
+          lang = next;
+          const dict = I18N[lang];
+          document.documentElement.lang = lang;
+          document.querySelectorAll('[data-i18n]').forEach((el) => {
+            const v = resolve(dict, el.getAttribute('data-i18n'));
+            if (typeof v === 'string') el.textContent = v;
+          });
+          document.querySelectorAll('[data-lang-btn]').forEach((b) => {
+            b.setAttribute('aria-current', b.getAttribute('data-lang-btn') === lang ? 'true' : 'false');
+          });
+          try { localStorage.setItem(STORE_KEY, lang); } catch (e) {}
+        }
+
+        document.querySelectorAll('[data-lang-btn]').forEach((b) => {
+          b.addEventListener('click', () => apply(b.getAttribute('data-lang-btn')));
+        });
+
+        // Mobile menu toggle (header gets .menu-open; CSS reveals the panel ≤820px).
+        const header = document.querySelector('.site-header');
+        const burger = document.querySelector('[data-burger]');
+        if (header && burger) {
+          burger.addEventListener('click', () => header.classList.toggle('menu-open'));
+          header.querySelectorAll('.mobile-panel a').forEach((a) =>
+            a.addEventListener('click', () => header.classList.remove('menu-open'))
+          );
+        }
+        // Close the mobile panel when crossing back to desktop width.
+        const mq = window.matchMedia('(min-width: 821px)');
+        mq.addEventListener('change', (e) => { if (e.matches && header) header.classList.remove('menu-open'); });
+
+        if (lang !== DEFAULT_LANG) apply(lang); else apply(DEFAULT_LANG);
+      })();
+    </script>
+  </body>
+</html>

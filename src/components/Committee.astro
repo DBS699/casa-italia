@@ -1,0 +1,26 @@
+---
+import { I18N, DEFAULT_LANG, MEMBERS } from '../data/content.js';
+const t = I18N[DEFAULT_LANG];
+---
+
+<section id="komitee" class="section white reveal" aria-label="Komitee">
+  <div class="container">
+    <div class="section-head">
+      <div class="kicker">
+        <span class="swatch"><span style="background:#1f7a43"></span><span style="background:#fff"></span><span style="background:#c0202a"></span></span>
+        <span data-i18n="komiteeKicker">{t.komiteeKicker}</span>
+      </div>
+      <h2 data-i18n="komiteeTitle">{t.komiteeTitle}</h2>
+      <p data-i18n="komiteeBody">{t.komiteeBody}</p>
+    </div>
+    <div class="members">
+      {MEMBERS.map((m) => (
+        <div class="member">
+          <span class="photo"><img id={m.slot} src={m.src} alt={m.name} loading="lazy" /></span>
+          <span class="name">{m.name}</span>
+          <span class="role">{m.role}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

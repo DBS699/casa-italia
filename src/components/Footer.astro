@@ -1,0 +1,41 @@
+---
+import { I18N, DEFAULT_LANG, CLUB } from '../data/content.js';
+const t = I18N[DEFAULT_LANG];
+const nav = [
+  { key: 'komitee', href: '#komitee' },
+  { key: 'sponsoren', href: '#sponsoren' },
+  { key: 'touren', href: '#touren' },
+  { key: 'galerie', href: '#gallery' },
+  { key: 'mitglieder', href: '#mitglieder' },
+];
+---
+
+<footer id="kontakt" class="site-footer" aria-label="Footer">
+  <div class="tricolore-bar"><span class="g"></span><span class="w"></span><span class="r"></span></div>
+  <div class="cols">
+    <div>
+      <img class="laurel" src="/assets/laurel.png" alt="Velo Club Casa d'Italia – seit 1985" />
+      <p class="motto">Passione su due ruote.</p>
+    </div>
+    <div>
+      <h4 data-i18n="footAddrLabel">{t.footAddrLabel}</h4>
+      <p>{CLUB.address.line1}<br />{CLUB.address.line2}<br />{CLUB.address.country}</p>
+    </div>
+    <div>
+      <h4 data-i18n="footMailLabel">{t.footMailLabel}</h4>
+      <a href={`mailto:${CLUB.email}`} style="word-break:break-word">{CLUB.email}</a>
+    </div>
+    <div>
+      <h4 data-i18n="footLinksLabel">{t.footLinksLabel}</h4>
+      <div class="links">
+        {nav.map((item) => (
+          <a href={item.href} data-i18n={`nav.${item.key}`}>{t.nav[item.key]}</a>
+        ))}
+      </div>
+    </div>
+  </div>
+  <div class="legal">
+    <span class="rights" data-i18n="footRights">{t.footRights}</span>
+    <span class="place">Bern · Schweiz<a href={CLUB.adminUrl}>Admin</a></span>
+  </div>
+</footer>

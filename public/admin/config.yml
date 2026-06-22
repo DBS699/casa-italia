@@ -1,0 +1,102 @@
+# Sveltia CMS configuration — Velo-Club Casa d'Italia
+# ─────────────────────────────────────────────────────────────────────────────
+# Edits made here are committed to the GitHub repo; Vercel rebuilds → live.
+# BEFORE THIS WORKS you must:
+#   1. set `repo:` below to your GitHub repo (owner/name)
+#   2. create a GitHub OAuth App and set GITHUB_CLIENT_ID / GITHUB_CLIENT_SECRET
+#      as environment variables in the Vercel project (see site/README.md)
+#   3. connect the repo to the Vercel project (git integration)
+
+backend:
+  name: github
+  repo: dbs699/casa-italia        # ← CHANGE to your GitHub owner/repo
+  branch: main
+  base_url: https://casa-italia.vercel.app   # OAuth handler lives here (api/auth)
+  auth_endpoint: /api/auth
+
+site_url: https://casa-italia.vercel.app
+display_url: https://casa-italia.vercel.app
+
+# Uploaded media is committed into the repo here and served from public_folder.
+media_folder: "public/assets/uploads"
+public_folder: "/assets/uploads"
+
+locale: de
+
+collections:
+  - name: hero
+    label: "Hero & Video"
+    files:
+      - name: site
+        label: "Hero & Video"
+        file: "src/data/site.json"
+        fields:
+          - { name: heroMotto, label: "Motto", widget: string }
+          - { name: heroVideo, label: "Hintergrund-Video (mp4)", widget: file }
+          - { name: heroPoster, label: "Video-Vorschaubild", widget: image }
+
+  - name: tours
+    label: "Touren"
+    files:
+      - name: tours
+        label: "Touren"
+        file: "src/data/tours.json"
+        fields:
+          - name: tours
+            label: "Touren"
+            label_singular: "Tour"
+            widget: list
+            summary: "{{fields.date}} — {{fields.title}}"
+            fields:
+              - { name: date, label: "Datum", widget: string }
+              - { name: title, label: "Titel", widget: string }
+              - { name: url, label: "Link (optional, z. B. Komoot)", widget: string, required: false, default: "" }
+              - { name: img, label: "Bild", widget: image }
+
+  - name: committee
+    label: "Komitee"
+    files:
+      - name: members
+        label: "Komitee"
+        file: "src/data/members.json"
+        fields:
+          - name: members
+            label: "Mitglieder"
+            label_singular: "Mitglied"
+            widget: list
+            summary: "{{fields.name}} — {{fields.role}}"
+            fields:
+              - { name: name, label: "Name", widget: string }
+              - { name: role, label: "Funktion", widget: string }
+              - { name: photo, label: "Foto", widget: image }
+
+  - name: sponsors
+    label: "Sponsoren"
+    files:
+      - name: sponsors
+        label: "Sponsoren"
+        file: "src/data/sponsors.json"
+        fields:
+          - name: sponsors
+            label: "Sponsoren"
+            label_singular: "Sponsor"
+            widget: list
+            summary: "{{fields.name}}"
+            fields:
+              - { name: name, label: "Name", widget: string }
+              - { name: url, label: "Webseite (Hyperlink)", widget: string }
+              - { name: logo, label: "Logo", widget: image }
+
+  - name: gallery
+    label: "Galerie"
+    files:
+      - name: gallery
+        label: "Galerie"
+        file: "src/data/gallery.json"
+        fields:
+          - name: images
+            label: "Bilder"
+            label_singular: "Bild"
+            widget: list
+            fields:
+              - { name: image, label: "Bild", widget: image }

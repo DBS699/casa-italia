@@ -1,0 +1,31 @@
+---
+import { I18N, DEFAULT_LANG, CLUB, SITE } from '../data/content.js';
+const t = I18N[DEFAULT_LANG];
+---
+
+<section id="hero" class="hero" aria-label="Intro">
+  <!--
+    Background video plays muted on load. Currently a free placeholder clip
+    (Mixkit Free License, cycling). Replace /public/assets/hero.mp4 (+ hero-poster.jpg)
+    with the real club video anytime — filenames are fixed.
+  -->
+  <video autoplay muted loop playsinline preload="auto" poster={SITE.heroPoster}>
+    <source src={SITE.heroVideo} type="video/mp4" />
+  </video>
+  <div class="scrim"></div>
+  <div class="inner">
+    <img class="laurel" src="/assets/laurel-cut.png" alt="Velo Club Casa d'Italia – seit 1985" />
+    <div class="hero-kicker">
+      <span class="mini-tri"><span class="g"></span><span class="w"></span><span class="r"></span></span>
+      <span data-i18n="heroKicker">{t.heroKicker}</span>
+      <span class="mini-tri"><span class="g"></span><span class="w"></span><span class="r"></span></span>
+    </div>
+    <h1>{SITE.heroMotto}</h1>
+    <p class="hero-sub" data-i18n="heroSub">{t.heroSub}</p>
+    <p class="hero-intro" data-i18n="heroIntro">{t.heroIntro}</p>
+    <div class="actions">
+      <a class="btn btn-green" href={`mailto:${CLUB.email}`} data-i18n="ctaJoin">{t.ctaJoin}</a>
+      <a class="btn btn-ghost-light" href="#touren" data-i18n="ctaSeason">{t.ctaSeason}</a>
+    </div>
+  </div>
+</section>

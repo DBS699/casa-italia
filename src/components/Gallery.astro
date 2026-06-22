@@ -1,0 +1,22 @@
+---
+import { I18N, DEFAULT_LANG, GALLERY } from '../data/content.js';
+const t = I18N[DEFAULT_LANG];
+---
+
+<section id="gallery" class="section white reveal" aria-label="Galerie">
+  <div class="container gallery-grid">
+    <div class="gallery-copy">
+      <div class="kicker">
+        <span class="swatch"><span style="background:#1f7a43"></span><span style="background:#fff"></span><span style="background:#c0202a"></span></span>
+        <span data-i18n="galleryKicker">{t.galleryKicker}</span>
+      </div>
+      <h2 data-i18n="galleryTitle">{t.galleryTitle}</h2>
+      <p data-i18n="galleryBody">{t.galleryBody}</p>
+    </div>
+    <div class="gallery-images">
+      {GALLERY.map((s) => (
+        <span class="frame"><img id={s.id} src={s.image} alt="" loading="lazy" /></span>
+      ))}
+    </div>
+  </div>
+</section>

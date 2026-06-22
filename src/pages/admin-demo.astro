@@ -1,0 +1,529 @@
+---
+import { I18N, DEFAULT_LANG, MEMBERS, SPONSORS, TOURS } from '../data/content.js';
+const base = I18N[DEFAULT_LANG];
+
+// Defaults reflect the CURRENT live content so the admin opens pre-filled.
+const DEFAULTS = {
+  heroMotto: 'Passione su due ruote.',
+  heroSub: base.heroSub,
+  heroIntro: base.heroIntro,
+  heroVideo: '/assets/hero.mp4',
+  brochureUrl: '',
+  members: MEMBERS.map((m, i) => ({ name: m.name, role: base.roles[i], slot: m.slot, src: m.src })),
+  sponsors: SPONSORS.map((s) => ({ name: s.name, url: s.url, slot: s.slot, src: s.src })),
+  gallery: [1, 2, 3, 4].map((i) => ({ slot: 'vcgal' + i, src: `/assets/gallery/gallery-${i}.jpg` })),
+  tours: TOURS.map((t) => ({ date: t.date, title: t.title, url: t.url, img: t.img })),
+};
+
+const TABS = [
+  ['hero', 'Hero & Video'],
+  ['komitee', 'Komitee'],
+  ['sponsoren', 'Sponsoren'],
+  ['touren', 'Touren'],
+  ['galerie', 'Galerie'],
+  ['broschuere', 'Broschüre'],
+];
+---
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Admin — Velo-Club Casa d'Italia</title>
+    <link rel="icon" type="image/png" href="/assets/emblem.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Libre+Caslon+Display&family=Saira+Condensed:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style is:global>
+      :root {
+        --ink: #1b1a16; --ink-soft: #57544c; --ink-light: #8a857a;
+        --green: #1f7a43; --green-hover: #19632f; --red: #c0202a;
+        --line: rgba(27, 26, 22, 0.12);
+        --serif: 'Libre Caslon Display', Georgia, serif;
+        --label: 'Saira Condensed', sans-serif;
+        --body: 'Archivo', system-ui, sans-serif;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; font-family: var(--body); color: var(--ink); background: #f1ede4; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+      ::selection { background: var(--green); color: #fff; }
+      input:focus, textarea:focus { outline: none; border-color: var(--green) !important; box-shadow: 0 0 0 3px rgba(31, 122, 67, 0.12); }
+      .tri { display: flex; height: 4px; width: 100%; }
+      .tri span { flex: 1; }
+      .tri .g { background: var(--green); } .tri .w { background: #f3efe6; } .tri .r { background: var(--red); }
+
+      /* Login */
+      .login-wrap { min-height: calc(100vh - 4px); display: flex; align-items: center; justify-content: center; padding: 24px; }
+      .login-card { width: 100%; max-width: 392px; background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 42px 36px; text-align: center; box-shadow: 0 22px 60px rgba(27, 26, 22, 0.12); }
+      .login-card img { width: 74px; height: 74px; object-fit: contain; margin: 0 auto 18px; display: block; }
+      .login-card .kicker { font-family: var(--label); text-transform: uppercase; letter-spacing: 0.22em; font-size: 12px; font-weight: 600; color: var(--green); margin-bottom: 6px; }
+      .login-card h1 { font-family: var(--serif); font-weight: 400; font-size: 26px; margin: 0 0 22px; }
+      .login-card input { width: 100%; padding: 13px 14px; border: 1px solid rgba(27, 26, 22, 0.18); border-radius: 5px; font-family: var(--body); font-size: 15px; text-align: center; }
+      .login-card .err { color: var(--red); font-size: 13px; margin: 10px 0 0; }
+      .login-card .note { font-size: 12.5px; line-height: 1.6; color: var(--ink-light); margin: 18px 0 0; }
+      .btn-primary { width: 100%; margin-top: 16px; background: var(--green); color: #fff; border: 1px solid var(--green); padding: 14px; border-radius: 5px; font-family: var(--label); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; font-size: 15px; cursor: pointer; transition: background .2s ease; }
+      .btn-primary:hover { background: var(--green-hover); }
+
+      /* Editor */
+      [hidden] { display: none !important; }
+      header.admin { position: sticky; top: 0; z-index: 50; background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(27, 26, 22, 0.1); }
+      header.admin .top { max-width: 1080px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 28px); min-height: 62px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+      header.admin .brand { display: flex; align-items: center; gap: 11px; flex: none; }
+      header.admin .brand img { width: 38px; height: 38px; object-fit: contain; }
+      header.admin .brand .name { font-family: var(--serif); font-size: 17px; }
+      header.admin .brand .sub { font-family: var(--label); text-transform: uppercase; letter-spacing: 0.16em; font-size: 10px; font-weight: 600; color: var(--green); }
+      header.admin .actions { display: flex; align-items: center; gap: 10px; }
+      .saved-tag { display: inline-flex; align-items: center; gap: 6px; font-family: var(--label); text-transform: uppercase; letter-spacing: 0.1em; font-size: 12px; font-weight: 600; color: var(--green); }
+      .link-btn { font-family: var(--label); text-transform: uppercase; letter-spacing: 0.1em; font-size: 13px; font-weight: 600; color: #3a3833; text-decoration: none; padding: 9px 12px; }
+      .link-btn:hover { color: var(--green); }
+      .btn-save { background: var(--green); color: #fff; border: 1px solid var(--green); padding: 10px 20px; border-radius: 4px; font-family: var(--label); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; font-size: 13px; cursor: pointer; transition: background .2s ease; }
+      .btn-save:hover { background: var(--green-hover); }
+      .btn-ghost { background: transparent; color: #6b675e; border: 1px solid rgba(27, 26, 22, 0.2); padding: 10px 14px; border-radius: 4px; font-family: var(--label); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; font-size: 13px; cursor: pointer; }
+      .btn-ghost:hover { border-color: var(--ink); color: var(--ink); }
+      .tabbar { max-width: 1080px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 28px); border-top: 1px solid rgba(27, 26, 22, 0.07); display: flex; overflow-x: auto; }
+      .tabbar button { appearance: none; cursor: pointer; border: none; background: transparent; padding: 14px 2px; margin-right: 24px; white-space: nowrap; font-family: var(--label); text-transform: uppercase; letter-spacing: 0.1em; font-size: 14px; font-weight: 600; color: #6b675e; border-bottom: 2px solid transparent; }
+      .tabbar button[aria-selected='true'] { color: var(--green); border-bottom-color: var(--green); }
+
+      main.admin { max-width: 1080px; margin: 0 auto; padding: clamp(20px, 4vw, 34px) clamp(16px, 4vw, 28px) 80px; }
+      .info { display: flex; gap: 12px; align-items: flex-start; background: #fbf7ee; border: 1px solid rgba(31, 122, 67, 0.25); border-radius: 6px; padding: 14px 16px; margin-bottom: 26px; }
+      .info .i { color: var(--green); font-size: 18px; line-height: 1.3; }
+      .info p { margin: 0; font-size: 13.5px; line-height: 1.6; color: var(--ink-soft); }
+      .panel { background: #fff; border: 1px solid rgba(27, 26, 22, 0.1); border-radius: 8px; padding: clamp(22px, 4vw, 34px); }
+      .panel h2 { font-family: var(--serif); font-weight: 400; font-size: 24px; margin: 0 0 4px; }
+      .panel > p.hint { font-size: 14px; color: var(--ink-light); margin: 0 0 26px; }
+      label.field { display: block; font-family: var(--label); text-transform: uppercase; letter-spacing: 0.12em; font-size: 11px; font-weight: 600; color: var(--ink-light); margin: 0 0 6px; }
+      input.txt, textarea.txt { width: 100%; padding: 11px 13px; border: 1px solid rgba(27, 26, 22, 0.18); border-radius: 4px; font-family: var(--body); font-size: 15px; color: var(--ink); background: #fff; }
+      textarea.txt { line-height: 1.6; resize: vertical; }
+      .mb { margin-bottom: 18px; }
+      .tip { font-size: 13px; color: var(--ink-light); margin: 8px 0 0; }
+
+      .row { display: flex; align-items: center; gap: 16px; padding: 14px; border: 1px solid rgba(27, 26, 22, 0.1); border-radius: 6px; background: #fcfaf5; flex-wrap: wrap; }
+      .row .grow { flex: 1; min-width: 160px; }
+      .row label.field { font-size: 10px; margin-bottom: 5px; }
+      .row input.txt { padding: 9px 12px; font-size: 14px; }
+      .stack { display: flex; flex-direction: column; gap: 16px; }
+
+      /* image slot */
+      .slot { position: relative; overflow: hidden; cursor: pointer; background: #fff center/cover no-repeat; border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; }
+      .slot.circle { border-radius: 50%; }
+      .slot.rounded { border-radius: 4px; }
+      .slot .ph { font-family: var(--label); text-transform: uppercase; letter-spacing: 0.1em; font-size: 10px; font-weight: 600; color: #b4afa3; text-align: center; padding: 4px; }
+      .slot.has-img .ph { display: none; }
+      .slot.drag { border-color: var(--green); box-shadow: 0 0 0 3px rgba(31, 122, 67, 0.15); }
+      .slot input[type='file'] { display: none; }
+
+      .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; }
+      .btn-add { margin-top: 18px; background: transparent; border: 1px dashed rgba(27, 26, 22, 0.3); color: var(--ink); padding: 12px 20px; border-radius: 5px; font-family: var(--label); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; font-size: 13px; cursor: pointer; }
+      .btn-add:hover { border-color: var(--green); color: var(--green); }
+      .btn-del { background: transparent; border: 1px solid rgba(192, 32, 42, 0.35); color: var(--red); padding: 9px 13px; border-radius: 4px; font-family: var(--label); text-transform: uppercase; letter-spacing: 0.08em; font-size: 12px; font-weight: 600; cursor: pointer; align-self: flex-end; }
+      .btn-del:hover { background: var(--red); color: #fff; border-color: var(--red); }
+      .tour-row { align-items: flex-end; }
+      .tour-row .date { width: 120px; } .tour-row .grow { min-width: 150px; }
+      .tour-img { flex: none; }
+      .tour-slot { width: 84px; height: 56px; }
+
+      /* file upload (Broschüre) */
+      .upload { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; border: 1px dashed rgba(27, 26, 22, 0.28); border-radius: 6px; padding: 16px; background: #fcfaf5; }
+      .upload.drag { border-color: var(--green); background: #f4faf6; box-shadow: 0 0 0 3px rgba(31, 122, 67, 0.12); }
+      .btn-upload { background: var(--green); color: #fff; border: 1px solid var(--green); padding: 10px 18px; border-radius: 5px; font-family: var(--label); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; font-size: 13px; cursor: pointer; transition: background .2s ease; }
+      .btn-upload:hover { background: var(--green-hover); }
+      .upload-name { font-size: 14px; color: var(--ink-light); word-break: break-all; }
+      .btn-clear { margin-left: auto; background: transparent; border: 1px solid rgba(192, 32, 42, 0.35); color: var(--red); padding: 8px 12px; border-radius: 4px; font-family: var(--label); text-transform: uppercase; letter-spacing: 0.08em; font-size: 12px; font-weight: 600; cursor: pointer; }
+      .btn-clear:hover { background: var(--red); color: #fff; border-color: var(--red); }
+      .video-preview { display: block; width: 100%; max-width: 380px; margin-top: 14px; border-radius: 6px; border: 1px solid var(--line); background: #000; }
+    </style>
+  </head>
+  <body>
+    <div class="tri"><span class="g"></span><span class="w"></span><span class="r"></span></div>
+
+    <!-- ── Login ──────────────────────────────────────────────── -->
+    <div id="login" class="login-wrap">
+      <div class="login-card">
+        <img src="/assets/emblem.png" alt="Velo Club Casa d'Italia" />
+        <div class="kicker">Admin-Bereich</div>
+        <h1>Velo-Club Casa d'Italia</h1>
+        <input id="pass" type="password" placeholder="Passwort" autocomplete="current-password" />
+        <p id="err" class="err" hidden></p>
+        <button id="loginBtn" class="btn-primary">Anmelden</button>
+        <p class="note">Demo-Login: beliebiges Passwort eingeben. Die echte Zugangskontrolle kommt beim Deploy dazu (siehe README).</p>
+      </div>
+    </div>
+
+    <!-- ── Editor ─────────────────────────────────────────────── -->
+    <div id="editor" hidden>
+      <header class="admin">
+        <div class="top">
+          <div class="brand">
+            <img src="/assets/emblem.png" alt="" />
+            <span style="display:flex;flex-direction:column;line-height:1.15">
+              <span class="name">Casa d'Italia</span>
+              <span class="sub">Admin</span>
+            </span>
+          </div>
+          <div class="actions">
+            <span id="savedTag" class="saved-tag" hidden>✓ Gespeichert</span>
+            <a class="link-btn" href="/" target="_blank" rel="noopener">Vorschau</a>
+            <button id="saveBtn" class="btn-save">Speichern</button>
+            <button id="logoutBtn" class="btn-ghost">Abmelden</button>
+          </div>
+        </div>
+        <div class="tabbar" role="tablist">
+          {TABS.map(([k, label], i) => (
+            <button data-tab={k} role="tab" aria-selected={i === 0 ? 'true' : 'false'}>{label}</button>
+          ))}
+        </div>
+      </header>
+
+      <main class="admin">
+        <div class="info">
+          <span class="i">ⓘ</span>
+          <p>Prototyp: Änderungen werden lokal in diesem Browser gespeichert (kein Server). Für echte Live-Schaltung mit Login → siehe README (Git-CMS / Variante A).</p>
+        </div>
+
+        <!-- Hero -->
+        <section class="panel" data-panel="hero">
+          <h2>Hero &amp; Video</h2>
+          <p class="hint">Der grosse Bereich zuoberst auf der Startseite.</p>
+          <label class="field">Motto</label>
+          <input class="txt mb" data-field="heroMotto" />
+          <label class="field">Untertitel</label>
+          <input class="txt mb" data-field="heroSub" />
+          <label class="field">Einleitungstext</label>
+          <textarea class="txt mb" rows="3" data-field="heroIntro"></textarea>
+          <label class="field">Hintergrund-Video hochladen</label>
+          <div class="upload" id="videoDrop">
+            <input type="file" id="videoInput" accept="video/*" hidden />
+            <button type="button" class="btn-upload" id="videoPick">Video auswählen</button>
+            <span class="upload-name" id="videoName">Keine Datei gewählt – oder hierher ziehen</span>
+            <button type="button" class="btn-clear" id="videoClear" hidden>Entfernen</button>
+          </div>
+          <video id="videoPreview" class="video-preview" muted loop playsinline hidden></video>
+          <label class="field" style="margin-top:20px">…oder Video-URL / Projekt-Asset</label>
+          <input class="txt" data-field="heroVideo" placeholder="https://… oder /assets/hero.mp4" />
+          <p class="tip">Kurzes, stummes Loop-Video wirkt am besten. Prototyp: sehr grosse Videos passen nicht in den lokalen Browser-Speicher – fürs echte Einbinden ersetzt du <code>/assets/hero.mp4</code> im Projekt oder hinterlegst eine URL.</p>
+        </section>
+
+        <!-- Komitee -->
+        <section class="panel" data-panel="komitee" hidden>
+          <h2>Komitee</h2>
+          <p class="hint">Foto per Drag &amp; Drop, Name und Funktion eintragen.</p>
+          <div class="stack">
+            {DEFAULTS.members.map((m, i) => (
+              <div class="row">
+                <div class="slot circle has-img" data-slot={m.slot} style={`width:64px;height:64px;flex:none;background-image:url('${m.src}')`}>
+                  <span class="ph">Foto</span>
+                  <input type="file" accept="image/*" />
+                </div>
+                <div class="grow">
+                  <label class="field">Name</label>
+                  <input class="txt" data-field={`members.${i}.name`} />
+                </div>
+                <div class="grow">
+                  <label class="field">Funktion</label>
+                  <input class="txt" data-field={`members.${i}.role`} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <!-- Sponsoren -->
+        <section class="panel" data-panel="sponsoren" hidden>
+          <h2>Sponsoren</h2>
+          <p class="hint">Logo hochladen, Name und Webseite (Hyperlink) eintragen. Auf der Website öffnet ein Klick auf den Namen den Link.</p>
+          <div class="stack">
+            {DEFAULTS.sponsors.map((s, i) => (
+              <div class="row">
+                <div class="slot rounded has-img" data-slot={s.slot} style={`width:110px;height:60px;flex:none;background-image:url('${s.src}')`}>
+                  <span class="ph">Logo</span>
+                  <input type="file" accept="image/*" />
+                </div>
+                <div class="grow">
+                  <label class="field">Name</label>
+                  <input class="txt" data-field={`sponsors.${i}.name`} />
+                </div>
+                <div class="grow" style="flex:1.4;min-width:180px">
+                  <label class="field">Webseite (Hyperlink)</label>
+                  <input class="txt" data-field={`sponsors.${i}.url`} placeholder="https://…" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <!-- Touren -->
+        <section class="panel" data-panel="touren" hidden>
+          <h2>Touren</h2>
+          <p class="hint">Datum, Titel und optional ein Link (z.&nbsp;B. Komoot/Strava).</p>
+          <div class="stack" id="toursList"></div>
+          <button class="btn-add" id="addTour">+ Tour hinzufügen</button>
+        </section>
+
+        <!-- Galerie -->
+        <section class="panel" data-panel="galerie" hidden>
+          <h2>Galerie</h2>
+          <p class="hint">Bilder per Drag &amp; Drop in die Felder ziehen.</p>
+          <div class="gallery-grid">
+            {DEFAULTS.gallery.map((g) => (
+              <div class="slot rounded has-img" data-slot={g.slot} style={`width:100%;height:150px;background-image:url('${g.src}')`}>
+                <span class="ph">Bild ablegen</span>
+                <input type="file" accept="image/*" />
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <!-- Broschüre -->
+        <section class="panel" data-panel="broschuere" hidden>
+          <h2>Broschüre</h2>
+          <p class="hint">PDF vom Computer hochladen – oder einen Link zu einem extern gehosteten PDF eintragen.</p>
+          <label class="field">PDF hochladen</label>
+          <div class="upload" id="brochureDrop">
+            <input type="file" id="brochureInput" accept="application/pdf,.pdf" hidden />
+            <button type="button" class="btn-upload" id="brochurePick">PDF auswählen</button>
+            <span class="upload-name" id="brochureName">Keine Datei gewählt – oder hierher ziehen</span>
+            <button type="button" class="btn-clear" id="brochureClear" hidden>Entfernen</button>
+          </div>
+          <label class="field" style="margin-top:20px">…oder PDF-Link (extern gehostet)</label>
+          <input class="txt" data-field="brochureUrl" placeholder="https://…/broschuere-2025.pdf" />
+          <p class="tip">Prototyp: Die Datei wird lokal im Browser gespeichert. Sehr grosse PDFs (&gt; ~4&nbsp;MB) passen evtl. nicht in den lokalen Speicher – fürs echte Hosting kommt die Mediathek mit dem Backend.</p>
+        </section>
+      </main>
+    </div>
+
+    <script is:inline define:vars={{ DEFAULTS }}>
+      (function () {
+        const ADMIN_KEY = 'vcc_admin';
+        const CONTENT_KEY = 'vcc_content';
+        const $ = (s, r = document) => r.querySelector(s);
+        const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+        // deep clone defaults, then merge any saved content
+        let content = JSON.parse(JSON.stringify(DEFAULTS));
+        try {
+          const saved = JSON.parse(localStorage.getItem(CONTENT_KEY) || 'null');
+          if (saved) content = Object.assign(content, saved);
+        } catch (e) {}
+        if (!content.images) content.images = {};
+
+        // ── path helpers ──────────────────────────────────────
+        const getPath = (obj, path) =>
+          path.split('.').reduce((o, k) => (o == null ? undefined : o[Array.isArray(o) ? Number(k) : k]), obj);
+        const setPath = (obj, path, val) => {
+          const keys = path.split('.');
+          let o = obj;
+          for (let i = 0; i < keys.length - 1; i++) {
+            const k = Array.isArray(o) ? Number(keys[i]) : keys[i];
+            o = o[k];
+          }
+          o[Array.isArray(o) ? Number(keys.at(-1)) : keys.at(-1)] = val;
+        };
+
+        let dirty = false;
+        const markDirty = () => { dirty = true; $('#savedTag').hidden = true; };
+
+        // ── bind text fields ──────────────────────────────────
+        function bindFields() {
+          $$('[data-field]').forEach((el) => {
+            const path = el.getAttribute('data-field');
+            const v = getPath(content, path);
+            if (v != null) el.value = v;
+            el.addEventListener('input', () => { setPath(content, path, el.value); markDirty(); });
+          });
+        }
+
+        // ── image slots (local preview only) ──────────────────
+        function applyImage(slotEl, dataUrl) {
+          slotEl.style.backgroundImage = `url('${dataUrl}')`;
+          slotEl.classList.add('has-img');
+        }
+        function bindSlots() {
+          $$('.slot[data-slot]').forEach((slot) => {
+            const id = slot.getAttribute('data-slot');
+            if (content.images[id]) applyImage(slot, content.images[id]);
+            const input = $('input[type=file]', slot);
+            const read = (file) => {
+              if (!file || !file.type.startsWith('image/')) return;
+              const fr = new FileReader();
+              fr.onload = () => { content.images[id] = fr.result; applyImage(slot, fr.result); markDirty(); };
+              fr.readAsDataURL(file);
+            };
+            slot.addEventListener('click', () => input.click());
+            input.addEventListener('change', (e) => read(e.target.files[0]));
+            ['dragenter', 'dragover'].forEach((ev) => slot.addEventListener(ev, (e) => { e.preventDefault(); slot.classList.add('drag'); }));
+            ['dragleave', 'drop'].forEach((ev) => slot.addEventListener(ev, (e) => { e.preventDefault(); slot.classList.remove('drag'); }));
+            slot.addEventListener('drop', (e) => read(e.dataTransfer.files[0]));
+          });
+        }
+
+        // ── tours (dynamic list) ──────────────────────────────
+        function renderTours() {
+          const list = $('#toursList');
+          list.innerHTML = '';
+          content.tours.forEach((t, i) => {
+            const row = document.createElement('div');
+            row.className = 'row tour-row';
+            row.innerHTML = `
+              <div class="tour-img">
+                <label class="field">Bild</label>
+                <div class="slot rounded tour-slot"><span class="ph">Bild</span><input type="file" accept="image/*"></div>
+              </div>
+              <div class="date"><label class="field">Datum</label><input class="txt" data-k="date" value=""></div>
+              <div class="grow"><label class="field">Titel</label><input class="txt" data-k="title" value=""></div>
+              <div class="grow"><label class="field">Link</label><input class="txt" data-k="url" placeholder="https://…" value=""></div>
+              <button class="btn-del" type="button">Entfernen</button>`;
+            // text fields (exclude the file input)
+            row.querySelectorAll('input.txt').forEach((inp) => {
+              const k = inp.getAttribute('data-k');
+              inp.value = t[k] || '';
+              inp.addEventListener('input', () => { content.tours[i][k] = inp.value; markDirty(); });
+            });
+            // image slot — stored on the tour object so it follows add/remove
+            const slot = row.querySelector('.tour-slot');
+            const fileInput = slot.querySelector('input[type=file]');
+            if (t.img) { slot.style.backgroundImage = `url('${t.img}')`; slot.classList.add('has-img'); }
+            const readImg = (file) => {
+              if (!file || !file.type.startsWith('image/')) return;
+              const fr = new FileReader();
+              fr.onload = () => { content.tours[i].img = fr.result; slot.style.backgroundImage = `url('${fr.result}')`; slot.classList.add('has-img'); markDirty(); };
+              fr.readAsDataURL(file);
+            };
+            slot.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', (e) => readImg(e.target.files[0]));
+            ['dragenter', 'dragover'].forEach((ev) => slot.addEventListener(ev, (e) => { e.preventDefault(); slot.classList.add('drag'); }));
+            ['dragleave', 'drop'].forEach((ev) => slot.addEventListener(ev, (e) => { e.preventDefault(); slot.classList.remove('drag'); }));
+            slot.addEventListener('drop', (e) => readImg(e.dataTransfer.files[0]));
+            // delete
+            row.querySelector('.btn-del').addEventListener('click', () => {
+              content.tours.splice(i, 1); markDirty(); renderTours();
+            });
+            list.appendChild(row);
+          });
+        }
+        $('#addTour').addEventListener('click', () => {
+          content.tours.push({ date: '', title: '', url: '' }); markDirty(); renderTours();
+        });
+
+        // ── tabs ──────────────────────────────────────────────
+        $$('.tabbar button').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const tab = btn.getAttribute('data-tab');
+            $$('.tabbar button').forEach((b) => b.setAttribute('aria-selected', b === btn ? 'true' : 'false'));
+            $$('[data-panel]').forEach((p) => { p.hidden = p.getAttribute('data-panel') !== tab; });
+          });
+        });
+
+        // ── Broschüre PDF upload (local, prototype) ───────────
+        function bindBrochure() {
+          const drop = $('#brochureDrop'), input = $('#brochureInput'), pick = $('#brochurePick');
+          const nameEl = $('#brochureName'), clearBtn = $('#brochureClear');
+          const showName = () => {
+            const f = content.brochureFile;
+            if (f && f.name) {
+              nameEl.textContent = f.name; nameEl.style.color = '#1b1a16'; clearBtn.hidden = false;
+            } else {
+              nameEl.textContent = 'Keine Datei gewählt – oder hierher ziehen'; nameEl.style.color = ''; clearBtn.hidden = true;
+            }
+          };
+          const read = (file) => {
+            if (!file) return;
+            if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) { alert('Bitte eine PDF-Datei wählen.'); return; }
+            const fr = new FileReader();
+            fr.onload = () => { content.brochureFile = { name: file.name, data: fr.result }; showName(); markDirty(); };
+            fr.readAsDataURL(file);
+          };
+          pick.addEventListener('click', () => input.click());
+          input.addEventListener('change', (e) => read(e.target.files[0]));
+          clearBtn.addEventListener('click', () => { content.brochureFile = null; input.value = ''; showName(); markDirty(); });
+          ['dragenter', 'dragover'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add('drag'); }));
+          ['dragleave', 'drop'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove('drag'); }));
+          drop.addEventListener('drop', (e) => read(e.dataTransfer.files[0]));
+          showName();
+        }
+
+        // ── Hero background video upload (local, prototype) ───
+        function bindVideo() {
+          const drop = $('#videoDrop'), input = $('#videoInput'), pick = $('#videoPick');
+          const nameEl = $('#videoName'), clearBtn = $('#videoClear'), preview = $('#videoPreview');
+          let objUrl = null;
+          const showName = () => {
+            const f = content.heroVideoFile;
+            if (f && f.name) { nameEl.textContent = f.name; nameEl.style.color = '#1b1a16'; clearBtn.hidden = false; }
+            else { nameEl.textContent = 'Keine Datei gewählt – oder hierher ziehen'; nameEl.style.color = ''; clearBtn.hidden = true; }
+          };
+          const setPreview = (src) => {
+            if (src) { preview.src = src; preview.hidden = false; preview.play().catch(() => {}); }
+            else { preview.removeAttribute('src'); preview.load(); preview.hidden = true; }
+          };
+          const read = (file) => {
+            if (!file) return;
+            if (!file.type.startsWith('video/')) { alert('Bitte eine Videodatei wählen.'); return; }
+            if (objUrl) URL.revokeObjectURL(objUrl);
+            objUrl = URL.createObjectURL(file);
+            setPreview(objUrl);
+            const fr = new FileReader();
+            fr.onload = () => { content.heroVideoFile = { name: file.name, data: fr.result }; showName(); markDirty(); };
+            fr.readAsDataURL(file);
+          };
+          pick.addEventListener('click', () => input.click());
+          input.addEventListener('change', (e) => read(e.target.files[0]));
+          clearBtn.addEventListener('click', () => {
+            content.heroVideoFile = null; input.value = '';
+            if (objUrl) { URL.revokeObjectURL(objUrl); objUrl = null; }
+            setPreview(null); showName(); markDirty();
+          });
+          ['dragenter', 'dragover'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add('drag'); }));
+          ['dragleave', 'drop'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove('drag'); }));
+          drop.addEventListener('drop', (e) => read(e.dataTransfer.files[0]));
+          if (content.heroVideoFile && content.heroVideoFile.data) setPreview(content.heroVideoFile.data);
+          showName();
+        }
+
+        // ── save / auth ───────────────────────────────────────
+        $('#saveBtn').addEventListener('click', () => {
+          let ok = true;
+          try { localStorage.setItem(CONTENT_KEY, JSON.stringify(content)); } catch (e) { ok = false; }
+          if (!ok) {
+            alert('Konnte nicht lokal gespeichert werden – die Inhalte (evtl. ein grosses PDF oder Bild) sprengen den Browser-Speicher. Fürs echte Speichern braucht es das Backend.');
+            return;
+          }
+          dirty = false;
+          const tag = $('#savedTag'); tag.hidden = false;
+          clearTimeout(window._svT); window._svT = setTimeout(() => { tag.hidden = true; }, 2200);
+        });
+
+        function showEditor() {
+          $('#login').hidden = true;
+          $('#editor').hidden = false;
+          bindFields(); bindSlots(); renderTours(); bindBrochure(); bindVideo();
+        }
+        function login() {
+          const pass = $('#pass').value || '';
+          if (pass.length >= 1) {
+            try { localStorage.setItem(ADMIN_KEY, '1'); } catch (e) {}
+            $('#err').hidden = true;
+            showEditor();
+          } else {
+            const err = $('#err'); err.textContent = 'Bitte ein Passwort eingeben.'; err.hidden = false;
+          }
+        }
+        $('#loginBtn').addEventListener('click', login);
+        $('#pass').addEventListener('keydown', (e) => { if (e.key === 'Enter') login(); });
+        $('#logoutBtn').addEventListener('click', () => {
+          try { localStorage.removeItem(ADMIN_KEY); } catch (e) {}
+          location.reload();
+        });
+        window.addEventListener('beforeunload', (e) => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+
+        // auto-enter if already authed
+        let authed = false;
+        try { authed = localStorage.getItem(ADMIN_KEY) === '1'; } catch (e) {}
+        if (authed) showEditor();
+      })();
+    </script>
+  </body>
+</html>

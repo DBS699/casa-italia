@@ -1,0 +1,17 @@
+{
+  "name": "veloclub-casaitalia",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Velo-Club Casa d'Italia Bern — website (Astro rebuild of the hi-fi handoff design)",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "astro": "^5.5.0"
+  }
+}

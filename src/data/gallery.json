@@ -1,0 +1,8 @@
+{
+  "images": [
+    { "image": "/assets/gallery/gallery-1.jpg" },
+    { "image": "/assets/gallery/gallery-2.jpg" },
+    { "image": "/assets/gallery/gallery-3.jpg" },
+    { "image": "/assets/gallery/gallery-4.jpg" }
+  ]
+}

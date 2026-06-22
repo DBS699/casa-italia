@@ -1,0 +1,7 @@
+{
+  "tours": [
+    { "date": "04. Mai", "title": "Gurnigel-Runde", "url": "", "img": "/assets/tours/tour-1.jpg" },
+    { "date": "08. Juni", "title": "Emmental-Tour", "url": "", "img": "/assets/tours/tour-2.jpg" },
+    { "date": "13. Juli", "title": "Drei-Seen-Fahrt", "url": "", "img": "/assets/tours/tour-3.jpg" }
+  ]
+}

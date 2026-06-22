@@ -1,0 +1,36 @@
+---
+import { I18N, DEFAULT_LANG, TOURS } from '../data/content.js';
+const t = I18N[DEFAULT_LANG];
+---
+
+<section id="touren" class="section white bordered reveal season" aria-label="Touren / Saison">
+  <div class="container">
+    <div class="kicker">
+      <span class="swatch"><span style="background:#1f7a43"></span><span style="background:#fff"></span><span style="background:#c0202a"></span></span>
+      <span data-i18n="seasonKicker">{t.seasonKicker}</span>
+    </div>
+    <h2 data-i18n="seasonTitle">{t.seasonTitle}</h2>
+    <p class="lead" data-i18n="seasonBody">{t.seasonBody}</p>
+
+    <div class="tours">
+      {TOURS.map((tour) => {
+        const Card = tour.url ? 'a' : 'div';
+        return (
+          <Card
+            class="tour-card"
+            href={tour.url || undefined}
+            target={tour.url ? '_blank' : undefined}
+            rel={tour.url ? 'noopener' : undefined}
+          >
+            <div class="tour-photo"><img src={tour.img} alt={tour.title} loading="lazy" /></div>
+            <div class="tour-meta">
+              <span class="tour-date"><span class="dot"></span>{tour.date}</span>
+              <h3 class="tour-title">{tour.title}</h3>
+              {tour.url && <span class="tour-link">Route ansehen <span class="arrow">→</span></span>}
+            </div>
+          </Card>
+        );
+      })}
+    </div>
+  </div>
+</section>
