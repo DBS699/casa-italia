@@ -109,6 +109,17 @@ const jsonLd = {
         const mq = window.matchMedia('(min-width: 821px)');
         mq.addEventListener('change', (e) => { if (e.matches && header) header.classList.remove('menu-open'); });
 
+        // Scroll reveal — progressive enhancement. Content is visible by default;
+        // only here do we hide .reveal sections and fade them in on view, so a
+        // missing observer / anchor jump never leaves a blank section.
+        if (window.matchMedia('(prefers-reduced-motion: no-preference)').matches && 'IntersectionObserver' in window) {
+          document.documentElement.classList.add('js-reveal');
+          const io = new IntersectionObserver((entries) => {
+            entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+          }, { rootMargin: '0px 0px -8% 0px', threshold: 0.04 });
+          document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+        }
+
         if (lang !== DEFAULT_LANG) apply(lang); else apply(DEFAULT_LANG);
       })();
     </script>
