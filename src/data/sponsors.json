@@ -1,14 +1,59 @@
 {
   "sponsors": [
-    { "name": "CEM Immobilien AG", "url": "https://www.klossner-ag.ch", "logo": "/assets/sponsors/cem-immobilien.jpg" },
-    { "name": "Pirelli Posarte", "url": "http://www.pirelliposarte.ch", "logo": "/assets/sponsors/pirelli-posarte.jpg" },
-    { "name": "La Tribuna · Moser Maler AG", "url": "https://www.mosermalerag.ch/ueber-uns/marcel_suter_mosermalerag/", "logo": "/assets/sponsors/la-tribuna.jpg" },
-    { "name": "Casa d'Italia Ristorante", "url": "https://www.casaitalia.ch/index.php/de/", "logo": "/assets/sponsors/casa-italia-restaurant.jpg" },
-    { "name": "Thömus", "url": "https://thoemus.ch/", "logo": "/assets/sponsors/thoemus.jpg" },
-    { "name": "Velo Virus", "url": "https://www.velovirus.ch", "logo": "/assets/sponsors/velo-virus.jpg" },
-    { "name": "Länggass Optik", "url": "https://www.laenggassoptik.ch", "logo": "/assets/sponsors/laenggass-optik.jpg" },
-    { "name": "Arche Bestattungen", "url": "https://www.arche-bestattungen.ch", "logo": "/assets/sponsors/arche-bestattungen.jpg" },
-    { "name": "Prontokredit", "url": "https://www.prontokredit.ch/de/", "logo": "/assets/sponsors/prontokredit.jpg" },
-    { "name": "Veloterra", "url": "https://veloterra.ch", "logo": "/assets/sponsors/veloterra.jpg" }
+    {
+      "name": "CEM Immobilien AG",
+      "url": "https://www.klossner-ag.ch",
+      "logo": "/assets/sponsors/cem-immobilien.jpg"
+    },
+    {
+      "name": "Pirelli Posarte",
+      "url": "http://www.pirelliposarte.ch",
+      "logo": "/assets/sponsors/pirelli-posarte.jpg"
+    },
+    {
+      "name": "La Tribuna · Moser Maler AG",
+      "url": "https://www.mosermalerag.ch/ueber-uns/marcel_suter_mosermalerag/",
+      "logo": "/assets/sponsors/la-tribuna.jpg"
+    },
+    {
+      "name": "Casa d'Italia Ristorante",
+      "url": "https://www.casaitalia.ch/index.php/de/",
+      "logo": "/assets/sponsors/casa-italia-restaurant.jpg"
+    },
+    {
+      "name": "Thömus",
+      "url": "https://thoemus.ch/",
+      "logo": "/assets/sponsors/thoemus.jpg"
+    },
+    {
+      "name": "Velo Virus",
+      "url": "https://www.velovirus.ch",
+      "logo": "/assets/sponsors/velo-virus.jpg"
+    },
+    {
+      "name": "Länggass Optik",
+      "url": "https://www.laenggassoptik.ch",
+      "logo": "/assets/sponsors/laenggass-optik.jpg"
+    },
+    {
+      "name": "Arche Bestattungen",
+      "url": "https://www.arche-bestattungen.ch",
+      "logo": "/assets/sponsors/arche-bestattungen.jpg"
+    },
+    {
+      "name": "Prontokredit",
+      "url": "https://www.prontokredit.ch/de/",
+      "logo": "/assets/sponsors/prontokredit.jpg"
+    },
+    {
+      "name": "Veloterra",
+      "url": "https://veloterra.ch",
+      "logo": "/assets/sponsors/veloterra.jpg"
+    },
+    {
+      "name": "gagischwii",
+      "url": "sgsdgsdg",
+      "logo": "/assets/uploads/DSC00973.jpg"
+    }
   ]
 }
