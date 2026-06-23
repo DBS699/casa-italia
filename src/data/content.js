@@ -31,6 +31,9 @@ export const CLUB = {
     facebook: '',
     strava: '',
   },
+  // Free Web3Forms access key → the join form sends directly to the club inbox.
+  // Empty = the form falls back to opening a pre-filled e-mail. Get a key at web3forms.com.
+  joinFormKey: '',
 };
 
 // Committee — name, role, photo (from members.json; CMS-editable).
@@ -68,6 +71,14 @@ export const I18N = {
     heroSub: 'Leidenschaft auf zwei Rädern',
     heroIntro: "Gemeinsame Ausfahrten, Touren und Freundschaft – die ganze Saison hindurch.",
     ctaJoin: 'Mitglied werden', ctaSeason: 'Saison entdecken',
+    join: {
+      title: 'Mitglied werden',
+      intro: 'Schön, dass du mitfahren willst! Lass uns kurz deine Angaben da – wir melden uns bei dir.',
+      name: 'Name', email: 'E-Mail', message: 'Nachricht (optional)',
+      submit: 'Anfrage senden', sending: 'Wird gesendet …',
+      success: 'Danke! Wir haben deine Anfrage erhalten und melden uns bald.',
+      error: 'Etwas ist schiefgelaufen. Bitte versuch es nochmal oder schreib an vorstand@veloclubcasaitalia.ch.',
+    },
     aboutKicker: 'Über den Club', aboutTitle: 'Eine Familie auf dem Sattel.',
     aboutBody1: 'Wir sind ein italienischer Velo-Club mit Heimat in Bern. Was uns verbindet, ist einfach: die Freude am Fahren, gute Gesellschaft und ein Espresso am Ziel.',
     aboutBody2: 'Von gemütlichen Ausfahrten bis zu längeren Touren – bei uns findet jede und jeder den passenden Rhythmus.',
@@ -97,6 +108,14 @@ export const I18N = {
     heroSub: 'La passion sur deux roues',
     heroIntro: "Sorties, tours et amitié – tout au long de la saison.",
     ctaJoin: 'Devenir membre', ctaSeason: 'Voir la saison',
+    join: {
+      title: 'Devenir membre',
+      intro: 'Envie de rouler avec nous ? Laisse-nous tes coordonnées – on te recontacte.',
+      name: 'Nom', email: 'E-mail', message: 'Message (facultatif)',
+      submit: 'Envoyer la demande', sending: 'Envoi …',
+      success: 'Merci ! Nous avons bien reçu ta demande et te recontactons bientôt.',
+      error: "Une erreur s'est produite. Réessaie ou écris à vorstand@veloclubcasaitalia.ch.",
+    },
     aboutKicker: 'Le club', aboutTitle: 'Une famille en selle.',
     aboutBody1: "Nous sommes un vélo-club italien établi à Berne. Ce qui nous unit est simple : le plaisir de rouler, la bonne compagnie et un espresso à l'arrivée.",
     aboutBody2: 'Des sorties tranquilles aux tours plus longs, chacun trouve son rythme chez nous.',
@@ -126,6 +145,14 @@ export const I18N = {
     heroSub: 'La passione su due ruote',
     heroIntro: "Uscite, gite e amicizia – per tutta la stagione.",
     ctaJoin: 'Diventa socio', ctaSeason: 'Scopri la stagione',
+    join: {
+      title: 'Diventa socio',
+      intro: 'Vuoi pedalare con noi? Lasciaci i tuoi dati – ti ricontattiamo.',
+      name: 'Nome', email: 'E-mail', message: 'Messaggio (facoltativo)',
+      submit: 'Invia richiesta', sending: 'Invio …',
+      success: 'Grazie! Abbiamo ricevuto la tua richiesta e ti ricontatteremo presto.',
+      error: 'Qualcosa è andato storto. Riprova o scrivi a vorstand@veloclubcasaitalia.ch.',
+    },
     aboutKicker: 'Il club', aboutTitle: 'Una famiglia in sella.',
     aboutBody1: "Siamo un velo-club italiano con casa a Berna. Ciò che ci unisce è semplice: il piacere di pedalare, la buona compagnia e un espresso all'arrivo.",
     aboutBody2: 'Dalle uscite tranquille alle gite più lunghe, da noi ognuno trova il proprio ritmo.',
@@ -155,6 +182,14 @@ export const I18N = {
     heroSub: 'Passion on two wheels',
     heroIntro: "Group rides, tours and friendship – all season long.",
     ctaJoin: 'Become a member', ctaSeason: 'See the season',
+    join: {
+      title: 'Become a member',
+      intro: "Want to ride with us? Leave your details and we'll get back to you.",
+      name: 'Name', email: 'E-mail', message: 'Message (optional)',
+      submit: 'Send request', sending: 'Sending …',
+      success: "Thanks! We've received your request and will be in touch soon.",
+      error: 'Something went wrong. Please try again or email vorstand@veloclubcasaitalia.ch.',
+    },
     aboutKicker: 'The club', aboutTitle: 'A family in the saddle.',
     aboutBody1: "We're an Italian velo-club at home in Bern. What unites us is simple: the joy of riding, good company and an espresso at the finish.",
     aboutBody2: 'From easy rides to longer tours, everyone finds their rhythm with us.',

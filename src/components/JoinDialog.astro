@@ -1,0 +1,81 @@
+---
+import { I18N, DEFAULT_LANG, CLUB } from '../data/content.js';
+const t = I18N[DEFAULT_LANG].join;
+// per-language join strings for the inline script (success/error/sending)
+const JOIN = Object.fromEntries(Object.entries(I18N).map(([k, v]) => [k, v.join]));
+---
+
+<dialog class="join-modal" aria-labelledby="jm-title">
+  <button class="tm-close" type="button" aria-label="Schliessen" data-join-close>×</button>
+  <div class="modal-body">
+    <div class="kicker">
+      <span class="swatch"><span style="background:#1f7a43"></span><span style="background:#fff"></span><span style="background:#c0202a"></span></span>
+      <span data-i18n="ctaJoin">{t.title}</span>
+    </div>
+    <h3 id="jm-title" class="tm-title" data-i18n="join.title">{t.title}</h3>
+    <p class="jm-intro" data-i18n="join.intro">{t.intro}</p>
+    <form class="join-form" novalidate>
+      <label class="jm-field">
+        <span class="field" data-i18n="join.name">{t.name}</span>
+        <input name="name" type="text" required autocomplete="name" />
+      </label>
+      <label class="jm-field">
+        <span class="field" data-i18n="join.email">{t.email}</span>
+        <input name="email" type="email" required autocomplete="email" />
+      </label>
+      <label class="jm-field">
+        <span class="field" data-i18n="join.message">{t.message}</span>
+        <textarea name="message" rows="3"></textarea>
+      </label>
+      <button type="submit" class="btn btn-green jm-submit" data-i18n="join.submit">{t.submit}</button>
+      <p class="jm-status" role="status" aria-live="polite" hidden></p>
+    </form>
+  </div>
+</dialog>
+
+<script is:inline define:vars={{ JOIN, DEFAULT_LANG, formKey: CLUB.joinFormKey, clubEmail: CLUB.email }}>
+  (function () {
+    const dlg = document.querySelector('.join-modal');
+    if (!dlg) return;
+    const form = dlg.querySelector('.join-form');
+    const status = dlg.querySelector('.jm-status');
+    const submitBtn = dlg.querySelector('.jm-submit');
+    const lang = () => { try { const l = localStorage.getItem('vcci-lang'); return JOIN[l] ? l : DEFAULT_LANG; } catch (e) { return DEFAULT_LANG; } };
+
+    document.querySelectorAll('[data-join]').forEach((el) =>
+      el.addEventListener('click', (e) => { e.preventDefault(); status.hidden = true; dlg.showModal(); setTimeout(() => form.querySelector('input').focus(), 60); }));
+    dlg.querySelector('[data-join-close]').addEventListener('click', () => dlg.close());
+    dlg.addEventListener('click', (e) => {
+      const r = dlg.getBoundingClientRect();
+      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) dlg.close();
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const j = JOIN[lang()];
+      const data = Object.fromEntries(new FormData(form).entries());
+      if (!data.name || !data.email) { form.reportValidity(); return; }
+      // Fallback when no Web3Forms key: open a pre-filled e-mail.
+      if (!formKey) {
+        const body = encodeURIComponent((data.message ? data.message + '\n\n' : '') + 'Name: ' + data.name + '\nE-Mail: ' + data.email);
+        window.location.href = 'mailto:' + clubEmail + '?subject=' + encodeURIComponent(j.title) + '&body=' + body;
+        return;
+      }
+      submitBtn.disabled = true; submitBtn.textContent = j.sending;
+      try {
+        const res = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({ access_key: formKey, subject: 'Mitglieder-Anfrage: ' + data.name, from_name: data.name, name: data.name, email: data.email, message: data.message || '—' }),
+        });
+        const out = await res.json();
+        if (!out.success) throw new Error(out.message || 'failed');
+        form.reset(); status.textContent = j.success; status.className = 'jm-status ok'; status.hidden = false;
+      } catch (err) {
+        status.textContent = j.error; status.className = 'jm-status err'; status.hidden = false;
+      } finally {
+        submitBtn.disabled = false; submitBtn.textContent = j.submit;
+      }
+    });
+  })();
+</script>
