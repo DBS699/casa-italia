@@ -60,7 +60,7 @@ img { display: block; }
 /* Anchor targets clear the sticky header (≈86px) when reached via nav links. */
 section[id], footer[id] { scroll-margin-top: 98px; }
 
-.tricolore-bar { display: flex; height: 4px; width: 100%; }
+.tricolore-bar { display: flex; height: 6px; width: 100%; }
 .tricolore-bar > span { flex: 1; }
 .tricolore-bar .g { background: var(--green); }
 .tricolore-bar .w { background: #f3efe6; }
