@@ -18,7 +18,7 @@ const jsonLd = {
   foundingDate: '1985',
   url: Astro.site?.href,
   email: CLUB.email,
-  logo: new URL('/assets/emblem.png', Astro.site).href,
+  logo: new URL('/assets/logo.png', Astro.site).href,
   address: {
     '@type': 'PostalAddress',
     streetAddress: CLUB.address.line1,
@@ -37,8 +37,8 @@ const jsonLd = {
     <meta name="description" content={description} />
     <title>{title}</title>
     <link rel="canonical" href={canonical} />
-    <link rel="icon" type="image/png" href="/assets/emblem.png" />
-    <link rel="apple-touch-icon" href="/assets/emblem.png" />
+    <link rel="icon" type="image/png" href="/assets/logo.png" />
+    <link rel="apple-touch-icon" href="/assets/logo.png" />
     <meta name="theme-color" content="#1f7a43" />
 
     <!-- Social sharing (Open Graph + Twitter) -->
