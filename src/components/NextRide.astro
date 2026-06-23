@@ -1,0 +1,82 @@
+---
+import { TOURS, I18N, DEFAULT_LANG } from '../data/content.js';
+const t = I18N[DEFAULT_LANG].next;
+
+// Map German month names → number, parse "13. Juli" → { day, month, label }.
+const MONTHS = {
+  januar: 1, jan: 1, februar: 2, feb: 2, märz: 3, marz: 3, mär: 3, mar: 3,
+  april: 4, apr: 4, mai: 5, juni: 6, jun: 6, juli: 7, jul: 7, august: 8, aug: 8,
+  september: 9, sept: 9, sep: 9, oktober: 10, okt: 10, november: 11, nov: 11, dezember: 12, dez: 12,
+};
+const parse = (date) => {
+  const m = String(date).match(/(\d{1,2})\.?\s+([A-Za-zäöüÄÖÜ]+)/);
+  if (!m) return { day: 0, month: 0, label: String(date) };
+  return { day: +m[1], month: MONTHS[m[2].toLowerCase()] || 0, label: m[2] };
+};
+const tours = TOURS.map((tr) => ({ ...tr, ...parse(tr.date) }));
+
+// Build-time choice of the next upcoming ride (re-checked client-side too).
+const now = new Date();
+const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+const pickNext = (list) => {
+  const dated = list.filter((x) => x.month);
+  if (!dated.length) return list[0];
+  const upcoming = dated
+    .map((x) => ({ x, d: new Date(today.getFullYear(), x.month - 1, x.day) }))
+    .filter((o) => o.d >= today)
+    .sort((a, b) => a.d - b.d);
+  if (upcoming.length) return upcoming[0].x;
+  return dated
+    .map((x) => ({ x, d: new Date(today.getFullYear() + 1, x.month - 1, x.day) }))
+    .sort((a, b) => a.d - b.d)[0].x;
+};
+const ride = pickNext(tours);
+---
+
+<section id="naechste" class="section paper bordered reveal next-ride" aria-label="Nächste Ausfahrt">
+  <div class="container">
+    <div class="kicker">
+      <span class="swatch"><span style="background:#1f7a43"></span><span style="background:#f6f2e9"></span><span style="background:#c0202a"></span></span>
+      <span data-i18n="next.kicker">{t.kicker}</span>
+    </div>
+    <div class="nr-card">
+      <div class="nr-photo">
+        <img class="nr-img" src={ride.img} alt={ride.title} width="800" height="600" loading="lazy" decoding="async" />
+        <span class="tour-badge"><span class="d nr-day">{ride.day || ''}</span><span class="m nr-month">{ride.label}</span></span>
+      </div>
+      <div class="nr-info">
+        <h2 class="nr-title">{ride.title}</h2>
+        {ride.description && <p class="nr-desc">{ride.description}</p>}
+        <div class="nr-facts">
+          <div><span class="k" data-i18n="next.distance">{t.distance}</span><span class="v nr-distance">{ride.distance}</span></div>
+          <div><span class="k" data-i18n="next.elevation">{t.elevation}</span><span class="v nr-elev">{ride.elevation}</span></div>
+          <div><span class="k" data-i18n="next.meet">{t.meet}</span><span class="v nr-meet">{ride.meet}</span></div>
+        </div>
+        <a class="btn btn-ghost-dark nr-cta" href="#touren"><span data-i18n="next.cta">{t.cta}</span> <span class="arrow" style="font-size:16px">→</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script is:inline define:vars={{ tours }}>
+  (function () {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const dated = tours.filter((x) => x.month);
+    if (!dated.length) return;
+    let up = dated
+      .map((x) => ({ x, d: new Date(today.getFullYear(), x.month - 1, x.day) }))
+      .filter((o) => o.d >= today)
+      .sort((a, b) => a.d - b.d);
+    const next = up.length
+      ? up[0].x
+      : dated.map((x) => ({ x, d: new Date(today.getFullYear() + 1, x.month - 1, x.day) })).sort((a, b) => a.d - b.d)[0].x;
+    if (!next) return;
+    const set = (sel, v) => { const el = document.querySelector(sel); if (el && v != null) el.textContent = v; };
+    set('.nr-day', next.day || ''); set('.nr-month', next.label);
+    set('.nr-title', next.title); set('.nr-desc', next.description || '');
+    set('.nr-distance', next.distance); set('.nr-elev', next.elevation); set('.nr-meet', next.meet);
+    const img = document.querySelector('.nr-img');
+    if (img && next.img) { img.src = next.img; img.alt = next.title; }
+  })();
+</script>
