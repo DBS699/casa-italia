@@ -21,13 +21,24 @@ const t = I18N[DEFAULT_LANG];
     </div>
 
     <div class="tour-track gallery-track" role="list" tabindex="0" aria-label="Galerie">
-      {GALLERY.map((s) => (
+      {GALLERY.map((s, i) => (
         <div class="gallery-slide" role="listitem">
-          <img id={s.id} src={s.image} alt="" width="380" height="254" loading="lazy" decoding="async" />
+          <button type="button" class="gallery-open" data-index={i} aria-label="Bild vergrössern">
+            <img id={s.id} src={s.image} alt="" width="380" height="254" loading="lazy" decoding="async" />
+          </button>
         </div>
       ))}
     </div>
   </div>
+
+  <!-- Lightbox (click an image → full-screen viewer, zooms in) -->
+  <dialog class="lightbox" aria-label="Galerie-Bild">
+    <button type="button" class="lb-close" aria-label="Schliessen">×</button>
+    <button type="button" class="lb-nav lb-prev" aria-label="Vorheriges Bild">‹</button>
+    <img class="lb-img" alt="" />
+    <button type="button" class="lb-nav lb-next" aria-label="Nächstes Bild">›</button>
+    <div class="lb-counter" aria-hidden="true"><span class="lb-cur">1</span> / <span class="lb-total">1</span></div>
+  </dialog>
 </section>
 
 <script is:inline>
@@ -48,5 +59,35 @@ const t = I18N[DEFAULT_LANG];
     track.addEventListener('scroll', upd, { passive: true });
     window.addEventListener('resize', upd);
     upd();
+
+    // ── lightbox ──────────────────────────────────────────
+    const lb = document.querySelector('#gallery .lightbox');
+    const imgs = [...track.querySelectorAll('.gallery-slide img')].map((i) => i.currentSrc || i.src);
+    if (lb && imgs.length) {
+      const lbImg = lb.querySelector('.lb-img');
+      const cur = lb.querySelector('.lb-cur');
+      lb.querySelector('.lb-total').textContent = imgs.length;
+      const multi = imgs.length > 1;
+      lb.querySelectorAll('.lb-nav').forEach((b) => { b.hidden = !multi; });
+      let idx = 0;
+      const show = (n) => {
+        idx = (n + imgs.length) % imgs.length;
+        lbImg.src = imgs[idx];
+        cur.textContent = idx + 1;
+      };
+      document.querySelectorAll('#gallery .gallery-open').forEach((btn) => {
+        btn.addEventListener('click', () => { show(Number(btn.dataset.index)); lb.showModal(); });
+      });
+      lb.querySelector('.lb-prev').addEventListener('click', () => show(idx - 1));
+      lb.querySelector('.lb-next').addEventListener('click', () => show(idx + 1));
+      lb.querySelector('.lb-close').addEventListener('click', () => lb.close());
+      lb.addEventListener('keydown', (e) => {
+        if (!multi) return;
+        if (e.key === 'ArrowRight') { e.preventDefault(); show(idx + 1); }
+        else if (e.key === 'ArrowLeft') { e.preventDefault(); show(idx - 1); }
+      });
+      // click on the dark surround (the dialog box itself) closes
+      lb.addEventListener('click', (e) => { if (e.target === lb) lb.close(); });
+    }
   })();
 </script>
