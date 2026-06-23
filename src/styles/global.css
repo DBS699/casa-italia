@@ -80,7 +80,7 @@ section[id], footer[id] { scroll-margin-top: 98px; }
 
 .section-title {
   font-family: var(--serif); font-weight: 400;
-  font-size: clamp(30px, 4.5vw, 46px); line-height: 1.08;
+  font-size: clamp(34px, 5.2vw, 58px); line-height: 1.08;
   margin: 0; color: var(--ink); text-wrap: balance;
 }
 
@@ -222,7 +222,7 @@ section[id], footer[id] { scroll-margin-top: 98px; }
   display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: clamp(32px, 5vw, 64px); align-items: start;
 }
-.about-grid h2 { font-size: clamp(30px, 4.5vw, 46px); }
+.about-grid h2 { font-size: clamp(34px, 5.2vw, 58px); }
 .about-body p { font-size: 18px; line-height: 1.75; margin: 0 0 18px; text-wrap: pretty; }
 .about-body p:first-of-type { color: var(--ink-mute); }
 .about-body p:nth-of-type(2) { color: var(--ink-soft); margin-bottom: 0; }
@@ -234,7 +234,7 @@ section[id], footer[id] { scroll-margin-top: 98px; }
 /* Committee */
 .section-head { max-width: 640px; margin: 0 auto 48px; text-align: center; }
 .section-head .kicker { justify-content: center; }
-.section-head h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(28px, 4vw, 42px); line-height: 1.1; margin: 0 0 14px; }
+.section-head h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(32px, 4.8vw, 52px); line-height: 1.1; margin: 0 0 14px; }
 .section-head p { font-size: 17px; line-height: 1.7; color: var(--ink-soft); margin: 0; text-wrap: pretty; }
 
 .members {
@@ -261,7 +261,7 @@ section[id], footer[id] { scroll-margin-top: 98px; }
 .member .role { font-family: var(--label); text-transform: uppercase; letter-spacing: 0.14em; font-size: 12px; font-weight: 600; color: var(--green); margin-top: 7px; }
 
 /* Season */
-.season h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(30px, 4.5vw, 46px); line-height: 1.08; margin: 0 0 16px; }
+.season h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(34px, 5.2vw, 58px); line-height: 1.08; margin: 0 0 16px; }
 .season .lead { max-width: 620px; font-size: 18px; line-height: 1.7; color: var(--ink-soft); margin: 0 0 36px; text-wrap: pretty; }
 /* Season — horizontal scroll carousel of dated tour cards */
 .season-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 30px; }
@@ -383,7 +383,7 @@ section[id], footer[id] { scroll-margin-top: 98px; }
 .jm-status.err { color: var(--red); }
 
 /* News */
-.news h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(28px, 4vw, 42px); line-height: 1.1; margin: 0 0 40px; }
+.news h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(32px, 4.8vw, 52px); line-height: 1.1; margin: 0 0 40px; }
 .news-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(238px, 1fr)); gap: 24px; }
 .news-card {
   position: relative; display: flex; flex-direction: column;
@@ -406,7 +406,7 @@ section[id], footer[id] { scroll-margin-top: 98px; }
 
 /* Gallery */
 .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: clamp(32px, 5vw, 56px); align-items: center; }
-.gallery-copy h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(30px, 4.5vw, 46px); line-height: 1.08; margin: 0 0 16px; }
+.gallery-copy h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(34px, 5.2vw, 58px); line-height: 1.08; margin: 0 0 16px; }
 .gallery-copy p { font-size: 18px; line-height: 1.7; color: var(--ink-soft); margin: 0 0 28px; max-width: 420px; text-wrap: pretty; }
 .gallery-images { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .gallery-images .frame {
@@ -419,7 +419,7 @@ section[id], footer[id] { scroll-margin-top: 98px; }
 /* Sponsors */
 .sponsors { text-align: center; }
 .sponsors .lead { max-width: 560px; margin: 0 auto 34px; font-size: 17px; line-height: 1.7; color: var(--ink-soft); text-wrap: pretty; }
-.sponsors h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(28px, 4vw, 42px); line-height: 1.1; margin: 0 0 14px; }
+.sponsors h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(32px, 4.8vw, 52px); line-height: 1.1; margin: 0 0 14px; }
 .sponsors .kicker { justify-content: center; }
 .sponsor-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 24px; max-width: 760px; margin: 0 auto 34px; }
 .sponsor { display: flex; flex-direction: column; align-items: center; gap: 12px; }
