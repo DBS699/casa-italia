@@ -9,7 +9,7 @@
 
 backend:
   name: github
-  repo: dbs699/casa-italia        # ← CHANGE to your GitHub owner/repo
+  repo: DBS699/casa-italia        # GitHub owner/repo
   branch: main
   base_url: https://casa-italia.vercel.app   # OAuth handler lives here (api/auth)
   auth_endpoint: /api/auth
