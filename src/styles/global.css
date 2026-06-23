@@ -67,9 +67,9 @@ section[id], footer[id] { scroll-margin-top: 98px; }
 .tricolore-bar .r { background: var(--red); }
 
 .kicker {
-  display: inline-flex; align-items: center; gap: 10px;
+  display: inline-flex; align-items: center; gap: 11px;
   font-family: var(--label); text-transform: uppercase;
-  letter-spacing: 0.2em; font-size: 13px; font-weight: 600;
+  letter-spacing: 0.2em; font-size: 15px; font-weight: 600;
   color: var(--green); margin-bottom: 18px;
 }
 .kicker .swatch {
