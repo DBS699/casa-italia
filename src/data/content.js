@@ -66,7 +66,7 @@ export const NEWS_LINKS = {
 // All translatable text, per language. Lifted verbatim from the design's T object.
 export const I18N = {
   de: {
-    nav: { club: 'Verein', komitee: 'Komitee', touren: 'Touren', galerie: 'Galerie', sponsoren: 'Sponsoren', aktuelles: 'Aktuelles' },
+    nav: { club: 'Verein', komitee: 'Komitee', touren: 'Touren', galerie: 'Galerie', sponsoren: 'Sponsoren', aktuelles: 'Aktuelles', mitmachen: 'Mitmachen', classement: 'Rangliste' },
     heroKicker: 'Velo-Club · seit 1985',
     heroSub: 'Leidenschaft auf zwei Rädern',
     heroIntro: "Gemeinsame Ausfahrten, Touren und Freundschaft – die ganze Saison hindurch.",
@@ -79,6 +79,7 @@ export const I18N = {
       success: 'Danke! Wir haben deine Anfrage erhalten und melden uns bald.',
       error: 'Etwas ist schiefgelaufen. Bitte versuch es nochmal oder schreib an vorstand@veloclubcasaitalia.ch.',
     },
+    member: { kicker: 'Mitmachen', title: 'Fahr mit uns.', lead: 'Lust auf gemeinsame Ausfahrten? Werde Mitglied – wir freuen uns auf dich.', brochure: 'Broschüre ansehen' },
     aboutKicker: 'Über den Club', aboutTitle: 'Eine Familie auf dem Sattel.',
     aboutBody1: 'Wir sind ein italienischer Velo-Club mit Heimat in Bern. Was uns verbindet, ist einfach: die Freude am Fahren, gute Gesellschaft und ein Espresso am Ziel.',
     aboutBody2: 'Von gemütlichen Ausfahrten bis zu längeren Touren – bei uns findet jede und jeder den passenden Rhythmus.',
@@ -104,7 +105,7 @@ export const I18N = {
     ],
   },
   fr: {
-    nav: { club: 'Club', komitee: 'Comité', touren: 'Sorties', galerie: 'Galerie', sponsoren: 'Sponsors', aktuelles: 'Actualités' },
+    nav: { club: 'Club', komitee: 'Comité', touren: 'Sorties', galerie: 'Galerie', sponsoren: 'Sponsors', aktuelles: 'Actualités', mitmachen: 'Participer', classement: 'Classement' },
     heroKicker: 'Vélo-Club · depuis 1985',
     heroSub: 'La passion sur deux roues',
     heroIntro: "Sorties, tours et amitié – tout au long de la saison.",
@@ -117,6 +118,7 @@ export const I18N = {
       success: 'Merci ! Nous avons bien reçu ta demande et te recontactons bientôt.',
       error: "Une erreur s'est produite. Réessaie ou écris à vorstand@veloclubcasaitalia.ch.",
     },
+    member: { kicker: 'Participer', title: 'Roule avec nous.', lead: "Envie de sorties à plusieurs ? Deviens membre – on t'attend.", brochure: 'Voir la brochure' },
     aboutKicker: 'Le club', aboutTitle: 'Une famille en selle.',
     aboutBody1: "Nous sommes un vélo-club italien établi à Berne. Ce qui nous unit est simple : le plaisir de rouler, la bonne compagnie et un espresso à l'arrivée.",
     aboutBody2: 'Des sorties tranquilles aux tours plus longs, chacun trouve son rythme chez nous.',
@@ -142,7 +144,7 @@ export const I18N = {
     ],
   },
   it: {
-    nav: { club: 'Club', komitee: 'Comitato', touren: 'Uscite', galerie: 'Galleria', sponsoren: 'Sponsor', aktuelles: 'Novità' },
+    nav: { club: 'Club', komitee: 'Comitato', touren: 'Uscite', galerie: 'Galleria', sponsoren: 'Sponsor', aktuelles: 'Novità', mitmachen: 'Partecipa', classement: 'Classifica' },
     heroKicker: 'Velo-Club · dal 1985',
     heroSub: 'La passione su due ruote',
     heroIntro: "Uscite, gite e amicizia – per tutta la stagione.",
@@ -155,6 +157,7 @@ export const I18N = {
       success: 'Grazie! Abbiamo ricevuto la tua richiesta e ti ricontatteremo presto.',
       error: 'Qualcosa è andato storto. Riprova o scrivi a vorstand@veloclubcasaitalia.ch.',
     },
+    member: { kicker: 'Partecipa', title: 'Pedala con noi.', lead: 'Voglia di uscite in gruppo? Diventa socio – ti aspettiamo.', brochure: 'Vedi la brochure' },
     aboutKicker: 'Il club', aboutTitle: 'Una famiglia in sella.',
     aboutBody1: "Siamo un velo-club italiano con casa a Berna. Ciò che ci unisce è semplice: il piacere di pedalare, la buona compagnia e un espresso all'arrivo.",
     aboutBody2: 'Dalle uscite tranquille alle gite più lunghe, da noi ognuno trova il proprio ritmo.',
@@ -180,7 +183,7 @@ export const I18N = {
     ],
   },
   en: {
-    nav: { club: 'Club', komitee: 'Committee', touren: 'Tours', galerie: 'Gallery', sponsoren: 'Sponsors', aktuelles: 'Latest' },
+    nav: { club: 'Club', komitee: 'Committee', touren: 'Tours', galerie: 'Gallery', sponsoren: 'Sponsors', aktuelles: 'Latest', mitmachen: 'Join in', classement: 'Rankings' },
     heroKicker: 'Velo-Club · since 1985',
     heroSub: 'Passion on two wheels',
     heroIntro: "Group rides, tours and friendship – all season long.",
@@ -193,6 +196,7 @@ export const I18N = {
       success: "Thanks! We've received your request and will be in touch soon.",
       error: 'Something went wrong. Please try again or email vorstand@veloclubcasaitalia.ch.',
     },
+    member: { kicker: 'Join in', title: 'Ride with us.', lead: "Keen on group rides? Become a member – we'd love to have you.", brochure: 'View brochure' },
     aboutKicker: 'The club', aboutTitle: 'A family in the saddle.',
     aboutBody1: "We're an Italian velo-club at home in Bern. What unites us is simple: the joy of riding, good company and an espresso at the finish.",
     aboutBody2: 'From easy rides to longer tours, everyone finds their rhythm with us.',

@@ -3,9 +3,9 @@ import { I18N, DEFAULT_LANG, LANGS } from '../data/content.js';
 const t = I18N[DEFAULT_LANG];
 const nav = [
   { key: 'club', href: '#club' },
-  { key: 'komitee', href: '#komitee' },
   { key: 'touren', href: '#touren' },
   { key: 'galerie', href: '#gallery' },
+  { key: 'komitee', href: '#komitee' },
   { key: 'sponsoren', href: '#sponsoren' },
 ];
 ---
@@ -25,6 +25,7 @@ const nav = [
       {nav.map((item) => (
         <a href={item.href} data-i18n={`nav.${item.key}`}>{t.nav[item.key]}</a>
       ))}
+      <button class="btn btn-green nav-join" type="button" data-join data-i18n="ctaJoin">{t.ctaJoin}</button>
       <span class="divider"></span>
       <span class="langs">
         {LANGS.map((l) => (
@@ -43,6 +44,7 @@ const nav = [
       {nav.map((item) => (
         <a href={item.href} data-i18n={`nav.${item.key}`}>{t.nav[item.key]}</a>
       ))}
+      <button class="btn btn-green nav-join" type="button" data-join data-i18n="ctaJoin">{t.ctaJoin}</button>
     </div>
     <div class="langs">
       {LANGS.map((l) => (

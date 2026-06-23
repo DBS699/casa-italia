@@ -133,6 +133,9 @@ section[id], footer[id] { scroll-margin-top: 98px; }
 }
 .nav a:hover { color: var(--green); }
 .nav .divider { width: 1px; height: 18px; background: rgba(27, 26, 22, 0.16); }
+/* Compact "Mitglied werden" CTA button in the header / mobile menu */
+.nav-join { padding: 9px 18px; font-size: 13px; }
+.mobile-panel .nav-join { margin-top: 16px; align-self: flex-start; }
 
 .langs { display: flex; align-items: center; gap: 2px; }
 .langs button {
@@ -468,6 +471,14 @@ section[id], footer[id] { scroll-margin-top: 98px; }
   .lightbox .lb-next { right: 10px; }
   .lightbox .lb-close { top: 12px; right: 12px; }
 }
+
+/* Devenir membre — focused conversion section (replaces the old mixed "Aktuelles") */
+.join-cta { text-align: center; }
+.join-cta-inner { max-width: 640px; margin: 0 auto; }
+.join-cta .kicker { justify-content: center; }
+.join-cta h2 { margin: 0 0 14px; }
+.join-cta .lead { max-width: 540px; margin: 0 auto 30px; font-size: 17px; line-height: 1.7; color: var(--ink-soft); text-wrap: pretty; }
+.join-cta-actions { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
 
 /* Sponsors */
 .sponsors { text-align: center; }

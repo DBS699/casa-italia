@@ -1,0 +1,22 @@
+---
+import { I18N, DEFAULT_LANG, NEWS_LINKS } from '../data/content.js';
+const t = I18N[DEFAULT_LANG];
+const m = t.member;
+---
+
+<section id="mitmachen" class="section paper bordered reveal join-cta" aria-label="Mitmachen">
+  <div class="container">
+    <div class="join-cta-inner">
+      <div class="kicker">
+        <span class="swatch"><span style="background:#1f7a43"></span><span style="background:#f6f2e9"></span><span style="background:#c0202a"></span></span>
+        <span data-i18n="member.kicker">{m.kicker}</span>
+      </div>
+      <h2 data-i18n="member.title">{m.title}</h2>
+      <p class="lead" data-i18n="member.lead">{m.lead}</p>
+      <div class="join-cta-actions">
+        <button type="button" class="btn btn-green" data-join data-i18n="ctaJoin">{t.ctaJoin}</button>
+        <a class="btn btn-ghost-dark" href={NEWS_LINKS['03']} data-i18n="member.brochure">{m.brochure}</a>
+      </div>
+    </div>
+  </div>
+</section>
