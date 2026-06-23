@@ -3,20 +3,50 @@ import { I18N, DEFAULT_LANG, GALLERY } from '../data/content.js';
 const t = I18N[DEFAULT_LANG];
 ---
 
-<section id="gallery" class="section white reveal" aria-label="Galerie">
-  <div class="container gallery-grid">
-    <div class="gallery-copy">
-      <div class="kicker">
-        <span class="swatch"><span style="background:#1f7a43"></span><span style="background:#fff"></span><span style="background:#c0202a"></span></span>
-        <span data-i18n="galleryKicker">{t.galleryKicker}</span>
+<section id="gallery" class="section white bordered reveal gallery" aria-label="Galerie">
+  <div class="container">
+    <div class="season-head">
+      <div>
+        <div class="kicker">
+          <span class="swatch"><span style="background:#1f7a43"></span><span style="background:#fff"></span><span style="background:#c0202a"></span></span>
+          <span data-i18n="galleryKicker">{t.galleryKicker}</span>
+        </div>
+        <h2 data-i18n="galleryTitle">{t.galleryTitle}</h2>
+        <p class="lead" data-i18n="galleryBody">{t.galleryBody}</p>
       </div>
-      <h2 data-i18n="galleryTitle">{t.galleryTitle}</h2>
-      <p data-i18n="galleryBody">{t.galleryBody}</p>
+      <div class="season-arrows" aria-hidden="true">
+        <button type="button" class="season-arrow" data-dir="-1" aria-label="Vorherige Bilder">‹</button>
+        <button type="button" class="season-arrow" data-dir="1" aria-label="Weitere Bilder">›</button>
+      </div>
     </div>
-    <div class="gallery-images">
+
+    <div class="tour-track gallery-track" role="list" tabindex="0" aria-label="Galerie">
       {GALLERY.map((s) => (
-        <span class="frame"><img id={s.id} src={s.image} alt="" width="300" height="170" loading="lazy" decoding="async" /></span>
+        <div class="gallery-slide" role="listitem">
+          <img id={s.id} src={s.image} alt="" width="380" height="254" loading="lazy" decoding="async" />
+        </div>
       ))}
     </div>
   </div>
 </section>
+
+<script is:inline>
+  (function () {
+    const track = document.querySelector('#gallery .gallery-track');
+    if (!track) return;
+    const arrows = document.querySelectorAll('#gallery .season-arrow');
+    const step = () => { const c = track.querySelector('.gallery-slide'); return c ? c.getBoundingClientRect().width + 24 : 360; };
+    arrows.forEach((b) => b.addEventListener('click', () =>
+      track.scrollBy({ left: step() * Number(b.dataset.dir), behavior: 'smooth' })));
+    const upd = () => {
+      const max = track.scrollWidth - track.clientWidth - 2;
+      arrows.forEach((b) => {
+        const edge = Number(b.dataset.dir) < 0 ? track.scrollLeft <= 2 : track.scrollLeft >= max;
+        b.classList.toggle('is-disabled', edge || max <= 0);
+      });
+    };
+    track.addEventListener('scroll', upd, { passive: true });
+    window.addEventListener('resize', upd);
+    upd();
+  })();
+</script>
