@@ -141,7 +141,7 @@ section[id], footer[id] { scroll-margin-top: 98px; }
 .langs button {
   appearance: none; border: none; cursor: pointer; background: transparent;
   font-family: var(--label); font-weight: 600; font-size: 13px;
-  letter-spacing: 0.08em; padding: 4px 6px;
+  letter-spacing: 0.08em; padding: 8px 11px;
   color: #9a958a; border-bottom: 2px solid transparent;
   transition: color .15s ease, border-color .15s ease;
 }
