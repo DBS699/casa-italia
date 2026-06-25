@@ -47,6 +47,7 @@ const tours = TOURS.map((tour) => {
           data-elev={tour.elevation ?? ''}
           data-meet={tour.meet ?? ''}
           data-url={tour.url ?? ''}
+          data-gpx={tour.gpx ?? ''}
         >
           <div class="tour-photo">
             <img src={tour.img} alt={tour.title} width="800" height="520" loading="lazy" decoding="async" />
@@ -77,7 +78,10 @@ const tours = TOURS.map((tour) => {
         <div><span class="k">Treffpunkt</span><span class="v tm-meet"></span></div>
       </div>
       <div class="tm-map" hidden></div>
-      <a class="btn btn-green tm-route" target="_blank" rel="noopener" hidden>Route ansehen <span class="arrow" style="font-size:16px">→</span></a>
+      <div class="tm-actions">
+        <a class="btn btn-green tm-route" target="_blank" rel="noopener" hidden><span class="tm-route-label">Route ansehen</span> <span class="arrow" style="font-size:16px">→</span></a>
+        <a class="btn btn-ghost-dark tm-gpx" download hidden>GPX herunterladen</a>
+      </div>
     </div>
   </dialog>
 </section>
@@ -157,8 +161,17 @@ const tours = TOURS.map((tour) => {
         set('.tm-meet', d.meet);
         const emb = stravaEmbed(d.url);
         const route = dlg.querySelector('.tm-route');
-        if (d.url) { route.href = d.url; route.hidden = false; } else { route.hidden = true; }
+        if (d.url) {
+          route.href = d.url; route.hidden = false;
+          const host = (() => { try { return new URL(d.url).hostname; } catch (e) { return ''; } })();
+          route.querySelector('.tm-route-label').textContent =
+            /garmin\.com$/i.test(host) ? 'In Garmin Connect öffnen'
+            : /strava\.com$/i.test(host) ? 'Auf Strava ansehen'
+            : 'Route ansehen';
+        } else { route.hidden = true; }
         showStravaMap(emb);
+        const gpx = dlg.querySelector('.tm-gpx');
+        if (d.gpx) { gpx.href = d.gpx; gpx.hidden = false; } else { gpx.hidden = true; }
         dlg.showModal();
       });
     });

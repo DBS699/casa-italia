@@ -56,7 +56,8 @@ collections:
               - { name: distance, label: "Distanz", widget: string, required: false, default: "" }
               - { name: elevation, label: "Höhenmeter", widget: string, required: false, default: "" }
               - { name: meet, label: "Treffpunkt", widget: string, required: false, default: "" }
-              - { name: url, label: "Routen-Link (optional, z. B. Komoot)", widget: string, required: false, default: "" }
+              - { name: url, label: "Routen-Link (Strava oder Garmin Connect, optional)", widget: string, required: false, default: "" }
+              - { name: gpx, label: "GPX-Datei zum Herunterladen (optional)", widget: file, required: false, default: "" }
 
   - name: committee
     label: "Komitee"
