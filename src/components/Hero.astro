@@ -1,6 +1,14 @@
 ---
 import { I18N, DEFAULT_LANG, CLUB, SITE } from '../data/content.js';
 const t = I18N[DEFAULT_LANG];
+// The hero background can be a video OR a photo (the club may upload either via
+// the CMS). Play a real <video> only for video files; otherwise show the image
+// directly as an <img> — so a photo also appears on mobile Safari, which won't
+// fall back from a failed <video> source to its poster.
+const heroVideo = SITE.heroVideo || '';
+const heroPoster = SITE.heroPoster || '';
+const isVideo = /\.(mp4|webm|mov|m4v|ogg)$/i.test(heroVideo);
+const heroImage = heroPoster || (isVideo ? '' : heroVideo);
 ---
 
 <section id="hero" class="hero" aria-label="Intro">
@@ -11,7 +19,8 @@ const t = I18N[DEFAULT_LANG];
     reduce motion — those get the poster only. Replace /public/assets/hero.mp4
     (+ hero-poster.jpg) with the real club video anytime — filenames are fixed.
   -->
-  <video class="hero-video" autoplay muted loop playsinline preload="none" poster={SITE.heroPoster} data-src={SITE.heroVideo}></video>
+  {heroImage && <img class="hero-bg" src={heroImage} alt="" fetchpriority="high" decoding="async" />}
+  {isVideo && <video class="hero-video" autoplay muted loop playsinline preload="none" poster={heroPoster} data-src={heroVideo}></video>}
   <script is:inline>
     (function () {
       var v = document.querySelector('.hero-video');
