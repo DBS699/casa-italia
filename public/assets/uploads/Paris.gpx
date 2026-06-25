@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="ChatGPT">
+  <rte>
+    <name>Paris to Mont-Saint-Michel (Waypoints)</name>
+    <rtept lat="48.8566" lon="2.3522"><name>Paris</name></rtept>
+    <rtept lat="49.036" lon="2.062"><name>Cergy-Pontoise</name></rtept>
+    <rtept lat="49.2794" lon="1.776"><name>Gisors</name></rtept>
+    <rtept lat="49.615" lon="1.537"><name>Forges-les-Eaux</name></rtept>
+    <rtept lat="49.922" lon="1.077"><name>Dieppe</name></rtept>
+    <rtept lat="49.867" lon="0.722"><name>Saint-Valery-en-Caux</name></rtept>
+    <rtept lat="49.757" lon="0.374"><name>Fécamp</name></rtept>
+    <rtept lat="49.706" lon="0.204"><name>Étretat</name></rtept>
+    <rtept lat="49.494" lon="0.107"><name>Le Havre</name></rtept>
+    <rtept lat="49.419" lon="0.233"><name>Honfleur</name></rtept>
+    <rtept lat="49.289" lon="-0.114"><name>Cabourg</name></rtept>
+    <rtept lat="49.182" lon="-0.37"><name>Caen</name></rtept>
+    <rtept lat="49.276" lon="-0.705"><name>Bayeux</name></rtept>
+    <rtept lat="49.335" lon="-1.102"><name>Isigny-sur-Mer</name></rtept>
+    <rtept lat="49.304" lon="-1.247"><name>Carentan</name></rtept>
+    <rtept lat="49.045" lon="-1.441"><name>Coutances</name></rtept>
+    <rtept lat="48.837" lon="-1.596"><name>Granville</name></rtept>
+    <rtept lat="48.683" lon="-1.367"><name>Avranches</name></rtept>
+    <rtept lat="48.636" lon="-1.511"><name>Mont-Saint-Michel</name></rtept>
+  </rte>
+</gpx>
