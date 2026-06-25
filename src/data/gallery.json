@@ -1,8 +1,20 @@
 {
   "images": [
-    { "image": "/assets/gallery/gallery-1.jpg", "caption": "" },
-    { "image": "/assets/gallery/gallery-2.jpg", "caption": "" },
-    { "image": "/assets/gallery/gallery-3.jpg", "caption": "" },
-    { "image": "/assets/gallery/gallery-4.jpg", "caption": "" }
+    {
+      "image": "/assets/gallery/gallery-1.jpg",
+      "caption": "Ä Schwan so wiss wie schneeeeeeee"
+    },
+    {
+      "image": "/assets/gallery/gallery-2.jpg",
+      "caption": ""
+    },
+    {
+      "image": "/assets/gallery/gallery-3.jpg",
+      "caption": ""
+    },
+    {
+      "image": "/assets/gallery/gallery-4.jpg",
+      "caption": ""
+    }
   ]
 }
