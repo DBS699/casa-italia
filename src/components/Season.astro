@@ -1,5 +1,5 @@
 ---
-import { I18N, DEFAULT_LANG, TOURS } from '../data/content.js';
+import { I18N, DEFAULT_LANG, TOURS, SITE } from '../data/content.js';
 const t = I18N[DEFAULT_LANG];
 
 // Split "04. Mai" → day "04", month "Mai" for the calendar-style date badge.
@@ -19,6 +19,12 @@ const tours = TOURS.map((tour) => {
         </div>
         <h2 data-i18n="seasonTitle">{t.seasonTitle}</h2>
         <p class="lead" data-i18n="seasonBody">{t.seasonBody}</p>
+        {SITE.brochure && (
+          <div class="season-doc">
+            <a class="btn btn-green" href={SITE.brochure} target="_blank" rel="noopener" data-i18n="member.programmView">{t.member.programmView}</a>
+            <a class="btn btn-ghost-dark" href={SITE.brochure} download data-i18n="member.download">{t.member.download}</a>
+          </div>
+        )}
       </div>
       <div class="season-arrows" aria-hidden="true">
         <button type="button" class="season-arrow" data-dir="-1" aria-label="Vorherige Touren">‹</button>

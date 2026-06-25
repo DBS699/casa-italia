@@ -426,11 +426,17 @@ section[id], footer[id] { scroll-margin-top: 98px; }
 .news-card .cta .arrow { font-size: 17px; }
 
 /* Gallery — horizontal scroll carousel (shares .tour-track + .season-head/arrows) */
-.gallery-slide { flex: 0 0 min(380px, 84vw); scroll-snap-align: start; aspect-ratio: 3 / 2; overflow: hidden; border: 1px solid var(--line); border-radius: 4px; background: var(--paper); }
+.gallery-slide { position: relative; flex: 0 0 min(380px, 84vw); scroll-snap-align: start; aspect-ratio: 3 / 2; overflow: hidden; border: 1px solid var(--line); border-radius: 4px; background: var(--paper); }
 .gallery-slide img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }
 .gallery-slide:hover img { transform: scale(1.04); }
 .gallery-open { display: block; width: 100%; height: 100%; padding: 0; border: 0; background: none; cursor: zoom-in; }
 .gallery-open:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+/* optional caption overlaid at the bottom of a slide (pointer-events off so the image stays clickable) */
+.gallery-cap {
+  position: absolute; left: 0; right: 0; bottom: 0; pointer-events: none;
+  padding: 28px 14px 11px; color: #fff; font-size: 13px; line-height: 1.35; text-wrap: pretty;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.62), rgba(0, 0, 0, 0));
+}
 
 /* Gallery lightbox — full-screen image viewer; fades in, image zooms */
 .lightbox {
@@ -445,12 +451,20 @@ section[id], footer[id] { scroll-margin-top: 98px; }
 .lightbox[open]::backdrop { background: rgba(15, 14, 10, 0.9); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
 @starting-style { .lightbox[open]::backdrop { background: rgba(15, 14, 10, 0); } }
 
+.lightbox .lb-figure {
+  margin: 0; display: flex; flex-direction: column; align-items: center; gap: 14px;
+  max-width: min(1100px, 92vw); max-height: 92vh;
+}
 .lightbox .lb-img {
-  max-width: min(1100px, 92vw); max-height: 86vh; width: auto; height: auto;
+  max-width: 100%; max-height: 80vh; width: auto; height: auto;
   object-fit: contain; border-radius: 4px; box-shadow: 0 30px 90px rgba(0, 0, 0, 0.55);
 }
 @starting-style { .lightbox[open] .lb-img { transform: scale(0.94); opacity: 0; } }
 .lightbox .lb-img { transition: transform .3s cubic-bezier(.2, .7, .3, 1), opacity .3s ease; }
+.lightbox .lb-cap {
+  color: rgba(255, 255, 255, 0.92); font-size: 15px; line-height: 1.5;
+  text-align: center; max-width: 64ch; text-wrap: pretty; padding: 0 10px;
+}
 
 .lightbox .lb-close, .lightbox .lb-nav {
   position: absolute; z-index: 2; border: none; cursor: pointer; color: #fff;
@@ -473,6 +487,9 @@ section[id], footer[id] { scroll-margin-top: 98px; }
   .lightbox .lb-next { right: 10px; }
   .lightbox .lb-close { top: 12px; right: 12px; }
 }
+
+/* Touren — Tourenprogramm/Broschüre buttons under the season lead (shown when a PDF is set) */
+.season-doc { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
 
 /* Devenir membre — focused conversion section (replaces the old mixed "Aktuelles") */
 .join-cta { text-align: center; }

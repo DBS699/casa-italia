@@ -1,7 +1,10 @@
 ---
-import { I18N, DEFAULT_LANG, NEWS_LINKS } from '../data/content.js';
+import { I18N, DEFAULT_LANG, NEWS_LINKS, SITE } from '../data/content.js';
 const t = I18N[DEFAULT_LANG];
 const m = t.member;
+// Brochure button → the uploaded PDF if the club set one, else the e-mail fallback.
+const brochureHref = SITE.brochure || NEWS_LINKS['03'];
+const brochureExternal = !!SITE.brochure;
 ---
 
 <section id="mitmachen" class="section paper bordered reveal join-cta" aria-label="Mitmachen">
@@ -15,7 +18,7 @@ const m = t.member;
       <p class="lead" data-i18n="member.lead">{m.lead}</p>
       <div class="join-cta-actions">
         <button type="button" class="btn btn-green" data-join data-i18n="ctaJoin">{t.ctaJoin}</button>
-        <a class="btn btn-ghost-dark" href={NEWS_LINKS['03']} data-i18n="member.brochure">{m.brochure}</a>
+        <a class="btn btn-ghost-dark" href={brochureHref} target={brochureExternal ? '_blank' : undefined} rel={brochureExternal ? 'noopener' : undefined} data-i18n="member.brochure">{m.brochure}</a>
       </div>
     </div>
   </div>

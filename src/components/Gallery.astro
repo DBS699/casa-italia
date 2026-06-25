@@ -24,8 +24,9 @@ const t = I18N[DEFAULT_LANG];
       {GALLERY.map((s, i) => (
         <div class="gallery-slide" role="listitem">
           <button type="button" class="gallery-open" data-index={i} aria-label="Bild vergrössern">
-            <img id={s.id} src={s.image} alt="" width="380" height="254" loading="lazy" decoding="async" />
+            <img id={s.id} src={s.image} alt={s.caption} data-caption={s.caption} width="380" height="254" loading="lazy" decoding="async" />
           </button>
+          {s.caption && <span class="gallery-cap">{s.caption}</span>}
         </div>
       ))}
     </div>
@@ -35,7 +36,10 @@ const t = I18N[DEFAULT_LANG];
   <dialog class="lightbox" aria-label="Galerie-Bild">
     <button type="button" class="lb-close" aria-label="Schliessen">×</button>
     <button type="button" class="lb-nav lb-prev" aria-label="Vorheriges Bild">‹</button>
-    <img class="lb-img" alt="" />
+    <figure class="lb-figure">
+      <img class="lb-img" alt="" />
+      <figcaption class="lb-cap" hidden></figcaption>
+    </figure>
     <button type="button" class="lb-nav lb-next" aria-label="Nächstes Bild">›</button>
     <div class="lb-counter" aria-hidden="true"><span class="lb-cur">1</span> / <span class="lb-total">1</span></div>
   </dialog>
@@ -62,18 +66,21 @@ const t = I18N[DEFAULT_LANG];
 
     // ── lightbox ──────────────────────────────────────────
     const lb = document.querySelector('#gallery .lightbox');
-    const imgs = [...track.querySelectorAll('.gallery-slide img')].map((i) => i.currentSrc || i.src);
-    if (lb && imgs.length) {
+    const slides = [...track.querySelectorAll('.gallery-slide img')].map((i) => ({ src: i.currentSrc || i.src, cap: i.getAttribute('data-caption') || '' }));
+    if (lb && slides.length) {
       const lbImg = lb.querySelector('.lb-img');
+      const lbCap = lb.querySelector('.lb-cap');
       const cur = lb.querySelector('.lb-cur');
-      lb.querySelector('.lb-total').textContent = imgs.length;
-      const multi = imgs.length > 1;
+      lb.querySelector('.lb-total').textContent = slides.length;
+      const multi = slides.length > 1;
       lb.querySelectorAll('.lb-nav').forEach((b) => { b.hidden = !multi; });
       let idx = 0;
       const show = (n) => {
-        idx = (n + imgs.length) % imgs.length;
-        lbImg.src = imgs[idx];
+        idx = (n + slides.length) % slides.length;
+        lbImg.src = slides[idx].src;
         cur.textContent = idx + 1;
+        lbCap.textContent = slides[idx].cap;
+        lbCap.hidden = !slides[idx].cap;
       };
       document.querySelectorAll('#gallery .gallery-open').forEach((btn) => {
         btn.addEventListener('click', () => { show(Number(btn.dataset.index)); lb.showModal(); });
