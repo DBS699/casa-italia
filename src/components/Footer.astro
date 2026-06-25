@@ -1,5 +1,5 @@
 ---
-import { I18N, DEFAULT_LANG, CLUB, NEWS_LINKS } from '../data/content.js';
+import { I18N, DEFAULT_LANG, CLUB } from '../data/content.js';
 const t = I18N[DEFAULT_LANG];
 const nav = [
   { key: 'club', href: '#club' },
@@ -52,7 +52,6 @@ const socials = [
         {nav.map((item) => (
           <a href={item.href} data-i18n={`nav.${item.key}`}>{t.nav[item.key]}</a>
         ))}
-        <a href={NEWS_LINKS['02']} data-i18n="nav.classement">{t.nav.classement}</a>
       </div>
     </div>
   </div>
