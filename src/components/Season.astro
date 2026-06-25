@@ -43,9 +43,15 @@ const tours = TOURS.map((tour) => {
           data-month={tour.monthLabel}
           data-img={tour.img}
           data-desc={tour.description ?? ''}
+          data-meet={tour.meet ?? ''}
+          data-g1name={tour.g1name ?? ''}
+          data-g1route={tour.g1route ?? ''}
           data-distance={tour.distance ?? ''}
           data-elev={tour.elevation ?? ''}
-          data-meet={tour.meet ?? ''}
+          data-g2name={tour.g2name ?? ''}
+          data-g2route={tour.g2route ?? ''}
+          data-g2dist={tour.g2distance ?? ''}
+          data-g2elev={tour.g2elevation ?? ''}
           data-url={tour.url ?? ''}
           data-gpx={tour.gpx ?? ''}
         >
@@ -72,11 +78,17 @@ const tours = TOURS.map((tour) => {
     <div class="modal-body">
       <h3 id="tm-title" class="tm-title"></h3>
       <p class="tm-desc"></p>
-      <div class="tm-facts">
-        <div><span class="k">Distanz</span><span class="v tm-distance"></span></div>
-        <div><span class="k">Höhenmeter</span><span class="v tm-elev"></span></div>
-        <div><span class="k">Treffpunkt</span><span class="v tm-meet"></span></div>
+      <div class="tm-groups">
+        <div class="tm-group tm-g1" hidden>
+          <div class="tm-group-head"><span class="tm-group-name tm-g1-name"></span><span class="tm-group-facts tm-g1-facts"></span></div>
+          <div class="tm-group-route tm-g1-route"></div>
+        </div>
+        <div class="tm-group tm-g2" hidden>
+          <div class="tm-group-head"><span class="tm-group-name tm-g2-name"></span><span class="tm-group-facts tm-g2-facts"></span></div>
+          <div class="tm-group-route tm-g2-route"></div>
+        </div>
       </div>
+      <div class="tm-meet"><span class="k">Treffpunkt</span><span class="tm-meet-val"></span></div>
       <div class="tm-map" hidden></div>
       <div class="tm-actions">
         <a class="btn btn-green tm-route" target="_blank" rel="noopener" hidden><span class="tm-route-label">Route ansehen</span> <span class="arrow" style="font-size:16px">→</span></a>
@@ -156,9 +168,20 @@ const tours = TOURS.map((tour) => {
         set('.tm-photo .tour-badge .m', d.month);
         set('.tm-title', d.title);
         set('.tm-desc', d.desc);
-        set('.tm-distance', d.distance);
-        set('.tm-elev', d.elev);
-        set('.tm-meet', d.meet);
+        // two groups (Grappa + gemeinsame Ausfahrt) — each shown only if it has data
+        const setGroup = (n, name, dist, elev, rt) => {
+          const block = dlg.querySelector('.tm-g' + n);
+          const has = !!(name || dist || rt);
+          block.hidden = !has;
+          if (!has) return;
+          set('.tm-g' + n + '-name', name);
+          set('.tm-g' + n + '-facts', [dist, elev].filter(Boolean).join(' · '));
+          const r = dlg.querySelector('.tm-g' + n + '-route');
+          r.textContent = rt || ''; r.hidden = !rt;
+        };
+        setGroup(1, d.g1name, d.distance, d.elev, d.g1route);
+        setGroup(2, d.g2name, d.g2dist, d.g2elev, d.g2route);
+        set('.tm-meet-val', d.meet);
         const emb = stravaEmbed(d.url);
         const route = dlg.querySelector('.tm-route');
         if (d.url) {
