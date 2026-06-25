@@ -189,7 +189,11 @@ section[id], footer[id] { scroll-margin-top: 98px; }
 .hero video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; border: 0; }
 .hero .scrim {
   position: absolute; inset: 0; z-index: 1;
-  background: linear-gradient(180deg, rgba(11,10,6,0.42) 0%, rgba(11,10,6,0.34) 42%, rgba(11,10,6,0.66) 100%);
+  /* radial darkening behind the centred text + a vertical gradient — keeps the
+     overlay text legible over ANY uploaded hero photo, not just the dark video */
+  background:
+    radial-gradient(108% 88% at 50% 50%, rgba(8,7,4,0.52) 0%, rgba(8,7,4,0.14) 68%, rgba(8,7,4,0) 100%),
+    linear-gradient(180deg, rgba(8,7,4,0.50) 0%, rgba(8,7,4,0.44) 45%, rgba(8,7,4,0.74) 100%);
 }
 .hero .inner { position: relative; z-index: 2; max-width: 840px; margin: 0 auto; animation: heroIn 1s ease both; }
 .hero .laurel { width: min(280px, 62vw); height: auto; margin: 0 auto 20px; }
@@ -211,6 +215,7 @@ section[id], footer[id] { scroll-margin-top: 98px; }
   font-size: 15px; font-weight: 600; color: #cfc8bb; margin: 16px 0 0;
 }
 .hero .hero-intro { max-width: 620px; margin: 22px auto 0; font-size: 18px; line-height: 1.7; color: #e2ddd2; text-wrap: pretty; }
+.hero h1, .hero .hero-sub, .hero .hero-intro { text-shadow: 0 1px 18px rgba(0, 0, 0, 0.5); }
 .hero .actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 32px; }
 
 /* ── Generic sections ─────────────────────────────────────────────────────── */
