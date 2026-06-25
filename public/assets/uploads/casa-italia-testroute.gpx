@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="Velo-Club Casa d'Italia" xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+  <metadata>
+    <name>Casa d'Italia – Testrunde Bern</name>
+    <desc>Kurze Test-Route rund um Bern – nur zum Ausprobieren des GPX-Downloads.</desc>
+  </metadata>
+  <trk>
+    <name>Casa d'Italia – Testrunde Bern</name>
+    <trkseg>
+      <trkpt lat="46.94800" lon="7.44740"><ele>540</ele></trkpt>
+      <trkpt lat="46.94450" lon="7.45300"><ele>545</ele></trkpt>
+      <trkpt lat="46.94000" lon="7.46000"><ele>552</ele></trkpt>
+      <trkpt lat="46.93500" lon="7.46800"><ele>560</ele></trkpt>
+      <trkpt lat="46.93000" lon="7.47500"><ele>571</ele></trkpt>
+      <trkpt lat="46.92600" lon="7.48300"><ele>584</ele></trkpt>
+      <trkpt lat="46.92300" lon="7.49200"><ele>596</ele></trkpt>
+      <trkpt lat="46.92700" lon="7.49800"><ele>588</ele></trkpt>
+      <trkpt lat="46.93300" lon="7.50100"><ele>575</ele></trkpt>
+      <trkpt lat="46.93900" lon="7.49800"><ele>566</ele></trkpt>
+      <trkpt lat="46.94400" lon="7.49100"><ele>558</ele></trkpt>
+      <trkpt lat="46.94800" lon="7.48200"><ele>551</ele></trkpt>
+      <trkpt lat="46.95100" lon="7.47100"><ele>546</ele></trkpt>
+      <trkpt lat="46.95200" lon="7.46000"><ele>543</ele></trkpt>
+      <trkpt lat="46.95050" lon="7.45200"><ele>541</ele></trkpt>
+      <trkpt lat="46.94800" lon="7.44740"><ele>540</ele></trkpt>
+    </trkseg>
+  </trk>
+</gpx>
