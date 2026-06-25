@@ -70,6 +70,7 @@ const tours = TOURS.map((tour) => {
         <div><span class="k">Höhenmeter</span><span class="v tm-elev"></span></div>
         <div><span class="k">Treffpunkt</span><span class="v tm-meet"></span></div>
       </div>
+      <div class="tm-map" hidden></div>
       <a class="btn btn-green tm-route" target="_blank" rel="noopener" hidden>Route ansehen <span class="arrow" style="font-size:16px">→</span></a>
     </div>
   </dialog>
@@ -103,6 +104,39 @@ const tours = TOURS.map((tour) => {
 
     // ── detail dialog ─────────────────────────────────────
     const set = (sel, val) => { const el = dlg.querySelector(sel); if (el) el.textContent = val || ''; };
+
+    // Strava route/activity embed (interactive map) — auto-detected from a pasted strava.com link.
+    const stravaEmbed = (url) => {
+      try {
+        const u = new URL(url);
+        if (!/(^|\.)strava\.com$/i.test(u.hostname)) return null;
+        const parts = u.pathname.split('/').filter(Boolean);
+        const type = parts.includes('activities') ? 'activity' : parts.includes('routes') ? 'route' : null;
+        if (!type) return null;
+        const id = parts.reverse().find((p) => /^\d+$/.test(p)); // last all-digits segment = id
+        return id ? { type, id } : null;
+      } catch (e) { return null; }
+    };
+    const map = dlg.querySelector('.tm-map');
+    const showStravaMap = (emb) => {
+      map.innerHTML = '';
+      if (!emb) { map.hidden = true; return; }
+      const ph = document.createElement('div');
+      ph.className = 'strava-embed-placeholder';
+      ph.setAttribute('data-embed-type', emb.type);
+      ph.setAttribute('data-embed-id', emb.id);
+      ph.setAttribute('data-style', 'standard');
+      ph.setAttribute('data-slippy', 'true');
+      map.appendChild(ph);
+      map.hidden = false;
+      // (re)load Strava's embed script so it converts the just-added placeholder
+      const old = document.getElementById('strava-embed-js');
+      if (old) old.remove();
+      const s = document.createElement('script');
+      s.id = 'strava-embed-js';
+      s.src = 'https://strava-embeds.com/embed.js';
+      document.body.appendChild(s);
+    };
     root.querySelectorAll('.tour-card').forEach((card) => {
       card.addEventListener('click', () => {
         const d = card.dataset;
@@ -115,11 +149,15 @@ const tours = TOURS.map((tour) => {
         set('.tm-distance', d.distance);
         set('.tm-elev', d.elev);
         set('.tm-meet', d.meet);
+        const emb = stravaEmbed(d.url);
         const route = dlg.querySelector('.tm-route');
         if (d.url) { route.href = d.url; route.hidden = false; } else { route.hidden = true; }
+        showStravaMap(emb);
         dlg.showModal();
       });
     });
+    // stop the embedded map (and reset) whenever the dialog closes
+    dlg.addEventListener('close', () => { map.innerHTML = ''; map.hidden = true; });
     dlg.querySelector('.tm-close').addEventListener('click', () => dlg.close());
     // click on the backdrop (outside the dialog box) closes
     dlg.addEventListener('click', (e) => {
