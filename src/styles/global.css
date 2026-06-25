@@ -346,13 +346,17 @@ section[id], footer[id] { scroll-margin-top: 98px; }
 .tour-modal .tm-map iframe { display: block; width: 100% !important; border: 0; min-height: 360px; }
 .tour-modal .tm-actions { display: flex; flex-wrap: wrap; gap: 12px; }
 
-/* Two groups per tour (Gruppo Grappa + Gemeinsame Ausfahrt) */
-.tour-modal .tm-groups { display: flex; flex-direction: column; gap: 16px; padding: 18px 0; margin: 0 0 16px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.tour-modal .tm-group-head { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; }
-.tour-modal .tm-group-name { font-family: var(--label); text-transform: uppercase; letter-spacing: 0.12em; font-size: 12px; font-weight: 600; color: var(--green); }
-.tour-modal .tm-group-facts { font-family: var(--serif); font-size: 18px; color: var(--ink); white-space: nowrap; }
-.tour-modal .tm-group-route { font-size: 14px; line-height: 1.5; color: var(--ink-soft); margin-top: 5px; text-wrap: pretty; }
-.tour-modal .tm-meet { display: flex; align-items: baseline; gap: 12px; margin: 0 0 22px; }
+/* Two groups per tour — switchable tabs (Gruppo Grappa / Gemeinsame Ausfahrt) */
+.tour-modal .tm-tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--line); margin: 4px 0 18px; }
+.tour-modal .tm-tab { appearance: none; background: none; border: none; cursor: pointer; padding: 10px 6px; margin-bottom: -1px; font-family: var(--label); text-transform: uppercase; letter-spacing: 0.1em; font-size: 12px; font-weight: 600; color: var(--ink-light); border-bottom: 2px solid transparent; transition: color .15s ease, border-color .15s ease; }
+.tour-modal .tm-tab:hover { color: var(--ink); }
+.tour-modal .tm-tab.is-active { color: var(--green); border-bottom-color: var(--green); }
+.tour-modal .tm-panel-name { display: block; font-family: var(--label); text-transform: uppercase; letter-spacing: 0.12em; font-size: 12px; font-weight: 600; color: var(--green); margin-bottom: 6px; }
+.tour-modal .tm-panel-facts { font-family: var(--serif); font-size: 22px; color: var(--ink); }
+.tour-modal .tm-panel-route { font-size: 14px; line-height: 1.5; color: var(--ink-soft); margin-top: 5px; text-wrap: pretty; }
+.tour-modal .tm-panel .tm-map { margin-top: 16px; }
+.tour-modal .tm-panel .tm-actions { margin-top: 16px; }
+.tour-modal .tm-meet { display: flex; align-items: baseline; gap: 12px; margin: 20px 0 0; padding-top: 16px; border-top: 1px solid var(--line); }
 .tour-modal .tm-meet .k { font-family: var(--label); text-transform: uppercase; letter-spacing: 0.14em; font-size: 11px; font-weight: 600; color: var(--ink-light); }
 .tour-modal .tm-meet .tm-meet-val { font-family: var(--serif); font-size: 18px; color: var(--ink); }
 .tour-modal .tm-close {

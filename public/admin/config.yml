@@ -58,12 +58,14 @@ collections:
               - { name: g1route, label: "Gruppe 1 – Route", widget: string, required: false, default: "" }
               - { name: distance, label: "Gruppe 1 – Distanz", widget: string, required: false, default: "" }
               - { name: elevation, label: "Gruppe 1 – Höhenmeter", widget: string, required: false, default: "" }
+              - { name: url, label: "Gruppe 1 – Strava-/Garmin-Link (optional)", widget: string, required: false, default: "" }
+              - { name: gpx, label: "Gruppe 1 – GPX-Datei (optional)", widget: file, required: false, default: "" }
               - { name: g2name, label: "Gruppe 2 – Name (leer lassen wenn nur eine Gruppe)", widget: string, required: false, default: "Gemeinsame Ausfahrt" }
               - { name: g2route, label: "Gruppe 2 – Route", widget: string, required: false, default: "" }
               - { name: g2distance, label: "Gruppe 2 – Distanz", widget: string, required: false, default: "" }
               - { name: g2elevation, label: "Gruppe 2 – Höhenmeter", widget: string, required: false, default: "" }
-              - { name: url, label: "Routen-Link (Strava oder Garmin Connect, optional)", widget: string, required: false, default: "" }
-              - { name: gpx, label: "GPX-Datei zum Herunterladen (optional)", widget: file, required: false, default: "" }
+              - { name: g2url, label: "Gruppe 2 – Strava-/Garmin-Link (optional)", widget: string, required: false, default: "" }
+              - { name: g2gpx, label: "Gruppe 2 – GPX-Datei (optional)", widget: file, required: false, default: "" }
 
   - name: committee
     label: "Komitee"

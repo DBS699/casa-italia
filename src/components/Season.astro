@@ -54,6 +54,8 @@ const tours = TOURS.map((tour) => {
           data-g2elev={tour.g2elevation ?? ''}
           data-url={tour.url ?? ''}
           data-gpx={tour.gpx ?? ''}
+          data-g2url={tour.g2url ?? ''}
+          data-g2gpx={tour.g2gpx ?? ''}
         >
           <div class="tour-photo">
             <img src={tour.img} alt={tour.title} width="800" height="520" loading="lazy" decoding="async" />
@@ -78,22 +80,21 @@ const tours = TOURS.map((tour) => {
     <div class="modal-body">
       <h3 id="tm-title" class="tm-title"></h3>
       <p class="tm-desc"></p>
-      <div class="tm-groups">
-        <div class="tm-group tm-g1" hidden>
-          <div class="tm-group-head"><span class="tm-group-name tm-g1-name"></span><span class="tm-group-facts tm-g1-facts"></span></div>
-          <div class="tm-group-route tm-g1-route"></div>
-        </div>
-        <div class="tm-group tm-g2" hidden>
-          <div class="tm-group-head"><span class="tm-group-name tm-g2-name"></span><span class="tm-group-facts tm-g2-facts"></span></div>
-          <div class="tm-group-route tm-g2-route"></div>
+      <div class="tm-tabs" role="tablist" hidden>
+        <button type="button" class="tm-tab" data-g="0"></button>
+        <button type="button" class="tm-tab" data-g="1"></button>
+      </div>
+      <div class="tm-panel" hidden>
+        <span class="tm-panel-name"></span>
+        <span class="tm-panel-facts"></span>
+        <div class="tm-panel-route"></div>
+        <div class="tm-map" hidden></div>
+        <div class="tm-actions">
+          <a class="btn btn-green tm-route" target="_blank" rel="noopener" hidden><span class="tm-route-label">Route ansehen</span> <span class="arrow" style="font-size:16px">→</span></a>
+          <a class="btn btn-ghost-dark tm-gpx" download hidden>GPX herunterladen</a>
         </div>
       </div>
       <div class="tm-meet"><span class="k">Treffpunkt</span><span class="tm-meet-val"></span></div>
-      <div class="tm-map" hidden></div>
-      <div class="tm-actions">
-        <a class="btn btn-green tm-route" target="_blank" rel="noopener" hidden><span class="tm-route-label">Route ansehen</span> <span class="arrow" style="font-size:16px">→</span></a>
-        <a class="btn btn-ghost-dark tm-gpx" download hidden>GPX herunterladen</a>
-      </div>
     </div>
   </dialog>
 </section>
@@ -159,6 +160,37 @@ const tours = TOURS.map((tour) => {
       s.src = 'https://strava-embeds.com/embed.js';
       document.body.appendChild(s);
     };
+    // ── group tabs (Grappa / Gemeinsame Ausfahrt) inside the modal ──
+    const tabsWrap = dlg.querySelector('.tm-tabs');
+    const tabs = [...dlg.querySelectorAll('.tm-tab')];
+    const panel = dlg.querySelector('.tm-panel');
+    const panelName = dlg.querySelector('.tm-panel-name');
+    const panelFacts = dlg.querySelector('.tm-panel-facts');
+    const panelRoute = dlg.querySelector('.tm-panel-route');
+    const routeBtn = dlg.querySelector('.tm-route');
+    const gpxBtn = dlg.querySelector('.tm-gpx');
+    let groups = [];
+    const selectTab = (idx) => {
+      const g = groups[idx];
+      if (!g) return;
+      tabs.forEach((t, i) => t.classList.toggle('is-active', i === idx));
+      panelName.textContent = g.name || '';
+      panelName.hidden = groups.length > 1 || !g.name; // the active tab already shows the name when there are two
+      panelFacts.textContent = g.facts || '';
+      panelRoute.textContent = g.route || ''; panelRoute.hidden = !g.route;
+      if (g.url) {
+        routeBtn.href = g.url; routeBtn.hidden = false;
+        const host = (() => { try { return new URL(g.url).hostname; } catch (e) { return ''; } })();
+        routeBtn.querySelector('.tm-route-label').textContent =
+          /garmin\.com$/i.test(host) ? 'In Garmin Connect öffnen'
+          : /strava\.com$/i.test(host) ? 'Auf Strava ansehen'
+          : 'Route ansehen';
+      } else { routeBtn.hidden = true; }
+      if (g.gpx) { gpxBtn.href = g.gpx; gpxBtn.hidden = false; } else { gpxBtn.hidden = true; }
+      showStravaMap(stravaEmbed(g.url));
+    };
+    tabs.forEach((tab, i) => tab.addEventListener('click', () => selectTab(i)));
+
     root.querySelectorAll('.tour-card').forEach((card) => {
       card.addEventListener('click', () => {
         const d = card.dataset;
@@ -168,33 +200,18 @@ const tours = TOURS.map((tour) => {
         set('.tm-photo .tour-badge .m', d.month);
         set('.tm-title', d.title);
         set('.tm-desc', d.desc);
-        // two groups (Grappa + gemeinsame Ausfahrt) — each shown only if it has data
-        const setGroup = (n, name, dist, elev, rt) => {
-          const block = dlg.querySelector('.tm-g' + n);
-          const has = !!(name || dist || rt);
-          block.hidden = !has;
-          if (!has) return;
-          set('.tm-g' + n + '-name', name);
-          set('.tm-g' + n + '-facts', [dist, elev].filter(Boolean).join(' · '));
-          const r = dlg.querySelector('.tm-g' + n + '-route');
-          r.textContent = rt || ''; r.hidden = !rt;
-        };
-        setGroup(1, d.g1name, d.distance, d.elev, d.g1route);
-        setGroup(2, d.g2name, d.g2dist, d.g2elev, d.g2route);
+        // build the group list — each group becomes a tab with its own facts/route/map/links
+        groups = [];
+        if (d.g1name || d.distance || d.g1route) groups.push({ name: d.g1name, facts: [d.distance, d.elev].filter(Boolean).join(' · '), route: d.g1route, url: d.url, gpx: d.gpx });
+        if (d.g2name || d.g2dist || d.g2route) groups.push({ name: d.g2name, facts: [d.g2dist, d.g2elev].filter(Boolean).join(' · '), route: d.g2route, url: d.g2url, gpx: d.g2gpx });
+        tabsWrap.hidden = groups.length < 2;
+        tabs.forEach((tab, i) => {
+          if (groups[i]) { tab.textContent = groups[i].name || ('Gruppe ' + (i + 1)); tab.hidden = false; }
+          else tab.hidden = true;
+        });
+        panel.hidden = groups.length === 0;
+        if (groups.length) selectTab(0); else showStravaMap(null);
         set('.tm-meet-val', d.meet);
-        const emb = stravaEmbed(d.url);
-        const route = dlg.querySelector('.tm-route');
-        if (d.url) {
-          route.href = d.url; route.hidden = false;
-          const host = (() => { try { return new URL(d.url).hostname; } catch (e) { return ''; } })();
-          route.querySelector('.tm-route-label').textContent =
-            /garmin\.com$/i.test(host) ? 'In Garmin Connect öffnen'
-            : /strava\.com$/i.test(host) ? 'Auf Strava ansehen'
-            : 'Route ansehen';
-        } else { route.hidden = true; }
-        showStravaMap(emb);
-        const gpx = dlg.querySelector('.tm-gpx');
-        if (d.gpx) { gpx.href = d.gpx; gpx.hidden = false; } else { gpx.hidden = true; }
         dlg.showModal();
       });
     });
