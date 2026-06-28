@@ -89,6 +89,7 @@ const tours = TOURS.map((tour) => {
         <span class="tm-panel-facts"></span>
         <div class="tm-panel-route"></div>
         <div class="tm-map" hidden></div>
+        <p class="tm-hint" hidden>💡 Tipp: Die Route lässt sich ohne Strava-Login ansehen — mit dem grünen Button „Auf Strava ansehen".</p>
         <div class="tm-actions">
           <a class="btn btn-green tm-route" target="_blank" rel="noopener" hidden><span class="tm-route-label">Route ansehen</span> <span class="arrow" style="font-size:16px">→</span></a>
           <a class="btn btn-ghost-dark tm-gpx" download hidden>GPX herunterladen</a>
@@ -169,6 +170,7 @@ const tours = TOURS.map((tour) => {
     const panelRoute = dlg.querySelector('.tm-panel-route');
     const routeBtn = dlg.querySelector('.tm-route');
     const gpxBtn = dlg.querySelector('.tm-gpx');
+    const hintEl = dlg.querySelector('.tm-hint');
     let groups = [];
     const selectTab = (idx) => {
       const g = groups[idx];
@@ -187,7 +189,9 @@ const tours = TOURS.map((tour) => {
           : 'Route ansehen';
       } else { routeBtn.hidden = true; }
       if (g.gpx) { gpxBtn.href = g.gpx; gpxBtn.hidden = false; } else { gpxBtn.hidden = true; }
-      showStravaMap(stravaEmbed(g.url));
+      const emb = stravaEmbed(g.url);
+      showStravaMap(emb);
+      hintEl.hidden = !emb; // the "view without login" tip only applies when the Strava map is shown
     };
     tabs.forEach((tab, i) => tab.addEventListener('click', () => selectTab(i)));
 

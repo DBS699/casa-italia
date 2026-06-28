@@ -361,6 +361,7 @@ section[id], footer[id] { scroll-margin-top: 98px; }
 .tour-modal .tm-panel-route { font-size: 14px; line-height: 1.5; color: var(--ink-soft); margin-top: 5px; text-wrap: pretty; }
 .tour-modal .tm-panel .tm-map { margin-top: 16px; }
 .tour-modal .tm-panel .tm-actions { margin-top: 16px; }
+.tour-modal .tm-hint { margin: 12px 0 0; font-size: 13.5px; line-height: 1.5; color: var(--ink-soft); text-wrap: pretty; }
 .tour-modal .tm-meet { display: flex; align-items: baseline; gap: 12px; margin: 20px 0 0; padding-top: 16px; border-top: 1px solid var(--line); }
 .tour-modal .tm-meet .k { font-family: var(--label); text-transform: uppercase; letter-spacing: 0.14em; font-size: 11px; font-weight: 600; color: var(--ink-light); }
 .tour-modal .tm-meet .tm-meet-val { font-family: var(--serif); font-size: 18px; color: var(--ink); }
