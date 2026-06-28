@@ -351,7 +351,7 @@ section[id], footer[id] { scroll-margin-top: 98px; }
 /* clip the bottom strip of the Strava embed (its "An Gerät senden" / "Anzeigen
    auf Strava" buttons + the created-on line) — they sit inside Strava's iframe
    which we can't edit; our own buttons below cover viewing + GPX without a login */
-.tour-modal .tm-map iframe { display: block; width: 100% !important; border: 0; min-height: 360px; margin-bottom: -116px; }
+.tour-modal .tm-map iframe { display: block; width: 100% !important; border: 0; min-height: 360px; margin-bottom: -96px; }
 .tour-modal .tm-actions { display: flex; flex-wrap: wrap; gap: 12px; }
 
 /* Two groups per tour — switchable tabs (Gruppo Grappa / Gemeinsame Ausfahrt) */
