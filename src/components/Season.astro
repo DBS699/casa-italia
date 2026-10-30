@@ -54,8 +54,10 @@ const tours = TOURS.map((tour) => {
           data-g2elev={tour.g2elevation ?? ''}
           data-url={tour.url ?? ''}
           data-gpx={tour.gpx ?? ''}
+          data-garmin={tour.garmin ?? ''}
           data-g2url={tour.g2url ?? ''}
           data-g2gpx={tour.g2gpx ?? ''}
+          data-g2garmin={tour.g2garmin ?? ''}
         >
           <div class="tour-photo">
             <img src={tour.img} alt={tour.title} width="800" height="520" loading="lazy" decoding="async" />
@@ -89,9 +91,9 @@ const tours = TOURS.map((tour) => {
         <span class="tm-panel-facts"></span>
         <div class="tm-panel-route"></div>
         <div class="tm-map" hidden></div>
-        <p class="tm-hint" hidden>💡 Tipp: Die Route lässt sich ohne Strava-Login ansehen — mit dem grünen Button „Auf Strava ansehen".</p>
         <div class="tm-actions">
           <a class="btn btn-green tm-route" target="_blank" rel="noopener" hidden><span class="tm-route-label">Route ansehen</span> <span class="arrow" style="font-size:16px">→</span></a>
+          <a class="btn btn-ghost-dark tm-garmin" target="_blank" rel="noopener" hidden>In Garmin Connect öffnen</a>
           <a class="btn btn-ghost-dark tm-gpx" download hidden>GPX herunterladen</a>
         </div>
       </div>
@@ -129,37 +131,28 @@ const tours = TOURS.map((tour) => {
     // ── detail dialog ─────────────────────────────────────
     const set = (sel, val) => { const el = dlg.querySelector(sel); if (el) el.textContent = val || ''; };
 
-    // Strava route/activity embed (interactive map) — auto-detected from a pasted strava.com link.
-    const stravaEmbed = (url) => {
+    // Komoot tour embed (interactive map + elevation profile) — auto-detected from a pasted komoot link.
+    // Accepts e.g. komoot.com/de-de/tour/123456 (locale optional); a share_token is kept for non-public tours.
+    const komootEmbed = (url) => {
       try {
         const u = new URL(url);
-        if (!/(^|\.)strava\.com$/i.test(u.hostname)) return null;
-        const parts = u.pathname.split('/').filter(Boolean);
-        const type = parts.includes('activities') ? 'activity' : parts.includes('routes') ? 'route' : null;
-        if (!type) return null;
-        const id = parts.reverse().find((p) => /^\d+$/.test(p)); // last all-digits segment = id
-        return id ? { type, id } : null;
+        if (!/(^|\.)komoot\.(com|de)$/i.test(u.hostname)) return null;
+        const m = u.pathname.match(/\/(?:smart)?tour\/(\w+)/);
+        if (!m) return null;
+        const q = new URLSearchParams({ profile: '1' });
+        const token = u.searchParams.get('share_token');
+        if (token) q.set('share_token', token);
+        return 'https://www.komoot.com/tour/' + m[1] + '/embed?' + q;
       } catch (e) { return null; }
     };
     const map = dlg.querySelector('.tm-map');
-    const showStravaMap = (emb) => {
+    const showMap = (src) => {
       map.innerHTML = '';
-      if (!emb) { map.hidden = true; return; }
-      const ph = document.createElement('div');
-      ph.className = 'strava-embed-placeholder';
-      ph.setAttribute('data-embed-type', emb.type);
-      ph.setAttribute('data-embed-id', emb.id);
-      ph.setAttribute('data-style', 'standard');
-      ph.setAttribute('data-slippy', 'true');
-      map.appendChild(ph);
+      if (!src) { map.hidden = true; return; }
+      const f = document.createElement('iframe');
+      f.src = src; f.title = 'Route auf Komoot';
+      map.appendChild(f);
       map.hidden = false;
-      // (re)load Strava's embed script so it converts the just-added placeholder
-      const old = document.getElementById('strava-embed-js');
-      if (old) old.remove();
-      const s = document.createElement('script');
-      s.id = 'strava-embed-js';
-      s.src = 'https://strava-embeds.com/embed.js';
-      document.body.appendChild(s);
     };
     // ── group tabs (Grappa / Gemeinsame Ausfahrt) inside the modal ──
     const tabsWrap = dlg.querySelector('.tm-tabs');
@@ -170,7 +163,7 @@ const tours = TOURS.map((tour) => {
     const panelRoute = dlg.querySelector('.tm-panel-route');
     const routeBtn = dlg.querySelector('.tm-route');
     const gpxBtn = dlg.querySelector('.tm-gpx');
-    const hintEl = dlg.querySelector('.tm-hint');
+    const garminBtn = dlg.querySelector('.tm-garmin');
     let groups = [];
     const selectTab = (idx) => {
       const g = groups[idx];
@@ -184,14 +177,14 @@ const tours = TOURS.map((tour) => {
         routeBtn.href = g.url; routeBtn.hidden = false;
         const host = (() => { try { return new URL(g.url).hostname; } catch (e) { return ''; } })();
         routeBtn.querySelector('.tm-route-label').textContent =
-          /garmin\.com$/i.test(host) ? 'In Garmin Connect öffnen'
+          /komoot\.(com|de)$/i.test(host) ? 'Auf Komoot ansehen'
+          : /garmin\.com$/i.test(host) ? 'In Garmin Connect öffnen'
           : /strava\.com$/i.test(host) ? 'Auf Strava ansehen'
           : 'Route ansehen';
       } else { routeBtn.hidden = true; }
+      if (g.garmin) { garminBtn.href = g.garmin; garminBtn.hidden = false; } else { garminBtn.hidden = true; }
       if (g.gpx) { gpxBtn.href = g.gpx; gpxBtn.hidden = false; } else { gpxBtn.hidden = true; }
-      const emb = stravaEmbed(g.url);
-      showStravaMap(emb);
-      hintEl.hidden = !emb; // the "view without login" tip only applies when the Strava map is shown
+      showMap(komootEmbed(g.url));
     };
     tabs.forEach((tab, i) => tab.addEventListener('click', () => selectTab(i)));
 
@@ -206,15 +199,15 @@ const tours = TOURS.map((tour) => {
         set('.tm-desc', d.desc);
         // build the group list — each group becomes a tab with its own facts/route/map/links
         groups = [];
-        if (d.g1name || d.distance || d.g1route) groups.push({ name: d.g1name, facts: [d.distance, d.elev].filter(Boolean).join(' · '), route: d.g1route, url: d.url, gpx: d.gpx });
-        if (d.g2name || d.g2dist || d.g2route) groups.push({ name: d.g2name, facts: [d.g2dist, d.g2elev].filter(Boolean).join(' · '), route: d.g2route, url: d.g2url, gpx: d.g2gpx });
+        if (d.g1name || d.distance || d.g1route) groups.push({ name: d.g1name, facts: [d.distance, d.elev].filter(Boolean).join(' · '), route: d.g1route, url: d.url, gpx: d.gpx, garmin: d.garmin });
+        if (d.g2name || d.g2dist || d.g2route) groups.push({ name: d.g2name, facts: [d.g2dist, d.g2elev].filter(Boolean).join(' · '), route: d.g2route, url: d.g2url, gpx: d.g2gpx, garmin: d.g2garmin });
         tabsWrap.hidden = groups.length < 2;
         tabs.forEach((tab, i) => {
           if (groups[i]) { tab.textContent = groups[i].name || ('Gruppe ' + (i + 1)); tab.hidden = false; }
           else tab.hidden = true;
         });
         panel.hidden = groups.length === 0;
-        if (groups.length) selectTab(0); else showStravaMap(null);
+        if (groups.length) selectTab(0); else showMap(null);
         set('.tm-meet-val', d.meet);
         dlg.showModal();
       });
