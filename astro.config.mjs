@@ -7,5 +7,5 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   site: 'https://veloclubcasaitaliabern.ch',
   server: { port: 5189, host: true },
-  integrations: [sitemap()],
+  integrations: [sitemap({ filter: (page) => !/\/(chat|admin-demo)\/?$/.test(page) })],
 });

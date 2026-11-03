@@ -100,3 +100,20 @@ section copy, nav, news cards) stays in the `I18N` object in `content.js` (devel
    Redeploy so the functions pick them up.
 
 After that: open `/admin`, “Login with GitHub”, edit → save → it commits → the site rebuilds.
+
+## Touren-Chat (`/chat`)
+
+Touren lassen sich auch per Nachricht ändern, ohne GitHub-Konto: Auf `/chat` mit dem Passwort anmelden, aufschreiben, was sich ändern soll, den Vorschlag prüfen und auf «Veröffentlichen» klicken. Nach etwa einer Minute ist es live. «Rückgängig machen» stellt die letzte Chat-Änderung wieder her; Änderungen aus dem CMS werden nie rückgängig gemacht.
+
+Gemini macht nur Vorschläge. `api/_chat-tours.js` prüft jeden Vorschlag, und ohne Klick auf «Veröffentlichen» wird nichts gespeichert. Der Chat kann nur `src/data/tours.json` und neue Fotos in `public/assets/uploads/` schreiben. Das CMS unter `/admin` funktioniert unabhängig davon weiter.
+
+Umgebungsvariablen in Vercel (Production, danach neu deployen):
+
+| Name | Inhalt |
+| --- | --- |
+| `CHAT_PASSWORD` | Passwort für den Chat, mindestens 12 Zeichen. Eine Änderung meldet alle ab. |
+| `GEMINI_API_KEY` | API-Key aus [Google AI Studio](https://aistudio.google.com/apikey) |
+| `CHAT_GITHUB_TOKEN` | Fine-grained GitHub-Token nur für `DBS699/casa-italia`, Berechtigung «Contents: Read and write». Der Token muss von DBS699 stammen, sonst deployt Vercel die Commits nicht. Er läuft ab und muss dann erneuert werden. |
+| `GEMINI_MODEL` | Optional: anderes Gemini-Modell als das Standardmodell in `api/_chat-gemini.js` |
+
+Fehlt eine Variable, zeigt `/chat` nur einen Hinweis. Tests ohne Keys: `npm test`.

@@ -2,5 +2,6 @@ User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /admin-demo
+Disallow: /chat
 
 Sitemap: https://veloclubcasaitaliabern.ch/sitemap-index.xml
