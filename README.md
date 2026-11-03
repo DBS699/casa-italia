@@ -101,11 +101,17 @@ section copy, nav, news cards) stays in the `I18N` object in `content.js` (devel
 
 After that: open `/admin`, “Login with GitHub”, edit → save → it commits → the site rebuilds.
 
-## Touren-Chat (`/chat`)
+## Website-Chat (`/chat`)
 
-Touren lassen sich auch per Nachricht ändern, ohne GitHub-Konto: Auf `/chat` mit dem Passwort anmelden, aufschreiben, was sich ändern soll, den Vorschlag prüfen und auf «Veröffentlichen» klicken. Nach etwa einer Minute ist es live. «Rückgängig machen» stellt die letzte Chat-Änderung wieder her; Änderungen aus dem CMS werden nie rückgängig gemacht.
+Alles, was im CMS änderbar ist, lässt sich auch per Nachricht ändern, ohne GitHub-Konto: Touren, Komitee, Sponsoren, Galerie und Startseite (Motto, Video, Vorschaubild, Broschüre). Auf `/chat` mit dem Passwort anmelden, aufschreiben, was sich ändern soll, Dateien bei Bedarf mit dem Plus-Zeichen anhängen, den Vorschlag prüfen und veröffentlichen. Nach etwa einer Minute ist es online. Die Seite ist nirgends verlinkt und für Suchmaschinen gesperrt (`noindex`, nicht in der Sitemap).
 
-Gemini macht nur Vorschläge. `api/_chat-tours.js` prüft jeden Vorschlag, und ohne Klick auf «Veröffentlichen» wird nichts gespeichert. Der Chat kann nur `src/data/tours.json` und neue Fotos in `public/assets/uploads/` schreiben. Das CMS unter `/admin` funktioniert unabhängig davon weiter.
+Gemini macht nur Vorschläge. `api/_chat-content.js` prüft jeden Vorschlag, und ohne Klick auf «Veröffentlichen» wird nichts gespeichert. Ist ein Gemini-Modell überlastet, nimmt der Chat automatisch das nächste (`api/_chat-gemini.js`). «Rückgängig machen» stellt die letzte Chat-Änderung wieder her, aber nie eine aus dem CMS.
+
+Dateien:
+
+- **Bilder** werden im Browser verkleinert und landen im selben Commit in `public/assets/uploads/` (höchstens 8 pro Veröffentlichung). PNGs bleiben PNG, solange sie klein genug sind, damit Logos transparent bleiben.
+- **Video und Broschüre-PDF** gehen direkt in den Vercel-Blob-Speicher (höchstens 100 MB), weil sie nicht durch das 4,5-MB-Limit einer Function passen.
+- **Tourenprogramm als PDF:** Der Browser liest den Text und schickt nur die Seiten mit Touren an Gemini (`src/scripts/chat-pdf.js`). Die Mitgliederliste mit den Adressen bleibt im Browser. Ein PDF wird nur dann öffentlich, wenn es ausdrücklich als Broschüre gesetzt wird.
 
 Umgebungsvariablen in Vercel (Production, danach neu deployen):
 
@@ -113,7 +119,6 @@ Umgebungsvariablen in Vercel (Production, danach neu deployen):
 | --- | --- |
 | `CHAT_PASSWORD` | Passwort für den Chat, mindestens 12 Zeichen. Eine Änderung meldet alle ab. |
 | `GEMINI_API_KEY` | API-Key aus [Google AI Studio](https://aistudio.google.com/apikey) |
-| `CHAT_GITHUB_TOKEN` | Fine-grained GitHub-Token nur für `DBS699/casa-italia`, Berechtigung «Contents: Read and write». Der Token muss von DBS699 stammen, sonst deployt Vercel die Commits nicht. Er läuft ab und muss dann erneuert werden. |
-| `GEMINI_MODEL` | Optional: anderes Gemini-Modell als das Standardmodell in `api/_chat-gemini.js` |
-
-Fehlt eine Variable, zeigt `/chat` nur einen Hinweis. Tests ohne Keys: `npm test`.
+| `CHAT_GITHUB_TOKEN` | Fine-grained GitHub-Token nur für `DBS699/casa-italia`, Berechtigung «Contents: Read and write». Der Token muss von DBS699 stammen, sonst deployt Vercel die Commits nicht. |
+| `BLOB_READ_WRITE_TOKEN` | Setzt Vercel beim Verbinden des Blob-Speichers selbst. Ohne ihn gehen im Chat keine grossen Uploads. |
+| `GEMINI_MODEL` | Optional: Modell, das vor den Standardmodellen in `api/_chat-gemini.js` versucht wird |

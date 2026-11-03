@@ -1,9 +1,10 @@
-// Reads and commits tours.json through the GitHub API. Commits are created without
-// an explicit author, so they count as the token's owner — Vercel's Hobby plan only
-// deploys a private repo's commits when they come from the project owner.
+// Reads and commits the content files through the GitHub API. Commits are created
+// without an explicit author, so they count as the token's owner — Vercel's Hobby
+// plan only deploys a private repo's commits when they come from the project owner.
+import { COLLECTIONS, COLLECTION_NAMES } from './_chat-content.js';
+
 const REPO = 'DBS699/casa-italia';
 const BRANCH = 'main';
-export const TOURS_PATH = 'src/data/tours.json';
 export const COMMIT_PREFIX = 'Chat: ';
 
 async function gh(path, options = {}) {
@@ -16,7 +17,7 @@ async function gh(path, options = {}) {
       'Content-Type': 'application/json',
       'User-Agent': 'casa-italia-chat',
     },
-    signal: AbortSignal.timeout(15000),
+    signal: AbortSignal.timeout(20000),
   });
   if (!r.ok) {
     const error = new Error(`GitHub ${r.status} on ${path.split('?')[0]}`);
@@ -26,11 +27,30 @@ async function gh(path, options = {}) {
   return r.json();
 }
 
-export async function readToursAt(ref = BRANCH) {
-  const file = await gh(`/contents/${TOURS_PATH}?ref=${encodeURIComponent(ref)}`);
-  const data = JSON.parse(Buffer.from(file.content, 'base64').toString('utf8'));
-  if (!Array.isArray(data.tours)) throw new Error('tours.json has no tours list');
-  return data;
+async function readFileAt(path, ref) {
+  const file = await gh(`/contents/${path}?ref=${encodeURIComponent(ref)}`);
+  return JSON.parse(Buffer.from(file.content, 'base64').toString('utf8'));
+}
+
+// All content files at a commit: `raw` holds each file as stored (so keys the chat
+// doesn't know survive), `content` the part the chat works with.
+export async function readContentAt(ref = BRANCH) {
+  const files = await Promise.all(COLLECTION_NAMES.map((name) => readFileAt(COLLECTIONS[name].file, ref)));
+  const raw = {};
+  const content = {};
+  COLLECTION_NAMES.forEach((name, i) => {
+    const { listKey } = COLLECTIONS[name];
+    raw[name] = files[i];
+    content[name] = listKey ? files[i][listKey] : files[i];
+    if (listKey && !Array.isArray(content[name])) throw new Error(`${COLLECTIONS[name].file} has no list ${listKey}`);
+  });
+  return { raw, content };
+}
+
+export function encodeContentFile(name, raw, value) {
+  const { listKey } = COLLECTIONS[name];
+  const data = listKey ? { ...raw, [listKey]: value } : { ...raw, ...value };
+  return { path: COLLECTIONS[name].file, base64: Buffer.from(`${JSON.stringify(data, null, 2)}\n`).toString('base64') };
 }
 
 export async function headCommit() {
@@ -38,15 +58,15 @@ export async function headCommit() {
   return ref.object.sha;
 }
 
-// The newest commit that touched tours.json — only that one can be undone safely.
-export async function latestToursCommit() {
-  const commits = await gh(`/commits?sha=${BRANCH}&path=${encodeURIComponent(TOURS_PATH)}&per_page=1`);
+// The newest commit that touched the data folder — only that one can be undone safely.
+export async function latestDataCommit() {
+  const commits = await gh(`/commits?sha=${BRANCH}&path=${encodeURIComponent('src/data')}&per_page=1`);
   const commit = commits[0];
   if (!commit) return null;
   return { sha: commit.sha, message: commit.commit.message, parent: commit.parents[0]?.sha };
 }
 
-// One atomic commit, so a tour and its photo always arrive (and deploy) together.
+// One atomic commit, so an entry and its photo always arrive (and deploy) together.
 // Fails with status 422 when main moved in the meantime; the caller starts over.
 export async function commitFiles({ parent, message, files }) {
   const base = await gh(`/git/commits/${parent}`);

@@ -1,6 +1,7 @@
 ---
-// Chat admin: edit the tours by writing what should change. Standalone page (not
-// Base.astro); all logic that matters lives in api/chat.js, this is only the UI.
+// Chat admin: edit everything the CMS can edit by writing what should change.
+// Standalone page (not Base.astro); all logic that matters lives in api/chat.js,
+// this is only the UI.
 import '../styles/global.css';
 ---
 
@@ -10,7 +11,7 @@ import '../styles/global.css';
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="robots" content="noindex, nofollow" />
-    <title>Touren-Chat — Velo-Club Casa d'Italia</title>
+    <title>Website-Chat — Velo-Club Casa d'Italia</title>
     <link rel="icon" type="image/png" href="/assets/logo.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -23,7 +24,7 @@ import '../styles/global.css';
     <header class="chat-head">
       <a href="/" class="chat-brand">
         <img src="/assets/logo.png" alt="" width="36" height="36" />
-        <span>Touren-Chat</span>
+        <span>Website-Chat</span>
       </a>
       <button type="button" class="chat-link" id="logout" hidden>Abmelden</button>
     </header>
@@ -33,11 +34,11 @@ import '../styles/global.css';
 
       <section class="chat-note" id="setup" hidden>
         <h1>Der Chat ist noch nicht eingerichtet.</h1>
-        <p>Es fehlen noch die Zugangsdaten bei Vercel. Touren lassen sich bis dahin im <a href="/admin">CMS</a> ändern.</p>
+        <p>Es fehlen noch die Zugangsdaten bei Vercel. Die Website lässt sich bis dahin im <a href="/admin">CMS</a> ändern.</p>
       </section>
 
       <form class="chat-login" id="login" hidden>
-        <h1>Touren ändern, einfach per Nachricht.</h1>
+        <h1>Website ändern, einfach per Nachricht.</h1>
         <label for="password">Passwort</label>
         <input id="password" type="password" autocomplete="current-password" required />
         <p class="chat-error" id="login-error" role="alert" hidden></p>
@@ -48,25 +49,23 @@ import '../styles/global.css';
         <div class="chat-log" id="log" aria-live="polite">
           <div class="chat-welcome" id="welcome">
             <h1>Was möchtest du ändern?</h1>
-            <p>Schreib es einfach auf. Du siehst immer zuerst einen Vorschlag, online geht erst, was du bestätigst.</p>
+            <p>Touren, Komitee, Sponsoren, Galerie oder Startseite: Schreib es einfach auf, und häng Bilder, ein Video oder das Tourenprogramm als PDF an. Du siehst immer zuerst einen Vorschlag, online geht erst, was du bestätigst.</p>
             <div class="chat-examples">
               <button type="button">Neue Tour am 14. März: Gurnigel-Runde, 85 km, Treffpunkt 8 Uhr</button>
-              <button type="button">Welche Touren sind im August eingetragen?</button>
-              <button type="button">Verschiebe die Studen-Runde um eine Woche</button>
+              <button type="button">Trage alle Touren aus dem angehängten PDF ein</button>
+              <button type="button">Neuer Sponsor mit dem angehängten Logo: Velo Muster, velomuster.ch</button>
+              <button type="button">Füge die angehängten Fotos in die Galerie ein</button>
             </div>
           </div>
         </div>
 
         <form class="chat-composer" id="composer">
-          <div class="chat-photo" id="photo-chip" hidden>
-            <img id="photo-preview" alt="Angehängtes Foto" />
-            <button type="button" class="chat-link" id="photo-remove">Foto entfernen</button>
-          </div>
+          <ul class="chat-files" id="files" hidden></ul>
           <div class="chat-input">
-            <label class="chat-attach" title="Foto anhängen">
-              <input id="photo-input" type="file" accept="image/*" />
+            <label class="chat-attach" title="Bilder, Video oder PDF anhängen">
+              <input id="file-input" type="file" accept="image/*,video/*,application/pdf,.pdf" multiple />
               <span aria-hidden="true">+</span>
-              <span class="sr">Foto anhängen</span>
+              <span class="sr">Bilder, Video oder PDF anhängen</span>
             </label>
             <textarea id="text" rows="1" placeholder="Nachricht schreiben …" aria-label="Nachricht"></textarea>
             <button type="submit" class="chat-primary" id="send">Senden</button>
@@ -124,10 +123,19 @@ import '../styles/global.css';
       .chat-fields del { color: var(--ink-light); }
       .chat-fields ins { text-decoration: none; font-weight: 600; }
       .chat-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+      .chat-count { font-weight: 600; }
+      .chat-change summary { cursor: pointer; display: flex; flex-direction: column; gap: 4px; }
+      .chat-change details[open] summary { margin-bottom: 8px; }
+      .chat-msg-files { display: block; margin-top: 4px; font-size: 13.5px; opacity: 0.85; }
 
       .chat-composer { position: sticky; bottom: 0; border-top: 1px solid var(--line); background: var(--paper); padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 8px; }
-      .chat-photo { display: flex; align-items: center; gap: 10px; }
-      .chat-photo img { width: 56px; height: 56px; object-fit: cover; border-radius: 6px; }
+      .chat-files { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; max-height: 30dvh; overflow-y: auto; }
+      .chat-file { display: flex; align-items: center; gap: 10px; font-size: 14.5px; }
+      .chat-file img, .chat-file .chat-file-icon { flex: none; width: 44px; height: 44px; object-fit: cover; border-radius: 6px; }
+      .chat-file .chat-file-icon { display: grid; place-items: center; background: var(--card); border: 1px solid var(--line); font-family: var(--label); font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); }
+      .chat-file-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+      .chat-file-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .chat-file-note { color: var(--ink-light); font-size: 13px; }
       .chat-input { display: flex; align-items: flex-end; gap: 8px; }
       .chat-input textarea { flex: 1; min-width: 0; resize: none; max-height: 160px; font: inherit; font-size: 16px; line-height: 1.4; padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--card); color: var(--ink); }
       .chat-attach { flex: none; width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 6px; background: var(--card); font-size: 24px; line-height: 1; color: var(--ink-soft); cursor: pointer; position: relative; }
@@ -135,251 +143,407 @@ import '../styles/global.css';
       .chat-attach:focus-within { outline: 2px solid var(--green); outline-offset: 1px; }
     </style>
 
-    <script is:inline>
-      (function () {
-        const $ = (id) => document.getElementById(id);
-        const log = $('log');
-        const text = $('text');
-        const send = $('send');
+    <script>
+      import { pickTourPages } from '../scripts/chat-pdf.js';
 
-        let history = [];
-        let photo = null;
-        let busy = false;
-        let openCard = null;
+      const $ = (id) => document.getElementById(id);
+      const log = $('log');
+      const text = $('text');
+      const send = $('send');
 
-        const show = (view) => {
-          ['loading', 'setup', 'login', 'room'].forEach((id) => { $(id).hidden = id !== view; });
-          $('logout').hidden = view !== 'room';
-        };
+      const MAX_FILES = 12;
+      const MAX_IMAGES_PER_PUBLISH = 8;
+      // Eight of these still fit through the function's 4.5 MB request limit.
+      const MAX_IMAGE_BYTES = 350 * 1024;
+      const MAX_UPLOAD_BYTES = 100 * 1024 * 1024;
 
-        async function call(action, payload) {
-          const r = await fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action, ...payload }),
-          });
-          const data = await r.json().catch(() => ({}));
-          if (data.loggedOut) show('login');
-          if (!r.ok) throw new Error(data.error || 'Das hat gerade nicht geklappt. Bitte versuch es nochmals.');
-          return data;
-        }
+      let messages = [];
+      let attachments = [];
+      let nextFileId = 1;
+      let uploadsEnabled = false;
+      let busy = false;
+      let openCard = null;
 
-        function el(tag, className, content) {
-          const node = document.createElement(tag);
-          if (className) node.className = className;
-          if (content !== undefined) node.textContent = content;
-          return node;
-        }
+      const show = (view) => {
+        ['loading', 'setup', 'login', 'room'].forEach((id) => { $(id).hidden = id !== view; });
+        $('logout').hidden = view !== 'room';
+      };
 
-        function addMessage(kind, content) {
-          $('welcome').hidden = true;
-          const node = el('div', `chat-msg ${kind}`, content);
-          log.appendChild(node);
-          log.scrollTop = log.scrollHeight;
-          return node;
-        }
+      async function call(action, payload) {
+        const r = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action, ...payload }),
+        });
+        const data = await r.json().catch(() => ({}));
+        if (data.loggedOut) show('login');
+        if (!r.ok) throw new Error(data.error || 'Das hat gerade nicht geklappt. Bitte versuch es nochmals.');
+        return data;
+      }
 
-        function setBusy(value) {
-          busy = value;
-          send.disabled = value;
-        }
+      function el(tag, className, content) {
+        const node = document.createElement(tag);
+        if (className) node.className = className;
+        if (content !== undefined) node.textContent = content;
+        return node;
+      }
 
-        function closeCard() {
-          if (!openCard) return;
-          openCard.classList.add('is-closed');
-          openCard.querySelectorAll('button').forEach((b) => { b.disabled = true; });
-          openCard = null;
-        }
+      function addMessage(kind, content) {
+        $('welcome').hidden = true;
+        const node = el('div', `chat-msg ${kind}`, content);
+        log.appendChild(node);
+        log.scrollTop = log.scrollHeight;
+        return node;
+      }
 
-        const KIND_LABEL = { add: 'Neue Tour', update: 'Änderung', delete: 'Wird gelöscht' };
+      function setBusy(value) {
+        busy = value;
+        send.disabled = value;
+      }
 
-        function renderChange(change) {
-          const box = el('div', 'chat-change');
-          box.appendChild(el('span', `chat-kind ${change.kind}`, KIND_LABEL[change.kind]));
-          box.appendChild(el('strong', '', `${change.title} · ${change.date}`));
-          if (change.fields.length) {
-            const list = el('ul', 'chat-fields');
-            change.fields.forEach((f) => {
-              const item = el('li');
-              item.appendChild(el('span', 'k', f.label));
-              const value = el('span', 'v');
-              if (f.before) { value.appendChild(el('del', '', f.before)); value.append(' → '); }
-              value.appendChild(el('ins', '', f.after || '(leer)'));
-              item.appendChild(value);
-              list.appendChild(item);
-            });
-            box.appendChild(list);
-          }
+      function closeCard() {
+        if (!openCard) return;
+        openCard.classList.add('is-closed');
+        openCard.querySelectorAll('button').forEach((b) => { b.disabled = true; });
+        openCard = null;
+      }
+
+      const KIND_LABEL = { add: 'neu', update: 'Änderung', delete: 'wird gelöscht', move: 'verschoben' };
+
+      function renderFields(change) {
+        const list = el('ul', 'chat-fields');
+        change.fields.forEach((f) => {
+          const item = el('li');
+          item.appendChild(el('span', 'k', f.label));
+          const value = el('span', 'v');
+          if (f.before) { value.appendChild(el('del', '', f.before)); value.append(' → '); }
+          value.appendChild(el('ins', '', f.after || '(leer)'));
+          item.appendChild(value);
+          list.appendChild(item);
+        });
+        return list;
+      }
+
+      // With many changes (a whole programme) every entry starts folded up.
+      function renderChange(change, folded) {
+        const box = el('div', 'chat-change');
+        const kind = el('span', `chat-kind ${change.kind}`, `${change.area} · ${KIND_LABEL[change.kind]}`);
+        const title = el('strong', '', change.title);
+        if (folded && change.fields.length) {
+          const details = el('details');
+          const summary = el('summary');
+          summary.append(kind, title);
+          details.append(summary, renderFields(change));
+          box.appendChild(details);
           return box;
         }
+        box.append(kind, title);
+        if (change.fields.length) box.appendChild(renderFields(change));
+        return box;
+      }
 
-        function addProposal(proposal) {
+      function addProposal(proposal) {
+        closeCard();
+        const card = el('div', 'chat-card');
+        const folded = proposal.changes.length > 5;
+        if (folded) card.appendChild(el('span', 'chat-count', `${proposal.changes.length} Änderungen. Antippen, um Einzelheiten zu sehen.`));
+        proposal.changes.forEach((c) => card.appendChild(renderChange(c, folded)));
+        const actions = el('div', 'chat-actions');
+        const publish = el('button', 'chat-primary', 'Veröffentlichen');
+        const discard = el('button', 'chat-secondary', 'Verwerfen');
+        publish.type = 'button';
+        discard.type = 'button';
+        publish.addEventListener('click', () => doPublish(proposal, publish));
+        discard.addEventListener('click', () => {
           closeCard();
-          const card = el('div', 'chat-card');
-          proposal.changes.forEach((c) => card.appendChild(renderChange(c)));
-          const actions = el('div', 'chat-actions');
-          const publish = el('button', 'chat-primary', 'Veröffentlichen');
-          const discard = el('button', 'chat-secondary', 'Verwerfen');
-          publish.type = 'button';
-          discard.type = 'button';
-          publish.addEventListener('click', () => doPublish(proposal, publish));
-          discard.addEventListener('click', () => {
-            closeCard();
-            history.push({ role: 'assistant', text: 'Der Vorschlag wurde verworfen, nichts wurde geändert.' });
-            addMessage('assistant', 'Alles klar, nichts geändert.');
+          messages.push({ role: 'assistant', text: 'Der Vorschlag wurde verworfen, nichts wurde geändert.' });
+          addMessage('assistant', 'Alles klar, nichts geändert.');
+        });
+        actions.append(publish, discard);
+        card.appendChild(actions);
+        log.appendChild(card);
+        log.scrollTop = log.scrollHeight;
+        openCard = card;
+      }
+
+      async function run(action, payload) {
+        setBusy(true);
+        const thinking = addMessage('thinking', 'Einen Moment …');
+        try {
+          const data = await call(action, payload);
+          thinking.remove();
+          const operations = data.proposal?.operations;
+          messages.push({ role: 'assistant', text: operations ? `${data.reply}\n[Vorschlag: ${JSON.stringify(operations)}]` : data.reply });
+          addMessage('assistant', data.reply);
+          if (data.proposal) addProposal(data.proposal);
+        } catch (e) {
+          thinking.remove();
+          addMessage('error', e.message);
+        } finally {
+          setBusy(false);
+        }
+      }
+
+      function attachedIds(operations) {
+        const ids = new Set();
+        (operations || []).forEach((op) => {
+          Object.values(op.fields || {}).forEach((value) => {
+            if (typeof value === 'string' && value.startsWith('@')) ids.add(value.slice(1));
           });
-          actions.append(publish, discard);
-          card.appendChild(actions);
-          log.appendChild(card);
-          log.scrollTop = log.scrollHeight;
-          openCard = card;
-        }
+        });
+        return ids;
+      }
 
-        async function run(action, payload) {
-          setBusy(true);
-          const thinking = addMessage('thinking', 'Einen Moment …');
-          try {
-            const data = await call(action, payload);
-            thinking.remove();
-            history.push({ role: 'assistant', text: data.reply });
-            addMessage('assistant', data.reply);
-            if (data.proposal) addProposal(data.proposal);
-          } catch (e) {
-            thinking.remove();
-            addMessage('error', e.message);
-          } finally {
-            setBusy(false);
-          }
+      async function uploadLarge(attachment, button) {
+        if (attachment.blobUrl) return attachment.blobUrl;
+        if (!uploadsEnabled) throw new Error('Grosse Dateien kann der Chat noch nicht hochladen. Bitte vorerst das CMS verwenden.');
+        const { upload } = await import('@vercel/blob/client');
+        const safeName = attachment.name.toLowerCase().replace(/[^a-z0-9.]+/g, '-');
+        try {
+          const blob = await upload(`chat/${safeName}`, attachment.file, {
+            access: 'public',
+            handleUploadUrl: '/api/chat',
+            multipart: attachment.file.size > 20 * 1024 * 1024,
+            onUploadProgress: ({ percentage }) => { button.textContent = `Lädt hoch … ${Math.round(percentage)} %`; },
+          });
+          attachment.blobUrl = blob.url;
+          return blob.url;
+        } catch (e) {
+          throw new Error(`«${attachment.name}» konnte nicht hochgeladen werden. Es wurde nichts geändert. Bitte versuch es nochmals.`);
         }
+      }
 
-        async function doPublish(proposal, button) {
-          if (busy) return;
+      async function filesForPublish(used, button) {
+        const chosen = attachments.filter((a) => used.has(a.id));
+        if (chosen.filter((a) => a.kind === 'image').length > MAX_IMAGES_PER_PUBLISH) {
+          throw new Error(`Bitte höchstens ${MAX_IMAGES_PER_PUBLISH} Bilder auf einmal veröffentlichen.`);
+        }
+        const files = [];
+        for (const a of chosen) {
+          if (a.kind === 'image') files.push({ id: a.id, kind: 'image', base64: a.base64 });
+          else files.push({ id: a.id, kind: a.kind, url: await uploadLarge(a, button) });
+        }
+        return files;
+      }
+
+      async function doPublish(proposal, button) {
+        if (busy) return;
+        button.textContent = 'Wird veröffentlicht …';
+        setBusy(true);
+        openCard.querySelectorAll('button').forEach((b) => { b.disabled = true; });
+        const used = attachedIds(proposal.operations);
+        try {
+          const { type, operations, commit } = proposal;
+          const files = await filesForPublish(used, button);
           button.textContent = 'Wird veröffentlicht …';
-          setBusy(true);
-          openCard.querySelectorAll('button').forEach((b) => { b.disabled = true; });
-          const needsPhoto = proposal.type === 'change' && proposal.operations.some((op) => op.useAttachment);
-          try {
-            const { type, operations, commit } = proposal;
-            await call('publish', {
-              proposal: { type, operations, commit },
-              photo: needsPhoto && photo ? { base64: photo.base64 } : undefined,
-            });
-            closeCard();
-            if (needsPhoto) clearPhoto();
-            history.push({ role: 'assistant', text: 'Der Vorschlag wurde veröffentlicht.' });
-            const done = addMessage('assistant', 'Veröffentlicht. In etwa einer Minute ist es auf der ');
-            const link = el('a', '', 'Website');
-            link.href = '/#touren';
-            link.target = '_blank';
-            done.append(link, ' zu sehen.');
-            const undo = el('button', 'chat-secondary', 'Rückgängig machen');
-            undo.type = 'button';
-            undo.addEventListener('click', () => {
-              if (busy) return;
-              undo.remove();
-              closeCard();
-              run('propose-undo', {});
-            });
-            const row = el('div', 'chat-actions');
-            row.appendChild(undo);
-            log.appendChild(row);
-            log.scrollTop = log.scrollHeight;
-          } catch (e) {
-            button.textContent = 'Veröffentlichen';
-            openCard.querySelectorAll('button').forEach((b) => { b.disabled = false; });
-            addMessage('error', e.message);
-          } finally {
-            setBusy(false);
-          }
-        }
-
-        function submit() {
-          const value = text.value.trim();
-          if (!value || busy) return;
+          await call('publish', { proposal: { type, operations, commit }, files });
+          button.textContent = 'Veröffentlicht';
           closeCard();
-          addMessage('user', value);
-          history.push({ role: 'user', text: value });
-          text.value = '';
-          text.style.height = '';
-          run('propose', { messages: history, hasAttachment: Boolean(photo) });
+          // A programme PDF has done its job once its tours are online.
+          attachments.filter((a) => used.has(a.id) || a.kind === 'pdf').forEach(forgetFile);
+          renderFiles();
+          messages.push({ role: 'assistant', text: 'Der Vorschlag wurde veröffentlicht.' });
+          const done = addMessage('assistant', 'Veröffentlicht. In etwa einer Minute ist es auf der ');
+          const link = el('a', '', 'Website');
+          link.href = '/';
+          link.target = '_blank';
+          done.append(link, ' zu sehen.');
+          const undo = el('button', 'chat-secondary', 'Rückgängig machen');
+          undo.type = 'button';
+          undo.addEventListener('click', () => {
+            if (busy) return;
+            undo.remove();
+            closeCard();
+            run('propose-undo', {});
+          });
+          const row = el('div', 'chat-actions');
+          row.appendChild(undo);
+          log.appendChild(row);
+          log.scrollTop = log.scrollHeight;
+        } catch (e) {
+          button.textContent = 'Veröffentlichen';
+          openCard.querySelectorAll('button').forEach((b) => { b.disabled = false; });
+          addMessage('error', e.message);
+        } finally {
+          setBusy(false);
         }
+      }
 
-        function clearPhoto() {
-          if (photo) URL.revokeObjectURL(photo.url);
-          photo = null;
-          $('photo-input').value = '';
-          $('photo-chip').hidden = true;
-        }
+      function defaultMessage() {
+        if (attachments.some((a) => a.text)) return 'Bitte trage alle Touren aus diesem PDF ein.';
+        return attachments.length ? 'Ich habe etwas angehängt.' : '';
+      }
 
-        // Shrink in the browser: phone photos are far larger than the site needs,
-        // and the upload has to stay under Vercel's request size limit.
-        async function preparePhoto(file) {
-          const bitmap = await createImageBitmap(file);
-          const scale = Math.min(1, 1600 / Math.max(bitmap.width, bitmap.height));
+      function submit() {
+        const value = text.value.trim() || defaultMessage();
+        if (!value || busy) return;
+        closeCard();
+        const bubble = addMessage('user', value);
+        if (attachments.length) bubble.appendChild(el('span', 'chat-msg-files', `Angehängt: ${attachments.map((a) => a.name).join(', ')}`));
+        messages.push({ role: 'user', text: value });
+        text.value = '';
+        text.style.height = '';
+        run('propose', {
+          messages,
+          attachments: attachments.map(({ id, kind, name }) => ({ id, kind, name })),
+          documents: attachments.filter((a) => a.text).map(({ name, text: content }) => ({ name, text: content })),
+        });
+      }
+
+      function forgetFile(attachment) {
+        if (attachment.preview) URL.revokeObjectURL(attachment.preview);
+        attachments = attachments.filter((a) => a !== attachment);
+      }
+
+      function renderFiles() {
+        const list = $('files');
+        list.replaceChildren();
+        list.hidden = attachments.length === 0;
+        attachments.forEach((attachment) => {
+          const item = el('li', 'chat-file');
+          if (attachment.preview) {
+            const img = el('img');
+            img.src = attachment.preview;
+            img.alt = '';
+            item.appendChild(img);
+          } else {
+            item.appendChild(el('span', 'chat-file-icon', attachment.kind === 'pdf' ? 'PDF' : 'Video'));
+          }
+          const label = el('span', 'chat-file-text');
+          label.appendChild(el('span', 'chat-file-name', attachment.name));
+          if (attachment.note) label.appendChild(el('span', 'chat-file-note', attachment.note));
+          const remove = el('button', 'chat-link', 'Entfernen');
+          remove.type = 'button';
+          remove.setAttribute('aria-label', `${attachment.name} entfernen`);
+          remove.addEventListener('click', () => { forgetFile(attachment); renderFiles(); });
+          item.append(label, remove);
+          list.appendChild(item);
+        });
+      }
+
+      const toBlob = (canvas, type, quality) => new Promise((resolve) => canvas.toBlob(resolve, type, quality));
+
+      // Shrink in the browser: phone photos are far larger than the site needs, and
+      // the upload has to stay under Vercel's request size limit. PNGs stay PNG when
+      // they are small enough, so logos keep a transparent background.
+      async function encodeImage(file) {
+        const bitmap = await createImageBitmap(file);
+        const draw = (side, background) => {
+          const scale = Math.min(1, side / Math.max(bitmap.width, bitmap.height));
           const canvas = document.createElement('canvas');
           canvas.width = Math.round(bitmap.width * scale);
           canvas.height = Math.round(bitmap.height * scale);
-          canvas.getContext('2d').drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-          bitmap.close();
-          const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.85));
-          const bytes = new Uint8Array(await blob.arrayBuffer());
-          let binary = '';
-          for (let i = 0; i < bytes.length; i += 0x8000) binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
-          return { base64: btoa(binary), url: URL.createObjectURL(blob) };
+          const context = canvas.getContext('2d');
+          if (background) { context.fillStyle = '#fff'; context.fillRect(0, 0, canvas.width, canvas.height); }
+          context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+          return canvas;
+        };
+        let blob = file.type === 'image/png' ? await toBlob(draw(1200, false), 'image/png') : null;
+        if (!blob || blob.size > MAX_IMAGE_BYTES) {
+          for (const [side, quality] of [[1600, 0.85], [1600, 0.7], [1280, 0.7], [1024, 0.6], [800, 0.5]]) {
+            blob = await toBlob(draw(side, true), 'image/jpeg', quality);
+            if (blob.size <= MAX_IMAGE_BYTES) break;
+          }
         }
+        bitmap.close();
+        const bytes = new Uint8Array(await blob.arrayBuffer());
+        let binary = '';
+        for (let i = 0; i < bytes.length; i += 0x8000) binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+        return { base64: btoa(binary), preview: URL.createObjectURL(blob) };
+      }
 
-        $('photo-input').addEventListener('change', async (e) => {
-          const file = e.target.files[0];
-          if (!file) return;
-          try {
-            const prepared = await preparePhoto(file);
-            clearPhoto();
-            photo = prepared;
-            $('photo-preview').src = photo.url;
-            $('photo-chip').hidden = false;
-          } catch (err) {
-            e.target.value = '';
-            addMessage('error', 'Dieses Foto konnte ich nicht lesen. Versuch es bitte mit einem JPG oder PNG.');
+      // Only the pages with tours ever reach the server; see chat-pdf.js.
+      async function readPdf(file) {
+        const [pdfjs, worker] = await Promise.all([import('pdfjs-dist'), import('pdfjs-dist/build/pdf.worker.min.mjs?url')]);
+        pdfjs.GlobalWorkerOptions.workerSrc = worker.default;
+        const doc = await pdfjs.getDocument({ data: await file.arrayBuffer() }).promise;
+        const pages = [];
+        for (let i = 1; i <= doc.numPages; i += 1) {
+          const page = await doc.getPage(i);
+          const content = await page.getTextContent();
+          pages.push(content.items.map((item) => `${item.str}${item.hasEOL ? '\n' : ' '}`).join(''));
+        }
+        await doc.destroy();
+        return pickTourPages(pages);
+      }
+
+      async function prepareFile(file) {
+        const base = { id: `datei${nextFileId}`, name: file.name, file };
+        if (file.type === 'application/pdf' || /\.pdf$/i.test(file.name)) {
+          if (file.size > MAX_UPLOAD_BYTES) throw new Error(`«${file.name}» ist zu gross (höchstens 100 MB).`);
+          const { numbers, text: content } = await readPdf(file);
+          const note = numbers.length
+            ? `Touren auf ${numbers.length} Seiten gefunden. Nur diese Seiten werden gelesen.`
+            : 'Keine Touren erkannt. Das PDF lässt sich als Broschüre verwenden.';
+          return { ...base, kind: 'pdf', text: content, note };
+        }
+        if (file.type.startsWith('video/')) {
+          if (file.size > MAX_UPLOAD_BYTES) throw new Error(`«${file.name}» ist zu gross (höchstens 100 MB).`);
+          return { ...base, kind: 'video' };
+        }
+        if (file.type.startsWith('image/')) return { ...base, kind: 'image', file: null, ...(await encodeImage(file)) };
+        throw new Error(`«${file.name}» kann ich nicht verwenden. Möglich sind Bilder, Videos und PDF.`);
+      }
+
+      $('file-input').addEventListener('change', async (e) => {
+        const chosen = [...e.target.files];
+        e.target.value = '';
+        for (const file of chosen) {
+          if (attachments.length >= MAX_FILES) {
+            addMessage('error', `Es lassen sich höchstens ${MAX_FILES} Dateien anhängen.`);
+            break;
           }
-        });
-        $('photo-remove').addEventListener('click', clearPhoto);
-
-        $('composer').addEventListener('submit', (e) => { e.preventDefault(); submit(); });
-        text.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); submit(); }
-        });
-        text.addEventListener('input', () => {
-          text.style.height = 'auto';
-          text.style.height = `${text.scrollHeight + 2}px`;
-        });
-        document.querySelectorAll('.chat-examples button').forEach((b) => {
-          b.addEventListener('click', () => { text.value = b.textContent; text.focus(); });
-        });
-
-        $('login').addEventListener('submit', async (e) => {
-          e.preventDefault();
-          const error = $('login-error');
-          error.hidden = true;
           try {
-            await call('login', { password: $('password').value });
-            $('password').value = '';
-            show('room');
-            text.focus();
+            const attachment = await prepareFile(file);
+            nextFileId += 1;
+            attachments.push(attachment);
+            renderFiles();
           } catch (err) {
-            error.textContent = err.message;
-            error.hidden = false;
+            addMessage('error', err.message.startsWith('«') ? err.message : `«${file.name}» konnte ich nicht lesen. Versuch es bitte mit einem JPG, PNG oder PDF.`);
           }
-        });
+        }
+      });
 
-        $('logout').addEventListener('click', async () => {
-          await call('logout', {}).catch(() => {});
-          show('login');
-        });
+      $('composer').addEventListener('submit', (e) => { e.preventDefault(); submit(); });
+      text.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); submit(); }
+      });
+      text.addEventListener('input', () => {
+        text.style.height = 'auto';
+        text.style.height = `${text.scrollHeight + 2}px`;
+      });
+      document.querySelectorAll('.chat-examples button').forEach((b) => {
+        b.addEventListener('click', () => { text.value = b.textContent; text.focus(); });
+      });
 
-        call('status', {})
-          .then((s) => show(!s.configured ? 'setup' : s.loggedIn ? 'room' : 'login'))
-          .catch(() => show('setup'));
-      })();
+      $('login').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const error = $('login-error');
+        error.hidden = true;
+        try {
+          await call('login', { password: $('password').value });
+          $('password').value = '';
+          const status = await call('status', {});
+          uploadsEnabled = Boolean(status.uploads);
+          show('room');
+          text.focus();
+        } catch (err) {
+          error.textContent = err.message;
+          error.hidden = false;
+        }
+      });
+
+      $('logout').addEventListener('click', async () => {
+        await call('logout', {}).catch(() => {});
+        show('login');
+      });
+
+      call('status', {})
+        .then((s) => {
+          uploadsEnabled = Boolean(s.uploads);
+          show(!s.configured ? 'setup' : s.loggedIn ? 'room' : 'login');
+        })
+        .catch(() => show('setup'));
     </script>
   </body>
 </html>
