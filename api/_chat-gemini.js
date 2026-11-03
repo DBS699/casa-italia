@@ -3,7 +3,9 @@
 // by _chat-content.js and shown to the person before anything is published.
 import { COLLECTIONS, COLLECTION_NAMES } from './_chat-content.js';
 
-// Flash models are often briefly overloaded (503), so a busy one falls through to the next.
+// Flash models are often briefly overloaded (503), so a busy one falls through to the
+// next. When all are busy at once, it is worth waiting: that usually passes in seconds.
+export const retry = { delaysMs: [0, 3000, 8000, 15000] };
 const DEFAULT_MODELS = ['gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-3.5-flash'];
 const TIMEOUT_MS = 90000;
 const BUSY_STATUS = new Set([429, 500, 503, 504]);
@@ -150,7 +152,8 @@ async function callModel(model, contents, system) {
     }),
   });
   if (!r.ok) {
-    const error = new Error(`Gemini ${r.status} (${model})`);
+    const details = await r.json().then((b) => b?.error?.message).catch(() => '');
+    const error = new Error(`Gemini ${r.status} (${model}): ${String(details || '').slice(0, 160)}`);
     error.status = r.status;
     throw error;
   }
@@ -166,14 +169,17 @@ async function callModel(model, contents, system) {
 async function generate(contents, system) {
   const models = process.env.GEMINI_MODEL ? [process.env.GEMINI_MODEL, ...DEFAULT_MODELS] : DEFAULT_MODELS;
   let lastError;
-  for (const model of models) {
-    try {
-      return await callModel(model, contents, system);
-    } catch (e) {
-      // 404 too: a model can be retired from one day to the next.
-      if (!BUSY_STATUS.has(e.status) && e.status !== 404) throw e;
-      console.error('chat model unavailable:', e.message);
-      lastError = e;
+  for (const delay of retry.delaysMs) {
+    if (delay) await new Promise((resolve) => setTimeout(resolve, delay));
+    for (const model of models) {
+      try {
+        return await callModel(model, contents, system);
+      } catch (e) {
+        // 404 too: a model can be retired from one day to the next.
+        if (!BUSY_STATUS.has(e.status) && e.status !== 404) throw e;
+        console.error('chat model unavailable:', e.message);
+        lastError = e;
+      }
     }
   }
   throw new GeminiBusy(lastError.message);

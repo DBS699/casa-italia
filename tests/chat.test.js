@@ -3,6 +3,7 @@
 import { test, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import handler from '../api/chat.js';
+import { retry } from '../api/_chat-gemini.js';
 import { applyOperations, COLLECTIONS, ContentError, diffContent } from '../api/_chat-content.js';
 import { cleanPageText, pickTourPages } from '../src/scripts/chat-pdf.js';
 import { marksForChanges, pickContext, pickLabel } from '../src/scripts/chat-marks.js';
@@ -125,7 +126,7 @@ const JPEG = Buffer.concat([Buffer.from([0xff, 0xd8, 0xff]), Buffer.alloc(50)]).
 const PNG = Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), Buffer.alloc(50)]).toString('base64');
 const BLOB = 'https://abc123.public.blob.vercel-storage.com/chat/video-xyz.mp4';
 
-beforeEach(() => { configure(); resetRepo(); });
+beforeEach(() => { configure(); resetRepo(); retry.delaysMs = [0, 0]; });
 
 // ── access ────────────────────────────────────────────────
 test('without keys the page learns the chat is not set up', async () => {
@@ -294,10 +295,19 @@ test('an overloaded model falls through to the next one', async () => {
 
 test('when all models are busy the message says so', async () => {
   const cookie = await session();
-  geminiAnswers.push({ httpStatus: 503 }, { httpStatus: 429 }, { httpStatus: 503 });
+  for (let i = 0; i < 6; i += 1) geminiAnswers.push({ httpStatus: 503 });
   const r = await post(say('Hallo'), { cookie });
   assert.equal(r.status, 503);
   assert.match(r.data.error, /überlastet/);
+  assert.equal(repo.calls.length, 6);
+});
+
+test('when all models are busy for a moment the chat waits and tries again', async () => {
+  const cookie = await session();
+  geminiAnswers.push({ httpStatus: 503 }, { httpStatus: 503 }, { httpStatus: 503 }, { reply: 'Hallo.', action: 'none' });
+  const r = await post(say('Hallo'), { cookie });
+  assert.equal(r.status, 200);
+  assert.equal(r.data.reply, 'Hallo.');
 });
 
 test('a key problem does not silently try other models', async () => {

@@ -390,14 +390,17 @@ import '../styles/global.css';
       async function run(action, payload) {
         setBusy(true);
         const thinking = addMessage('thinking', 'Einen Moment …');
+        const slow = setTimeout(() => { thinking.textContent = 'Das dauert gerade etwas länger, ich bleibe dran …'; }, 8000);
         try {
           const data = await call(action, payload);
+          clearTimeout(slow);
           thinking.remove();
           const operations = data.proposal?.operations;
           messages.push({ role: 'assistant', text: operations ? `${data.reply}\n[Vorschlag: ${JSON.stringify(operations)}]` : data.reply });
           addMessage('assistant', data.reply);
           if (data.proposal) addProposal(data.proposal);
         } catch (e) {
+          clearTimeout(slow);
           thinking.remove();
           addMessage('error', e.message);
         } finally {
