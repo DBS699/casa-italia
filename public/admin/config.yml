@@ -14,8 +14,8 @@ backend:
   base_url: https://casa-italia.vercel.app   # OAuth handler lives here (api/auth)
   auth_endpoint: /api/auth
 
-site_url: https://casa-italia.vercel.app
-display_url: https://casa-italia.vercel.app
+site_url: https://veloclubcasaitaliabern.ch
+display_url: https://veloclubcasaitaliabern.ch
 
 # Uploaded media is committed into the repo here and served from public_folder.
 media_folder: "public/assets/uploads"
