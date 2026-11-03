@@ -29,14 +29,14 @@ const RESPONSE_SCHEMA = {
       type: 'array',
       items: {
         type: 'object',
-        required: ['collection', 'op'],
+        // Required and before `position`: the model treats optional properties as
+        // skippable. It sent update operations with a position but without any fields.
+        required: ['collection', 'op', 'match', 'fields'],
+        propertyOrdering: ['collection', 'op', 'match', 'fields', 'position'],
         properties: {
           collection: { type: 'string', enum: COLLECTION_NAMES },
           op: { type: 'string', enum: ['add', 'update', 'delete', 'move'] },
           match: { type: 'object', properties: matchFields },
-          position: { type: 'integer' },
-          // A list of pairs, because properties of an object are optional to the model
-          // and it may leave them all out, which turned a rename into an empty change.
           fields: {
             type: 'array',
             items: {
@@ -45,6 +45,7 @@ const RESPONSE_SCHEMA = {
               properties: { name: { type: 'string', enum: [...fieldNames] }, value: { type: 'string' } },
             },
           },
+          position: { type: 'integer' },
         },
       },
     },
@@ -72,13 +73,15 @@ Frühere Antworten von dir können "[Vorschlag: ...]" enthalten: Das sind die Ä
 
 Eine Nachricht kann mit "[Ausgewählt auf der Website: ...]" beginnen: Die Person hat diesen Teil auf der Website angeklickt. Wörter wie "dieser", "das" oder "hier" meinen dann genau diesen Eintrag oder Bereich. Der Schlüssel darin entspricht den Werten für "match", bei Touren in der Form "Datum|Titel", bei Texten dem "key".
 
+Antworte immer als JSON in dieser Form: {"reply": "...", "action": "change", "operations": [{"collection": "...", "op": "...", "match": {...}, "fields": [{"name": "...", "value": "..."}]}]}
+
 "action":
 - "change": Du schlägst Änderungen vor und lieferst sie in "operations".
 - "none": Du stellst eine Rückfrage oder beantwortest eine Frage, ohne Änderung.
 - "undo": Die Person will die letzte Änderung rückgängig machen. Keine "operations".
 
 "operations": Jede hat "collection" und "op".
-- "fields" ist eine Liste von Paaren aus Feldname und neuem Wert: [{"name": "role", "value": "Kassier"}].
+- "fields" ist eine Liste von Paaren aus Feldname und neuem Wert: [{"name": "role", "value": "Kassier"}]. Bei "delete" und "move" ist die Liste leer, bei "site" ist "match" leer. "position" gibt es nur bei "move" und wenn ein neuer Eintrag nicht ans Ende soll.
 - op "add": Neuer Eintrag, Angaben in "fields". Fehlt eine Pflichtangabe, frage nach, statt sie zu erfinden.
 - op "update": Bestehender Eintrag. "fields" enthält immer jedes Feld, das sich ändert, mit dem neuen Wert, sonst nichts. Ein leerer Text löscht eine Angabe.
 - Umbenennen ist ein "update": "match" nennt den alten Namen, "fields" den neuen. Beispiel: {"collection": "sponsors", "op": "update", "match": {"name": "Alter Name"}, "fields": [{"name": "name", "value": "Neuer Name"}]}
@@ -96,6 +99,7 @@ Bereiche (collection), Felder und was "match" enthält:
 - sponsors (match: name): name, url (Webseite, mit https://) und logo sind Pflicht.
 - gallery (match: image): image ist Pflicht, caption.
 - site, die Startseite (kein match, nur op "update"): heroMotto, heroVideo (Hintergrund-Video oder -Bild), heroPoster (Vorschaubild), brochure (Tourenprogramm als PDF).
+- Beispiel für einen Text: {"collection": "texts", "op": "update", "match": {"key": "ctaJoin"}, "fields": [{"name": "de", "value": "Jetzt beitreten"}, {"name": "fr", "value": "Adhérer"}, {"name": "it", "value": "Iscriviti"}, {"name": "en", "value": "Join now"}]}
 - texts, alle übrigen Texte wie Titel, Abschnitte und Beschriftungen von Knöpfen (match: key, nur op "update"): Felder de, fr, it, en. Die Website gibt es in vier Sprachen. Ändert sich der deutsche Text, lieferst du immer auch fr, it und en mit, passend übersetzt, in gleichem Ton und ähnlicher Länge. Namen und Eigennamen bleiben unübersetzt. Will die Person nur eine Sprache ändern, lieferst du nur diese. Ist der gewünschte Text ungewöhnlich, übernimmst du ihn trotzdem wörtlich ins Deutsche, das entscheidet die Person. Nenne in "reply" kurz, dass du die Übersetzungen ergänzt hast.
 
 Erfinde nie Angaben. Trage nur ein, was die Person geschrieben hat oder im PDF steht, und übernimm Links unverändert. Fehlende freiwillige Angaben lässt du weg.
@@ -141,7 +145,7 @@ function fromModel(operations) {
   });
 }
 
-async function callModel(model, contents, system) {
+async function callModel(model, contents, system, useSchema) {
   const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-goog-api-key': process.env.GEMINI_API_KEY },
@@ -149,7 +153,7 @@ async function callModel(model, contents, system) {
     body: JSON.stringify({
       systemInstruction: { parts: [{ text: system }] },
       contents,
-      generationConfig: { temperature: 0.1, maxOutputTokens: 32768, responseMimeType: 'application/json', responseSchema: RESPONSE_SCHEMA },
+      generationConfig: { temperature: 0.1, maxOutputTokens: 32768, responseMimeType: 'application/json', ...(useSchema ? { responseSchema: RESPONSE_SCHEMA } : {}) },
     }),
   });
   if (!r.ok) {
@@ -167,15 +171,20 @@ async function callModel(model, contents, system) {
   return parsed;
 }
 
-async function generate(contents, system) {
+async function generate(contents, system, useSchema = true) {
   const models = process.env.GEMINI_MODEL ? [process.env.GEMINI_MODEL, ...DEFAULT_MODELS] : DEFAULT_MODELS;
   let lastError;
   for (const delay of retry.delaysMs) {
     if (delay) await new Promise((resolve) => setTimeout(resolve, delay));
     for (const model of models) {
       try {
-        return await callModel(model, contents, system);
+        return await callModel(model, contents, system, useSchema);
       } catch (e) {
+        // The prompt spells the format out as well, so the schema is not essential.
+        if (e.status === 400 && useSchema) {
+          console.error('chat schema refused:', e.message);
+          return generate(contents, system, false);
+        }
         // 404 too: a model can be retired from one day to the next.
         if (!BUSY_STATUS.has(e.status) && e.status !== 404) throw e;
         console.error('chat model unavailable:', e.message);
@@ -194,15 +203,25 @@ export async function askGemini({ messages, content, attachments = [], documents
   const first = await generate(contents, system);
   if (first.action !== 'change') return { ...first, operations: [] };
   try {
-    return { ...first, ...validate(fromModel(first.operations)) };
+    const accepted = validate(fromModel(first.operations));
+    console.log('chat proposal:', JSON.stringify(first.operations).slice(0, 400));
+    return { ...first, ...accepted };
   } catch (e) {
     console.error('chat rejected proposal:', e.message, JSON.stringify(first.operations).slice(0, 800));
+    // The second try runs without the schema, in case the schema caused the problem.
     const retry = await generate([
       ...contents,
       { role: 'model', parts: [{ text: JSON.stringify(first) }] },
-      { role: 'user', parts: [{ text: `Dieser Vorschlag ist ungültig: ${e.message} Korrigiere ihn, oder frage nach, falls dir eine Angabe fehlt.` }] },
-    ], system);
+      { role: 'user', parts: [{ text: `Dieser Vorschlag ist ungültig: ${e.message} Jedes "update" und "add" braucht in "fields" die neuen Werte als Liste aus "name" und "value". Korrigiere den Vorschlag und liefere ihn vollständig, oder frage nach, falls dir eine Angabe fehlt.` }] },
+    ], system, false);
     if (retry.action !== 'change') return { ...retry, operations: [] };
-    return { ...retry, ...validate(fromModel(retry.operations)) };
+    try {
+      const accepted = validate(fromModel(retry.operations));
+      console.log('chat proposal after retry:', JSON.stringify(retry.operations).slice(0, 400));
+      return { ...retry, ...accepted };
+    } catch (again) {
+      console.error('chat rejected retry:', again.message, JSON.stringify(retry.operations).slice(0, 800));
+      throw again;
+    }
   }
 }

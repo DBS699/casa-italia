@@ -249,6 +249,9 @@ test('the schema makes the model name a value for every field', async () => {
   const { fields } = repo.calls[0].gemini.generationConfig.responseSchema.properties.operations.items.properties;
   assert.equal(fields.type, 'array');
   assert.deepEqual(fields.items.required, ['name', 'value']);
+  const op = repo.calls[0].gemini.generationConfig.responseSchema.properties.operations.items;
+  assert.ok(op.required.includes('fields'), 'the model must not skip the fields');
+  assert.ok(op.propertyOrdering.indexOf('fields') < op.propertyOrdering.indexOf('position'));
   assert.ok(fields.items.properties.name.enum.includes('heroMotto'));
 });
 
@@ -263,6 +266,27 @@ test('an update without a new value does not claim it is already there', async (
   assert.equal(r.status, 422);
   assert.match(r.data.error, /nicht richtig verstanden/);
   assert.doesNotMatch(r.data.error, /schon so eingetragen/);
+});
+
+test('what the model really sent: a text update with a position and no fields', async () => {
+  const cookie = await session();
+  const broken = { reply: 'Ich ändere den Text.', action: 'change', operations: [{ collection: 'texts', op: 'update', match: { key: 'nav.club' }, position: 1 }] };
+  const fixed = { reply: 'Ich ändere den Text.', action: 'change', operations: [{ collection: 'texts', op: 'update', match: { key: 'nav.club' }, fields: ['de', 'fr', 'it', 'en'].map((name) => ({ name, value: 'test' })) }] };
+  geminiAnswers.push(broken, fixed);
+  const r = await post(say('Wechsle den Text zu test'), { cookie });
+  assert.equal(r.status, 200);
+  assert.equal(r.data.proposal.changes[0].fields.length, 4);
+  assert.ok(repo.calls[0].gemini.generationConfig.responseSchema, 'first try uses the schema');
+  assert.equal(repo.calls[1].gemini.generationConfig.responseSchema, undefined, 'second try does without');
+  assert.match(repo.calls[1].gemini.contents.at(-1).parts[0].text, /"name" und "value"/);
+});
+
+test('a schema the service refuses does not take the chat down', async () => {
+  const cookie = await session();
+  geminiAnswers.push({ httpStatus: 400 }, { reply: 'Hallo.', action: 'none' });
+  const r = await post(say('Hallo'), { cookie });
+  assert.equal(r.status, 200);
+  assert.equal(repo.calls[1].gemini.generationConfig.responseSchema, undefined);
 });
 
 test('the model gets one chance to fix an invalid proposal', async () => {
