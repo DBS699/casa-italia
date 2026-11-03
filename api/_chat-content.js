@@ -160,6 +160,8 @@ function checkRequired(collection, item) {
   }
 }
 
+const NOTHING_NEW = 'Das habe ich nicht richtig verstanden, es wurde nichts geändert. Schreib bitte nochmals, was genau neu sein soll.';
+
 const itemTitle = (collection, item) => collection.match.map((name) => item[name]).reverse().join(' · ');
 // Same format as data-chat-key on the website, so the chat page can point at the entry.
 const itemKey = (collection, item) => collection.match.map((name) => item[name]).join('|');
@@ -240,6 +242,7 @@ function applyToList(state, name, op, attachments) {
   }
   if (op.op === 'update') {
     const fields = normalizeFields(collection, op.fields, attachments);
+    if (Object.keys(fields).length === 0) throw new ContentError(NOTHING_NEW);
     const after = { ...before, ...fields };
     checkRequired(collection, after);
     const details = describe(collection, before, after);
@@ -254,7 +257,9 @@ function applyToList(state, name, op, attachments) {
 function applyToSite(state, op, attachments) {
   const collection = COLLECTIONS.site;
   if (op.op !== 'update') throw new ContentError('Die Startseite lässt sich nur ändern, nicht hinzufügen oder löschen.');
-  const after = { ...state.site, ...normalizeFields(collection, op.fields, attachments) };
+  const fields = normalizeFields(collection, op.fields, attachments);
+  if (Object.keys(fields).length === 0) throw new ContentError(NOTHING_NEW);
+  const after = { ...state.site, ...fields };
   checkRequired(collection, after);
   const details = describe(collection, state.site, after);
   if (details.length === 0) return null;

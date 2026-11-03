@@ -219,6 +219,44 @@ test('removing a sponsor is a proposal first, then a commit of only that file', 
   assert.deepEqual(head().files, ['src/data/sponsors.json']);
 });
 
+test('a rename from the model goes through as a preview and a commit', async () => {
+  const cookie = await session();
+  geminiAnswers.push({
+    reply: 'Ich benenne ihn um.',
+    action: 'change',
+    operations: [{ collection: 'sponsors', op: 'update', match: { name: 'Thömus' }, fields: [{ name: 'name', value: 'Velokartoffel' }] }],
+  });
+  const r = await post(say('Thömus zu Velokartoffel umbenennen'), { cookie });
+  assert.deepEqual(r.data.proposal.operations[0].fields, { name: 'Velokartoffel' });
+  const field = r.data.proposal.changes[0].fields[0];
+  assert.deepEqual([field.before, field.after], ['Thömus', 'Velokartoffel']);
+  assert.equal((await post(change(r.data.proposal.operations), { cookie })).status, 200);
+  assert.deepEqual(state().sponsors.map((s) => s.name), ['Velokartoffel', 'gäggeli siech']);
+});
+
+test('the schema makes the model name a value for every field', async () => {
+  const cookie = await session();
+  geminiAnswers.push({ reply: 'Gut.', action: 'none' });
+  await post(say('Hallo'), { cookie });
+  const { fields } = repo.calls[0].gemini.generationConfig.responseSchema.properties.operations.items.properties;
+  assert.equal(fields.type, 'array');
+  assert.deepEqual(fields.items.required, ['name', 'value']);
+  assert.ok(fields.items.properties.name.enum.includes('heroMotto'));
+});
+
+test('an update without a new value does not claim it is already there', async () => {
+  const cookie = await session();
+  const empty = { reply: 'x', action: 'change', operations: [{ collection: 'sponsors', op: 'update', match: { name: 'Thömus' }, fields: [] }] };
+  geminiAnswers.push(empty, { reply: 'Ich benenne ihn um.', action: 'change', operations: [{ collection: 'sponsors', op: 'update', match: { name: 'Thömus' }, fields: [{ name: 'name', value: 'Neu' }] }] });
+  const fixed = await post(say('Umbenennen'), { cookie });
+  assert.equal(fixed.data.proposal.changes[0].fields[0].after, 'Neu');
+  geminiAnswers.push(empty, empty);
+  const r = await post(say('Umbenennen'), { cookie });
+  assert.equal(r.status, 422);
+  assert.match(r.data.error, /nicht richtig verstanden/);
+  assert.doesNotMatch(r.data.error, /schon so eingetragen/);
+});
+
 test('the model gets one chance to fix an invalid proposal', async () => {
   const cookie = await session();
   const bad = { reply: 'x', action: 'change', operations: [{ collection: 'tours', op: 'add', fields: { date: '31. Februar', title: 'X' } }] };

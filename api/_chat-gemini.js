@@ -10,10 +10,10 @@ const BUSY_STATUS = new Set([429, 500, 503, 504]);
 
 export class GeminiBusy extends Error {}
 
-const allFields = {};
+const fieldNames = new Set();
 const matchFields = {};
 for (const collection of Object.values(COLLECTIONS)) {
-  for (const name of Object.keys(collection.fields)) allFields[name] = { type: 'string' };
+  for (const name of Object.keys(collection.fields)) fieldNames.add(name);
   for (const name of collection.match || []) matchFields[name] = { type: 'string' };
 }
 
@@ -33,7 +33,16 @@ const RESPONSE_SCHEMA = {
           op: { type: 'string', enum: ['add', 'update', 'delete', 'move'] },
           match: { type: 'object', properties: matchFields },
           position: { type: 'integer' },
-          fields: { type: 'object', properties: allFields },
+          // A list of pairs, because properties of an object are optional to the model
+          // and it may leave them all out, which turned a rename into an empty change.
+          fields: {
+            type: 'array',
+            items: {
+              type: 'object',
+              required: ['name', 'value'],
+              properties: { name: { type: 'string', enum: [...fieldNames] }, value: { type: 'string' } },
+            },
+          },
         },
       },
     },
@@ -45,7 +54,7 @@ function describeAttachments(attachments) {
   const list = attachments.map((a) => `- @${a.id}: ${a.kind === 'image' ? 'Bild' : a.kind === 'video' ? 'Video' : 'PDF'} «${a.name}»`).join('\n');
   return `Angehängte Dateien (du kannst sie nicht ansehen, du kennst nur den Namen und die Reihenfolge):
 ${list}
-Um eine Datei zu verwenden, setze das Bild-, Video- oder PDF-Feld auf ihren Wert mit @, z. B. "logo": "@datei1". Ist unklar, wohin eine Datei gehört, frage nach.`;
+Um eine Datei zu verwenden, setze das Bild-, Video- oder PDF-Feld auf ihren Wert mit @, z. B. {"name": "logo", "value": "@datei1"}. Ist unklar, wohin eine Datei gehört, frage nach.`;
 }
 
 function systemPrompt(content, attachments, today) {
@@ -67,11 +76,13 @@ Eine Nachricht kann mit "[Ausgewählt auf der Website: ...]" beginnen: Die Perso
 - "undo": Die Person will die letzte Änderung rückgängig machen. Keine "operations".
 
 "operations": Jede hat "collection" und "op".
+- "fields" ist eine Liste von Paaren aus Feldname und neuem Wert: [{"name": "role", "value": "Kassier"}].
 - op "add": Neuer Eintrag, Angaben in "fields". Fehlt eine Pflichtangabe, frage nach, statt sie zu erfinden.
-- op "update": Bestehender Eintrag. In "fields" nur, was sich ändert. Ein leerer Text löscht eine Angabe.
+- op "update": Bestehender Eintrag. "fields" enthält immer jedes Feld, das sich ändert, mit dem neuen Wert, sonst nichts. Ein leerer Text löscht eine Angabe.
+- Umbenennen ist ein "update": "match" nennt den alten Namen, "fields" den neuen. Beispiel: {"collection": "sponsors", "op": "update", "match": {"name": "Alter Name"}, "fields": [{"name": "name", "value": "Neuer Name"}]}
 - op "delete": Bestehenden Eintrag löschen.
 - op "move": Bestehenden Eintrag in der Reihenfolge verschieben, neue Stelle in "position" (1 = zuerst). Nicht für Touren.
-- Bei update, delete und move nennt "match" den Eintrag, mit den Werten exakt wie in den Daten unten. Die Person schreibt Namen vielleicht ungenau oder in Mundart: Nimm den passenden Eintrag aus den Daten. Ist unklar, welcher gemeint ist, frage nach.
+- Bei update, delete und move nennt "match" den Eintrag, mit den Werten exakt wie in den Daten unten. Die Person schreibt Namen vielleicht ungenau oder in Mundart: Nimm den passenden Eintrag aus den Daten. Ist unklar, welcher gemeint ist, frage nach. Gibt es den Eintrag nicht (mehr), sage das klar und nenne die vorhandenen Einträge, statt nach dem genauen Namen zu fragen.
 
 Bereiche (collection), Felder und was "match" enthält:
 - tours (match: date, title; wird automatisch nach Datum sortiert):
@@ -117,6 +128,14 @@ function toContents(messages, documents) {
     last.parts.push({ text: `Inhalt des PDF «${String(doc.name).slice(0, 120)}»:\n${String(doc.text ?? '').slice(0, 60000)}` });
   }
   return contents;
+}
+
+// The rest of the code works with { field: value }.
+function fromModel(operations) {
+  return (Array.isArray(operations) ? operations : []).map((op) => {
+    if (!Array.isArray(op?.fields)) return op;
+    return { ...op, fields: Object.fromEntries(op.fields.map((f) => [f?.name, f?.value])) };
+  });
 }
 
 async function callModel(model, contents, system) {
@@ -168,14 +187,15 @@ export async function askGemini({ messages, content, attachments = [], documents
   const first = await generate(contents, system);
   if (first.action !== 'change') return { ...first, operations: [] };
   try {
-    return { ...first, ...validate(first.operations) };
+    return { ...first, ...validate(fromModel(first.operations)) };
   } catch (e) {
+    console.error('chat rejected proposal:', e.message, JSON.stringify(first.operations).slice(0, 800));
     const retry = await generate([
       ...contents,
       { role: 'model', parts: [{ text: JSON.stringify(first) }] },
       { role: 'user', parts: [{ text: `Dieser Vorschlag ist ungültig: ${e.message} Korrigiere ihn, oder frage nach, falls dir eine Angabe fehlt.` }] },
     ], system);
     if (retry.action !== 'change') return { ...retry, operations: [] };
-    return { ...retry, ...validate(retry.operations) };
+    return { ...retry, ...validate(fromModel(retry.operations)) };
   }
 }
