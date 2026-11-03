@@ -54,7 +54,7 @@ import '../styles/global.css';
         <div class="chat-site" id="site-pane">
           <div class="chat-site-bar">
             <button type="button" class="chat-secondary" id="pick">Bereich anklicken</button>
-            <span class="chat-site-hint" id="site-hint">Klick auf «Bereich anklicken» und dann auf einen Sponsor, eine Tour oder ein Bild.</span>
+            <span class="chat-site-hint" id="site-hint">Klick auf «Bereich anklicken» und dann auf einen Sponsor, eine Tour, ein Bild oder einen Text.</span>
           </div>
           <iframe id="site" title="Vorschau der Website"></iframe>
         </div>
@@ -63,7 +63,7 @@ import '../styles/global.css';
           <div class="chat-log" id="log" aria-live="polite">
             <div class="chat-welcome" id="welcome">
               <h1>Was möchtest du ändern?</h1>
-              <p>Touren, Komitee, Sponsoren, Galerie oder Startseite: Schreib es einfach auf. Bilder, ein Video oder das Tourenprogramm als PDF ziehst du einfach hierher. Du siehst auf der Website, was sich wo ändert, und online geht erst, was du bestätigst.</p>
+              <p>Touren, Komitee, Sponsoren, Galerie, Startseite und alle Texte in vier Sprachen: Schreib es einfach auf. Bilder, ein Video oder das Tourenprogramm als PDF ziehst du einfach hierher. Du siehst auf der Website, was sich wo ändert, und online geht erst, was du bestätigst.</p>
               <div class="chat-examples">
                 <button type="button">Neue Tour am 14. März: Gurnigel-Runde, 85 km, Treffpunkt 8 Uhr</button>
                 <button type="button">Trage alle Touren aus dem angehängten PDF ein</button>
@@ -238,7 +238,7 @@ import '../styles/global.css';
         $('pick').textContent = on ? 'Abbrechen' : 'Bereich anklicken';
         $('site-hint').textContent = on
           ? 'Fahr über die Website und klick auf den Teil, den du ändern möchtest.'
-          : 'Klick auf «Bereich anklicken» und dann auf einen Sponsor, eine Tour oder ein Bild.';
+          : 'Klick auf «Bereich anklicken» und dann auf einen Sponsor, eine Tour, ein Bild oder einen Text.';
       }
 
       function setSelection(pick) {

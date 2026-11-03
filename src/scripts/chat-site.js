@@ -23,7 +23,13 @@ export function createSiteView(iframe, { onPick, onDragEnter }) {
   const doc = () => iframe.contentDocument;
   const isReady = () => Boolean(doc()?.getElementById('chat-marks-style'));
 
+  const isVisible = (el) => el.getClientRects().length > 0;
+
   function findTarget(mark) {
+    if (mark.collection === 'texts') {
+      // A button text can appear several times, also in menus that are closed right now.
+      return [...doc().querySelectorAll('[data-i18n]')].find((el) => el.getAttribute('data-i18n') === mark.key && isVisible(el));
+    }
     const items = [...doc().querySelectorAll(`[data-chat-item="${mark.collection}"]`)];
     return items.find((el) => mark.key && el.dataset.chatKey === mark.key)
       || doc().querySelector(`[data-chat-area="${mark.collection}"]`);
@@ -100,6 +106,8 @@ export function createSiteView(iframe, { onPick, onDragEnter }) {
   function pickFrom(target) {
     const item = target?.closest?.('[data-chat-item]');
     if (item) return { collection: item.dataset.chatItem, key: item.dataset.chatKey, el: item };
+    const text = target?.closest?.('[data-i18n]');
+    if (text) return { collection: 'texts', key: text.getAttribute('data-i18n'), el: text };
     const area = target?.closest?.('[data-chat-area]');
     return area ? { collection: area.dataset.chatArea, key: '', el: area } : null;
   }
@@ -109,7 +117,7 @@ export function createSiteView(iframe, { onPick, onDragEnter }) {
     const found = pickFrom(e.target);
     const el = found?.el || e.target.closest?.('section, footer, header');
     if (hover?.el === el) return;
-    hover = el ? { el, tone: found ? 'update' : 'none', note: found ? pickLabel(found.collection, found.key) : 'Geht nur im Code, nicht im Chat' } : null;
+    hover = el ? { el, tone: found ? 'update' : 'none', note: found ? pickLabel(found.collection, found.key, found.el.textContent) : 'Geht nur im Code, nicht im Chat' } : null;
     draw();
   }
 
@@ -121,7 +129,7 @@ export function createSiteView(iframe, { onPick, onDragEnter }) {
     // Phones have no hover, so a tap on the wrong spot has to explain itself too.
     if (!found) { onMove(e); return; }
     setPicking(false);
-    onPick({ collection: found.collection, key: found.key, label: pickLabel(found.collection, found.key) });
+    onPick({ collection: found.collection, key: found.key, label: pickLabel(found.collection, found.key, found.el.textContent) });
   }
 
   function onKey(e) {

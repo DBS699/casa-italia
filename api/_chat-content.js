@@ -76,8 +76,22 @@ export const COLLECTIONS = {
       brochure: { label: 'Broschüre / Tourenprogramm (PDF)', max: 500, kind: 'pdf' },
     },
   },
+  texts: {
+    area: 'Texte',
+    file: 'src/data/texts.json',
+    match: ['key'],
+    fields: {
+      de: { label: 'Deutsch', max: 1500 },
+      fr: { label: 'Französisch', max: 1500 },
+      it: { label: 'Italienisch', max: 1500 },
+      en: { label: 'Englisch', max: 1500 },
+    },
+  },
 };
 export const COLLECTION_NAMES = Object.keys(COLLECTIONS);
+const TEXT_LANGS = Object.keys(COLLECTIONS.texts.fields);
+// In the file but not shown anywhere on the website, so changing them would do nothing.
+const UNUSED_TEXT = /^(nav\.(aktuelles|classement)$|heroKicker$|months\.|newsKicker$|newsTitle$|roles\.|memberHint$|galleryCta$|galleryHint$|sponsorHint$|cards\.)/;
 
 const BLOB_URL = /^https:\/\/[a-z0-9]+\.public\.blob\.vercel-storage\.com\/[^\s?#]+$/i;
 export const isBlobUrl = (value) => BLOB_URL.test(String(value ?? ''));
@@ -215,6 +229,49 @@ function newItem(name, collection, fields, count) {
   return item;
 }
 
+const readPath = (obj, key) => key.split('.').reduce((o, part) => (o == null ? undefined : o[part]), obj);
+
+function writePath(obj, key, value) {
+  const parts = key.split('.');
+  const parent = parts.slice(0, -1).reduce((o, part) => o[part], obj);
+  parent[parts[parts.length - 1]] = value;
+}
+
+function textLeaves(obj, prefix = '') {
+  return Object.entries(obj).flatMap(([k, v]) => (typeof v === 'string' ? [`${prefix}${k}`] : textLeaves(v, `${prefix}${k}.`)));
+}
+
+// Every text the website shows, as { key, de, fr, it, en }.
+export function editableTexts(texts) {
+  return textLeaves(texts.de)
+    .filter((key) => !UNUSED_TEXT.test(key))
+    .map((key) => ({ key, ...Object.fromEntries(TEXT_LANGS.map((lang) => [lang, readPath(texts[lang], key) ?? ''])) }));
+}
+
+const textTitle = (text) => (text.length > 60 ? `${text.slice(0, 60)} …` : text);
+
+function applyToTexts(state, op, attachments) {
+  const collection = COLLECTIONS.texts;
+  if (op.op !== 'update') throw new ContentError('Texte lassen sich nur ändern, nicht hinzufügen oder löschen.');
+  const key = String(op.match?.key ?? '');
+  const entry = editableTexts(state.texts).find((text) => text.key === key);
+  if (!entry) throw new ContentError(`Den Text «${key}» gibt es nicht.`);
+  const fields = normalizeFields(collection, op.fields, attachments);
+  if (Object.keys(fields).length === 0) throw new ContentError(NOTHING_NEW);
+  for (const [lang, value] of Object.entries(fields)) {
+    if (!value) throw new ContentError(`${collection.fields[lang].label}: Der Text darf nicht leer sein.`);
+  }
+  // The other languages would silently stay on the old wording otherwise.
+  if (fields.de && fields.de !== entry.de) {
+    const missing = TEXT_LANGS.filter((lang) => !fields[lang]);
+    if (missing.length) throw new ContentError(`Wenn sich der deutsche Text ändert, braucht es auch die Übersetzung: ${missing.map((lang) => collection.fields[lang].label).join(', ')}.`);
+  }
+  const details = describe(collection, entry, { ...entry, ...fields });
+  if (details.length === 0) return null;
+  details.forEach((f) => writePath(state.texts[f.name], key, f.after));
+  return { area: collection.area, collection: 'texts', kind: 'update', title: textTitle(fields.de || entry.de), key, afterKey: key, fields: details };
+}
+
 function applyToList(state, name, op, attachments) {
   const collection = COLLECTIONS[name];
   const items = state[name];
@@ -274,13 +331,14 @@ export function applyOperations(current, operations, { attachments = {} } = {}) 
   if (!Array.isArray(operations) || operations.length === 0) throw new ContentError('Keine Änderung angegeben.');
   if (operations.length > 80) throw new ContentError('Zu viele Änderungen auf einmal.');
   const state = {};
-  for (const name of COLLECTION_NAMES) {
-    state[name] = name === 'site' ? { ...current.site } : current[name].map((item) => ({ ...item }));
-  }
+  for (const name of COLLECTION_NAMES) state[name] = structuredClone(current[name]);
   const changes = [];
   for (const op of operations) {
     if (!COLLECTION_NAMES.includes(op.collection)) throw new ContentError(`Unbekannter Bereich: ${op.collection}`);
-    const change = op.collection === 'site' ? applyToSite(state, op, attachments) : applyToList(state, op.collection, op, attachments);
+    let change;
+    if (op.collection === 'site') change = applyToSite(state, op, attachments);
+    else if (op.collection === 'texts') change = applyToTexts(state, op, attachments);
+    else change = applyToList(state, op.collection, op, attachments);
     if (change) changes.push(change);
   }
   if (changes.length === 0) throw new ContentError('Das ist schon so eingetragen, es gibt nichts zu ändern.');
@@ -295,6 +353,14 @@ export function diffContent(current, target) {
     if (name === 'site') {
       const fields = describe(collection, current.site, target.site);
       if (fields.length) changes.push({ area: collection.area, collection: name, kind: 'update', title: 'Startseite & Programm', key: '', afterKey: '', fields });
+      continue;
+    }
+    if (name === 'texts') {
+      const targets = editableTexts(target.texts);
+      editableTexts(current.texts).forEach((entry, i) => {
+        const fields = describe(collection, entry, targets[i]);
+        if (fields.length) changes.push({ area: collection.area, collection: name, kind: 'update', title: textTitle(targets[i].de), key: entry.key, afterKey: entry.key, fields });
+      });
       continue;
     }
     const key = (item) => collection.match.map((field) => String(item[field] ?? '').trim()).join('|');

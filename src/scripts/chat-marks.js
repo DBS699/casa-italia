@@ -5,6 +5,7 @@ const AREA_LABEL = { tours: 'Touren', members: 'Komitee', sponsors: 'Sponsoren',
 const SITE_LABEL = { heroMotto: 'Motto', brochure: 'Tourenprogramm (PDF)' };
 
 function proposedMark(change) {
+  if (change.collection === 'texts') return [{ collection: 'texts', key: change.key, tone: 'update', note: 'Text wird geändert' }];
   if (change.collection === 'site') {
     return change.fields.map((f) => ({ collection: 'site', key: f.name, tone: 'update', note: `${f.label}: wird geändert` }));
   }
@@ -29,7 +30,8 @@ export function marksForChanges(changes, { published = false } = {}) {
   const groups = new Map();
   changes.forEach((c) => groups.set(c.collection, [...(groups.get(c.collection) || []), c]));
   for (const [collection, group] of groups) {
-    if (group.length > SECTION_LIMIT) {
+    // Texts are all over the page, there is no one area to put a marker around.
+    if (group.length > SECTION_LIMIT && collection !== 'texts') {
       marks.push({ collection, key: '', tone: 'update', note: `${group.length} Änderungen${published ? ' jetzt online' : ' in diesem Bereich'}` });
     } else {
       group.forEach((c) => marks.push(...(published ? publishedMark(c) : proposedMark(c))));
@@ -38,9 +40,13 @@ export function marksForChanges(changes, { published = false } = {}) {
   return marks;
 }
 
-// `key` is empty when a whole area was clicked.
-export function pickLabel(collection, key) {
+// `key` is empty when a whole area was clicked; `shown` is the text as it appears on the page.
+export function pickLabel(collection, key, shown = '') {
   if (!key) return `Bereich ${AREA_LABEL[collection]}`;
+  if (collection === 'texts') {
+    const text = shown.replace(/\s+/g, ' ').trim();
+    return `Text «${text.length > 40 ? `${text.slice(0, 40)} …` : text}»`;
+  }
   if (collection === 'tours') {
     const [date, title] = key.split('|');
     return `Tour «${title}» am ${date}`;

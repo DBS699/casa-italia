@@ -4,12 +4,19 @@ import { test, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import handler from '../api/chat.js';
 import { retry } from '../api/_chat-gemini.js';
-import { applyOperations, COLLECTIONS, ContentError, diffContent } from '../api/_chat-content.js';
+import { applyOperations, COLLECTIONS, ContentError, diffContent, editableTexts } from '../api/_chat-content.js';
 import { cleanPageText, pickTourPages } from '../src/scripts/chat-pdf.js';
 import { marksForChanges, pickContext, pickLabel } from '../src/scripts/chat-marks.js';
 
 const TOUR = (date, title, extra = {}) => ({ date, title, img: '/assets/tours/tour-1.jpg', g1name: 'Gruppo Grappa', ...extra });
+const TEXTS = () => ({
+  de: { ctaSeason: 'Saison entdecken', nav: { club: 'Verein' }, stat: [{ n: '1985', l: 'Gegründet' }], months: ['März'], cards: [{ title: 'Alt' }] },
+  fr: { ctaSeason: 'Découvrir la saison', nav: { club: 'Club' }, stat: [{ n: '1985', l: 'Fondé' }], months: ['Mars'], cards: [{ title: 'Vieux' }] },
+  it: { ctaSeason: 'Scopri la stagione', nav: { club: 'Club' }, stat: [{ n: '1985', l: 'Fondato' }], months: ['Marzo'], cards: [{ title: 'Vecchio' }] },
+  en: { ctaSeason: 'Explore the season', nav: { club: 'Club' }, stat: [{ n: '1985', l: 'Founded' }], months: ['March'], cards: [{ title: 'Old' }] },
+});
 const seed = () => ({
+  'src/data/texts.json': TEXTS(),
   'src/data/tours.json': {
     tours: [
       TOUR('28. Juni', 'Wohlensee', { url: 'https://www.komoot.com/de-de/tour/1', gpx: '/assets/uploads/alt.gpx' }),
@@ -23,9 +30,9 @@ const seed = () => ({
 });
 const state = () => {
   const d = head().data;
-  return { tours: d['src/data/tours.json'].tours, members: d['src/data/members.json'].members, sponsors: d['src/data/sponsors.json'].sponsors, gallery: d['src/data/gallery.json'].images, site: d['src/data/site.json'] };
+  return asContent(d);
 };
-const asContent = (d) => ({ tours: d['src/data/tours.json'].tours, members: d['src/data/members.json'].members, sponsors: d['src/data/sponsors.json'].sponsors, gallery: d['src/data/gallery.json'].images, site: d['src/data/site.json'] });
+const asContent = (d) => ({ tours: d['src/data/tours.json'].tours, members: d['src/data/members.json'].members, sponsors: d['src/data/sponsors.json'].sponsors, gallery: d['src/data/gallery.json'].images, site: d['src/data/site.json'], texts: d['src/data/texts.json'] });
 
 // ── fake GitHub + Gemini ──────────────────────────────────
 let repo;
@@ -528,8 +535,8 @@ test('a stale undo is refused when something changed in between', async () => {
 const content = () => asContent(seed());
 const addTour = (fields) => applyOperations(content(), [{ collection: 'tours', op: 'add', fields: { date: '1. Mai', title: 'X', ...fields } }]).state.tours;
 
-test('the chat offers exactly the CMS collections', () => {
-  assert.deepEqual(Object.keys(COLLECTIONS).sort(), ['gallery', 'members', 'site', 'sponsors', 'tours']);
+test('the chat offers the CMS collections plus the texts', () => {
+  assert.deepEqual(Object.keys(COLLECTIONS).sort(), ['gallery', 'members', 'site', 'sponsors', 'texts', 'tours']);
   assert.deepEqual(Object.keys(COLLECTIONS.site.fields), ['heroMotto', 'heroVideo', 'heroPoster', 'brochure']);
   assert.deepEqual(Object.keys(COLLECTIONS.sponsors.fields), ['name', 'url', 'logo']);
   assert.deepEqual(Object.keys(COLLECTIONS.members.fields), ['name', 'role', 'photo']);
@@ -666,4 +673,92 @@ test('website keys match what the components render', async () => {
   assert.match(await read('Sponsors'), /data-chat-item="sponsors" data-chat-key=\{s\.name\}/);
   assert.match(await read('Committee'), /data-chat-item="members" data-chat-key=\{m\.name\}/);
   assert.match(await read('Gallery'), /data-chat-item="gallery" data-chat-key=\{s\.image\}/);
+});
+
+// ── website texts ─────────────────────────────────────────
+const text = (key, fields) => ({ collection: 'texts', op: 'update', match: { key }, fields });
+const FOUR = { de: 'Sakkerdir entdecken', fr: 'Découvrir Sakkerdir', it: 'Scopri Sakkerdir', en: 'Explore Sakkerdir' };
+
+test('a new German text arrives with its translations in one commit', async () => {
+  const cookie = await session();
+  const operations = [{ ...text('ctaSeason'), fields: Object.entries(FOUR).map(([name, value]) => ({ name, value })) }];
+  geminiAnswers.push({ reply: 'Ich ändere den Knopf und ergänze die Übersetzungen.', action: 'change', operations });
+  const r = await post(say('Das zu Sakkerdir entdecken umbenennen'), { cookie });
+  const [proposed] = r.data.proposal.changes;
+  assert.deepEqual(proposed.fields.map((f) => f.label), ['Deutsch', 'Französisch', 'Italienisch', 'Englisch']);
+  assert.equal(proposed.key, 'ctaSeason');
+  assert.equal((await post(change(r.data.proposal.operations), { cookie })).status, 200);
+  const { texts } = state();
+  assert.deepEqual([texts.de.ctaSeason, texts.fr.ctaSeason, texts.it.ctaSeason, texts.en.ctaSeason], Object.values(FOUR));
+  assert.deepEqual(head().files, ['src/data/texts.json']);
+  assert.equal(texts.de.nav.club, 'Verein', 'everything else stays');
+});
+
+test('German alone is sent back for its translations', () => {
+  assert.throws(() => applyOperations(content(), [text('ctaSeason', { de: 'Neu' })]), /Französisch, Italienisch, Englisch/);
+});
+
+test('a single foreign language can be corrected on its own', () => {
+  const { state: s, changes } = applyOperations(content(), [text('ctaSeason', { fr: 'Voir la saison' })]);
+  assert.equal(s.texts.fr.ctaSeason, 'Voir la saison');
+  assert.equal(s.texts.de.ctaSeason, 'Saison entdecken');
+  assert.equal(changes[0].fields.length, 1);
+});
+
+test('nested texts and texts in lists can be changed', () => {
+  const { state: s } = applyOperations(content(), [text('stat.0.l', { en: 'Since' }), text('nav.club', { it: 'Società' })]);
+  assert.equal(s.texts.en.stat[0].l, 'Since');
+  assert.equal(s.texts.it.nav.club, 'Società');
+  assert.ok(Array.isArray(s.texts.en.stat), 'lists stay lists');
+});
+
+test('texts cannot be emptied, added, deleted or invented', () => {
+  assert.throws(() => applyOperations(content(), [text('ctaSeason', { fr: '' })]), /nicht leer/);
+  assert.throws(() => applyOperations(content(), [text('gibtEsNicht', { fr: 'x' })]), /gibt es nicht/);
+  assert.throws(() => applyOperations(content(), [text('__proto__.x', { fr: 'x' })]), /gibt es nicht/);
+  assert.throws(() => applyOperations(content(), [{ collection: 'texts', op: 'delete', match: { key: 'ctaSeason' } }]), ContentError);
+  assert.throws(() => applyOperations(content(), [{ collection: 'texts', op: 'add', match: { key: 'neu' }, fields: { de: 'x' } }]), ContentError);
+});
+
+test('only texts the website shows are offered', () => {
+  const keys = editableTexts(TEXTS()).map((t) => t.key);
+  assert.deepEqual(keys, ['ctaSeason', 'nav.club', 'stat.0.n', 'stat.0.l']);
+  assert.throws(() => applyOperations(content(), [text('months.0', { fr: 'x' })]), /gibt es nicht/);
+});
+
+test('the model sees every language of the texts', async () => {
+  const cookie = await session();
+  geminiAnswers.push({ reply: 'Gut.', action: 'none' });
+  await post(say('Hallo'), { cookie });
+  const system = repo.calls[0].gemini.systemInstruction.parts[0].text;
+  for (const value of ['Saison entdecken', 'Découvrir la saison', 'Scopri la stagione', 'Explore the season']) assert.ok(system.includes(value), value);
+  assert.ok(!system.includes('Vecchio'), 'unused texts stay out');
+});
+
+test('undoing a text change restores all languages', async () => {
+  const cookie = await session();
+  await post(change([text('ctaSeason', FOUR)]), { cookie });
+  const preview = await post({ action: 'propose-undo' }, { cookie });
+  assert.equal(preview.data.proposal.changes[0].collection, 'texts');
+  assert.equal(preview.data.proposal.changes[0].fields.length, 4);
+  assert.equal((await post({ action: 'publish', proposal: { type: 'undo', commit: head().sha } }, { cookie })).status, 200);
+  assert.deepEqual(head().data, seed());
+});
+
+test('a changed text is marked where it stands', () => {
+  const changes = applyOperations(content(), [text('ctaSeason', FOUR)]).changes;
+  assert.deepEqual(marksForChanges(changes).map((m) => [m.collection, m.key]), [['texts', 'ctaSeason']]);
+  assert.equal(pickLabel('texts', 'ctaSeason', '  Saison\n entdecken '), 'Text «Saison entdecken»');
+});
+
+test('every text on offer is really used by a component', async () => {
+  const { readFile, readdir } = await import('node:fs/promises');
+  const dir = new URL('../src/components/', import.meta.url);
+  const sources = (await Promise.all((await readdir(dir)).map((f) => readFile(new URL(f, dir), 'utf8')))).join('\n');
+  const real = JSON.parse(await readFile(new URL('../src/data/texts.json', import.meta.url), 'utf8'));
+  for (const { key, de, fr, it, en } of editableTexts(real)) {
+    assert.ok(de && fr && it && en, `all languages for ${key}`);
+    const inSource = sources.includes(`data-i18n="${key}"`) || /^(nav|stat)\./.test(key) || /^join\.(sending|success|error)$/.test(key);
+    assert.ok(inSource, `${key} is not on the website`);
+  }
 });
