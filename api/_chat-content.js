@@ -161,6 +161,8 @@ function checkRequired(collection, item) {
 }
 
 const itemTitle = (collection, item) => collection.match.map((name) => item[name]).reverse().join(' · ');
+// Same format as data-chat-key on the website, so the chat page can point at the entry.
+const itemKey = (collection, item) => collection.match.map((name) => item[name]).join('|');
 
 function findItem(items, collection, op) {
   const wanted = op.match || {};
@@ -177,7 +179,7 @@ function describe(collection, before, after) {
   for (const [name, spec] of Object.entries(collection.fields)) {
     const from = before[name] ?? '';
     const to = after[name] ?? '';
-    if (from !== to) out.push({ label: spec.label, before: from, after: to });
+    if (from !== to) out.push({ name, label: spec.label, before: from, after: to });
   }
   return out;
 }
@@ -214,7 +216,9 @@ function newItem(name, collection, fields, count) {
 function applyToList(state, name, op, attachments) {
   const collection = COLLECTIONS[name];
   const items = state[name];
-  const change = (kind, item, fields = []) => ({ area: collection.area, kind, title: itemTitle(collection, item), fields });
+  const change = (kind, item, fields = [], before = item) => ({
+    area: collection.area, collection: name, kind, title: itemTitle(collection, item), key: itemKey(collection, before), afterKey: itemKey(collection, item), fields,
+  });
 
   if (op.op === 'add') {
     const item = newItem(name, collection, normalizeFields(collection, op.fields, attachments), items.length);
@@ -242,7 +246,7 @@ function applyToList(state, name, op, attachments) {
     if (details.length === 0) return null;
     items.splice(index, 1);
     if (collection.sorted && fields.date && fields.date !== before.date) placeByDate(items, after); else items.splice(index, 0, after);
-    return change('update', after, details);
+    return change('update', after, details, before);
   }
   throw new ContentError(`Unbekannte Änderung: ${op.op}`);
 }
@@ -255,7 +259,7 @@ function applyToSite(state, op, attachments) {
   const details = describe(collection, state.site, after);
   if (details.length === 0) return null;
   state.site = after;
-  return { area: collection.area, kind: 'update', title: 'Startseite & Programm', fields: details };
+  return { area: collection.area, collection: 'site', kind: 'update', title: 'Startseite & Programm', key: '', afterKey: '', fields: details };
 }
 
 // Applies operations to a copy of the content and returns the new content plus a
@@ -285,27 +289,28 @@ export function diffContent(current, target) {
     const collection = COLLECTIONS[name];
     if (name === 'site') {
       const fields = describe(collection, current.site, target.site);
-      if (fields.length) changes.push({ area: collection.area, kind: 'update', title: 'Startseite & Programm', fields });
+      if (fields.length) changes.push({ area: collection.area, collection: name, kind: 'update', title: 'Startseite & Programm', key: '', afterKey: '', fields });
       continue;
     }
     const key = (item) => collection.match.map((field) => String(item[field] ?? '').trim()).join('|');
+    const entry = (kind, item, fields) => ({ area: collection.area, collection: name, kind, title: itemTitle(collection, item), key: itemKey(collection, item), afterKey: itemKey(collection, item), fields });
     const targetKeys = new Set(target[name].map(key));
     const currentByKey = new Map(current[name].map((item) => [key(item), item]));
     const before = changes.length;
     for (const item of current[name]) {
-      if (!targetKeys.has(key(item))) changes.push({ area: collection.area, kind: 'delete', title: itemTitle(collection, item), fields: [] });
+      if (!targetKeys.has(key(item))) changes.push(entry('delete', item, []));
     }
     for (const item of target[name]) {
       const old = currentByKey.get(key(item));
       if (!old) {
-        changes.push({ area: collection.area, kind: 'add', title: itemTitle(collection, item), fields: describe(collection, {}, item) });
+        changes.push(entry('add', item, describe(collection, {}, item)));
       } else {
         const fields = describe(collection, old, item);
-        if (fields.length) changes.push({ area: collection.area, kind: 'update', title: itemTitle(collection, item), fields });
+        if (fields.length) changes.push(entry('update', item, fields));
       }
     }
     if (changes.length === before && JSON.stringify(current[name].map(key)) !== JSON.stringify(target[name].map(key))) {
-      changes.push({ area: collection.area, kind: 'move', title: 'Reihenfolge', fields: [] });
+      changes.push({ area: collection.area, collection: name, kind: 'move', title: 'Reihenfolge', key: '', afterKey: '', fields: [] });
     }
   }
   return changes;

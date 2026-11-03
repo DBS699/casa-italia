@@ -3,7 +3,7 @@ import { I18N, DEFAULT_LANG, SPONSORS, CLUB } from '../data/content.js';
 const t = I18N[DEFAULT_LANG];
 ---
 
-<section id="sponsoren" class="section paper reveal sponsors" aria-label="Sponsoren">
+<section id="sponsoren" data-chat-area="sponsors" class="section paper reveal sponsors" aria-label="Sponsoren">
   <div class="container">
     <div class="kicker">
       <span class="swatch"><span style="background:#1f7a43"></span><span style="background:#f6f2e9"></span><span style="background:#c0202a"></span></span>
@@ -13,7 +13,7 @@ const t = I18N[DEFAULT_LANG];
     <p class="lead" data-i18n="sponsorsBody">{t.sponsorsBody}</p>
     <div class="sponsor-grid">
       {SPONSORS.map((s) => (
-        <div class="sponsor">
+        <div class="sponsor" data-chat-item="sponsors" data-chat-key={s.name}>
           <span class="logo"><img id={s.slot} src={s.src} alt={s.name} width="150" height="92" loading="lazy" decoding="async" /></span>
           <a href={s.url} target="_blank" rel="noopener">{s.name}</a>
         </div>

@@ -9,7 +9,7 @@ const initials = (name) => {
 };
 ---
 
-<section id="komitee" class="section white reveal" aria-label="Komitee">
+<section id="komitee" data-chat-area="members" class="section white reveal" aria-label="Komitee">
   <div class="container">
     <div class="section-head">
       <div class="kicker">
@@ -21,7 +21,7 @@ const initials = (name) => {
     </div>
     <div class="members">
       {MEMBERS.map((m) => (
-        <div class="member">
+        <div class="member" data-chat-item="members" data-chat-key={m.name}>
           <span class="photo">
             {m.src
               ? <img id={m.slot} src={m.src} alt={m.name} width="128" height="128" loading="lazy" decoding="async" />

@@ -45,36 +45,58 @@ import '../styles/global.css';
         <button type="submit" class="chat-primary">Anmelden</button>
       </form>
 
-      <section class="chat-room" id="room" hidden>
-        <div class="chat-log" id="log" aria-live="polite">
-          <div class="chat-welcome" id="welcome">
-            <h1>Was möchtest du ändern?</h1>
-            <p>Touren, Komitee, Sponsoren, Galerie oder Startseite: Schreib es einfach auf, und häng Bilder, ein Video oder das Tourenprogramm als PDF an. Du siehst immer zuerst einen Vorschlag, online geht erst, was du bestätigst.</p>
-            <div class="chat-examples">
-              <button type="button">Neue Tour am 14. März: Gurnigel-Runde, 85 km, Treffpunkt 8 Uhr</button>
-              <button type="button">Trage alle Touren aus dem angehängten PDF ein</button>
-              <button type="button">Neuer Sponsor mit dem angehängten Logo: Velo Muster, velomuster.ch</button>
-              <button type="button">Füge die angehängten Fotos in die Galerie ein</button>
-            </div>
-          </div>
+      <section class="chat-room" id="room" data-view="chat" hidden>
+        <div class="chat-tabs" role="tablist" aria-label="Ansicht">
+          <button type="button" role="tab" id="tab-chat" aria-selected="true">Chat</button>
+          <button type="button" role="tab" id="tab-site" aria-selected="false">Website</button>
         </div>
 
-        <form class="chat-composer" id="composer">
-          <ul class="chat-files" id="files" hidden></ul>
-          <div class="chat-input">
-            <label class="chat-attach" title="Bilder, Video oder PDF anhängen">
-              <input id="file-input" type="file" accept="image/*,video/*,application/pdf,.pdf" multiple />
-              <span aria-hidden="true">+</span>
-              <span class="sr">Bilder, Video oder PDF anhängen</span>
-            </label>
-            <textarea id="text" rows="1" placeholder="Nachricht schreiben …" aria-label="Nachricht"></textarea>
-            <button type="submit" class="chat-primary" id="send">Senden</button>
+        <div class="chat-site" id="site-pane">
+          <div class="chat-site-bar">
+            <button type="button" class="chat-secondary" id="pick">Bereich anklicken</button>
+            <span class="chat-site-hint" id="site-hint">Klick auf «Bereich anklicken» und dann auf einen Sponsor, eine Tour oder ein Bild.</span>
           </div>
-        </form>
+          <iframe id="site" title="Vorschau der Website"></iframe>
+        </div>
+
+        <div class="chat-panel">
+          <div class="chat-log" id="log" aria-live="polite">
+            <div class="chat-welcome" id="welcome">
+              <h1>Was möchtest du ändern?</h1>
+              <p>Touren, Komitee, Sponsoren, Galerie oder Startseite: Schreib es einfach auf. Bilder, ein Video oder das Tourenprogramm als PDF ziehst du einfach hierher. Du siehst auf der Website, was sich wo ändert, und online geht erst, was du bestätigst.</p>
+              <div class="chat-examples">
+                <button type="button">Neue Tour am 14. März: Gurnigel-Runde, 85 km, Treffpunkt 8 Uhr</button>
+                <button type="button">Trage alle Touren aus dem angehängten PDF ein</button>
+                <button type="button">Neuer Sponsor mit dem angehängten Logo: Velo Muster, velomuster.ch</button>
+                <button type="button">Füge die angehängten Fotos in die Galerie ein</button>
+              </div>
+            </div>
+          </div>
+
+          <form class="chat-composer" id="composer">
+            <div class="chat-selection" id="selection" hidden>
+              <span id="selection-text"></span>
+              <button type="button" class="chat-link" id="selection-clear">Entfernen</button>
+            </div>
+            <ul class="chat-files" id="files" hidden></ul>
+            <div class="chat-input">
+              <label class="chat-attach" title="Bilder, Video oder PDF anhängen">
+                <input id="file-input" type="file" accept="image/*,video/*,application/pdf,.pdf" multiple />
+                <span aria-hidden="true">+</span>
+                <span class="sr">Bilder, Video oder PDF anhängen</span>
+              </label>
+              <textarea id="text" rows="1" placeholder="Nachricht schreiben …" aria-label="Nachricht"></textarea>
+              <button type="submit" class="chat-primary" id="send">Senden</button>
+            </div>
+          </form>
+        </div>
       </section>
     </main>
 
+    <div class="chat-drop" id="drop" hidden><p>Dateien hier ablegen</p></div>
+
     <style is:global>
+      .chat-page [hidden] { display: none !important; }
       .chat-page { height: 100dvh; overflow: hidden; display: flex; flex-direction: column; background: var(--paper); color: var(--ink); font-family: var(--body); }
       .chat-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid var(--line); background: var(--card-warm); }
       .chat-brand { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font-family: var(--serif); font-size: 20px; }
@@ -96,7 +118,28 @@ import '../styles/global.css';
       .chat-login label { font-family: var(--label); font-size: 13px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-light); }
       .chat-login input { font: inherit; font-size: 16px; padding: 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--card); color: var(--ink); }
 
-      .chat-room { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+      .chat-page.in-room .chat-main { max-width: none; overflow: hidden; }
+      .chat-room { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr) 420px; min-height: 0; }
+      .chat-panel { display: flex; flex-direction: column; min-height: 0; min-width: 0; border-left: 1px solid var(--line); }
+      .chat-site { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+      .chat-site iframe { flex: 1; width: 100%; min-height: 0; border: 0; background: #fff; }
+      .chat-site-bar { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-bottom: 1px solid var(--line); background: var(--card-warm); }
+      .chat-site-bar .chat-secondary { flex: none; padding: 7px 12px; font-size: 14px; }
+      .chat-site-bar .chat-secondary.is-on { background: var(--green); border-color: var(--green); color: #fff; }
+      .chat-site-hint { color: var(--ink-soft); font-size: 14px; line-height: 1.3; }
+      .chat-tabs { display: none; }
+      @media (max-width: 899px) {
+        .chat-room { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+        .chat-panel { border-left: 0; }
+        .chat-tabs { display: flex; border-bottom: 1px solid var(--line); background: var(--card-warm); }
+        .chat-tabs button { flex: 1; padding: 11px; background: none; border: 0; border-bottom: 3px solid transparent; font-family: var(--label); font-size: 15px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); cursor: pointer; }
+        .chat-tabs button[aria-selected='true'] { color: var(--green); border-bottom-color: var(--green); }
+        .chat-room[data-view='chat'] .chat-site { display: none; }
+        .chat-room[data-view='site'] .chat-panel { display: none; }
+      }
+      .chat-selection { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 10px; border: 1px solid var(--green); border-radius: 6px; font-size: 14.5px; }
+      .chat-drop { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; background: rgba(31, 122, 67, 0.88); }
+      .chat-drop p { pointer-events: none; margin: 0; padding: 28px 40px; border: 2px dashed #fff; border-radius: 12px; color: #fff; font-family: var(--serif); font-size: clamp(24px, 5vw, 36px); }
       .chat-log { flex: 1; overflow-y: auto; padding: 20px 16px; display: flex; flex-direction: column; gap: 12px; }
       .chat-welcome { padding: 12px 0; color: var(--ink-soft); }
       .chat-welcome p { margin: 0 0 16px; line-height: 1.5; }
@@ -145,6 +188,8 @@ import '../styles/global.css';
 
     <script>
       import { pickTourPages } from '../scripts/chat-pdf.js';
+      import { marksForChanges, pickContext } from '../scripts/chat-marks.js';
+      import { createSiteView } from '../scripts/chat-site.js';
 
       const $ = (id) => document.getElementById(id);
       const log = $('log');
@@ -163,11 +208,79 @@ import '../styles/global.css';
       let uploadsEnabled = false;
       let busy = false;
       let openCard = null;
+      let selection = null;
+      let deployWatch = 0;
+
+      const isWide = () => window.matchMedia('(min-width: 900px)').matches;
+      const hasFiles = (e) => [...(e.dataTransfer?.types || [])].includes('Files');
+      const showDrop = (e) => { if (hasFiles(e) && !$('room').hidden) $('drop').hidden = false; };
+
+      const site = createSiteView($('site'), { onPick: finishPick, onDragEnter: showDrop });
 
       const show = (view) => {
         ['loading', 'setup', 'login', 'room'].forEach((id) => { $(id).hidden = id !== view; });
         $('logout').hidden = view !== 'room';
+        document.body.classList.toggle('in-room', view === 'room');
+        // Phones only fetch the whole website when someone opens that tab.
+        if (view === 'room' && isWide()) site.load();
       };
+
+      function showPane(view) {
+        $('room').dataset.view = view;
+        $('tab-chat').setAttribute('aria-selected', String(view === 'chat'));
+        $('tab-site').setAttribute('aria-selected', String(view === 'site'));
+        if (view === 'site') { site.load(); site.refocus(); }
+      }
+
+      function setPicking(on) {
+        site.setPicking(on);
+        $('pick').classList.toggle('is-on', on);
+        $('pick').textContent = on ? 'Abbrechen' : 'Bereich anklicken';
+        $('site-hint').textContent = on
+          ? 'Fahr über die Website und klick auf den Teil, den du ändern möchtest.'
+          : 'Klick auf «Bereich anklicken» und dann auf einen Sponsor, eine Tour oder ein Bild.';
+      }
+
+      function setSelection(pick) {
+        selection = pick;
+        $('selection').hidden = !pick;
+        if (pick) $('selection-text').textContent = `Ausgewählt: ${pick.label}`;
+        site.mark(pick ? [{ collection: pick.collection, key: pick.key, tone: 'update', note: pick.label }] : []);
+      }
+
+      function finishPick(pick) {
+        setPicking(false);
+        if (!pick) return;
+        setSelection(pick);
+        if (!isWide()) showPane('chat');
+        text.focus();
+      }
+
+      const siteFingerprint = () => fetch('/', { cache: 'no-store' }).then((r) => r.text()).catch(() => null);
+
+      // The new version takes about a minute to build. Waits until the website really
+      // changed, so "online" is something the page saw and not just a promise.
+      function watchDeploy(before, changes) {
+        deployWatch += 1;
+        const watch = deployWatch;
+        const status = addMessage('thinking', 'Die Website wird neu aufgebaut. Das dauert etwa eine Minute …');
+        const started = Date.now();
+        const check = async () => {
+          if (watch !== deployWatch) { status.remove(); return; }
+          const now = await siteFingerprint();
+          if (now && before && now !== before) {
+            status.remove();
+            site.reload(marksForChanges(changes, { published: true }));
+            addMessage('assistant', isWide() ? 'Jetzt ist es online. Auf der Website links siehst du, wo.' : 'Jetzt ist es online. Im Tab «Website» siehst du, wo.');
+          } else if (Date.now() - started > 5 * 60 * 1000) {
+            status.remove();
+            addMessage('assistant', 'Das dauert länger als üblich. Schau in ein paar Minuten nochmals auf die Website.');
+          } else {
+            setTimeout(check, 8000);
+          }
+        };
+        setTimeout(check, 15000);
+      }
 
       async function call(action, payload) {
         const r = await fetch('/api/chat', {
@@ -251,19 +364,27 @@ import '../styles/global.css';
         const actions = el('div', 'chat-actions');
         const publish = el('button', 'chat-primary', 'Veröffentlichen');
         const discard = el('button', 'chat-secondary', 'Verwerfen');
+        const where = el('button', 'chat-secondary', 'Auf der Website zeigen');
         publish.type = 'button';
         discard.type = 'button';
+        where.type = 'button';
+        where.addEventListener('click', () => {
+          showPane('site');
+          site.mark(marksForChanges(proposal.changes));
+        });
         publish.addEventListener('click', () => doPublish(proposal, publish));
         discard.addEventListener('click', () => {
           closeCard();
+          site.mark([]);
           messages.push({ role: 'assistant', text: 'Der Vorschlag wurde verworfen, nichts wurde geändert.' });
           addMessage('assistant', 'Alles klar, nichts geändert.');
         });
-        actions.append(publish, discard);
+        actions.append(publish, discard, where);
         card.appendChild(actions);
         log.appendChild(card);
         log.scrollTop = log.scrollHeight;
         openCard = card;
+        site.mark(marksForChanges(proposal.changes));
       }
 
       async function run(action, payload) {
@@ -336,6 +457,7 @@ import '../styles/global.css';
           const { type, operations, commit } = proposal;
           const files = await filesForPublish(used, button);
           button.textContent = 'Wird veröffentlicht …';
+          const before = await siteFingerprint();
           await call('publish', { proposal: { type, operations, commit }, files });
           button.textContent = 'Veröffentlicht';
           closeCard();
@@ -343,11 +465,7 @@ import '../styles/global.css';
           attachments.filter((a) => used.has(a.id) || a.kind === 'pdf').forEach(forgetFile);
           renderFiles();
           messages.push({ role: 'assistant', text: 'Der Vorschlag wurde veröffentlicht.' });
-          const done = addMessage('assistant', 'Veröffentlicht. In etwa einer Minute ist es auf der ');
-          const link = el('a', '', 'Website');
-          link.href = '/';
-          link.target = '_blank';
-          done.append(link, ' zu sehen.');
+          addMessage('assistant', 'Veröffentlicht.');
           const undo = el('button', 'chat-secondary', 'Rückgängig machen');
           undo.type = 'button';
           undo.addEventListener('click', () => {
@@ -360,6 +478,7 @@ import '../styles/global.css';
           row.appendChild(undo);
           log.appendChild(row);
           log.scrollTop = log.scrollHeight;
+          watchDeploy(before, proposal.changes);
         } catch (e) {
           button.textContent = 'Veröffentlichen';
           openCard.querySelectorAll('button').forEach((b) => { b.disabled = false; });
@@ -379,8 +498,10 @@ import '../styles/global.css';
         if (!value || busy) return;
         closeCard();
         const bubble = addMessage('user', value);
+        if (selection) bubble.appendChild(el('span', 'chat-msg-files', `Ausgewählt: ${selection.label}`));
         if (attachments.length) bubble.appendChild(el('span', 'chat-msg-files', `Angehängt: ${attachments.map((a) => a.name).join(', ')}`));
-        messages.push({ role: 'user', text: value });
+        messages.push({ role: 'user', text: selection ? `${pickContext(selection)}\n${value}` : value });
+        setSelection(null);
         text.value = '';
         text.style.height = '';
         run('propose', {
@@ -485,9 +606,7 @@ import '../styles/global.css';
         throw new Error(`«${file.name}» kann ich nicht verwenden. Möglich sind Bilder, Videos und PDF.`);
       }
 
-      $('file-input').addEventListener('change', async (e) => {
-        const chosen = [...e.target.files];
-        e.target.value = '';
+      async function addFiles(chosen) {
         for (const file of chosen) {
           if (attachments.length >= MAX_FILES) {
             addMessage('error', `Es lassen sich höchstens ${MAX_FILES} Dateien anhängen.`);
@@ -502,7 +621,33 @@ import '../styles/global.css';
             addMessage('error', err.message.startsWith('«') ? err.message : `«${file.name}» konnte ich nicht lesen. Versuch es bitte mit einem JPG, PNG oder PDF.`);
           }
         }
+      }
+
+      $('file-input').addEventListener('change', (e) => {
+        const chosen = [...e.target.files];
+        e.target.value = '';
+        addFiles(chosen);
       });
+
+      window.addEventListener('dragenter', showDrop);
+      window.addEventListener('dragover', (e) => {
+        if (!hasFiles(e)) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = $('room').hidden ? 'none' : 'copy';
+      });
+      $('drop').addEventListener('dragleave', () => { $('drop').hidden = true; });
+      window.addEventListener('drop', (e) => {
+        if (!hasFiles(e)) return;
+        // Without this the browser would leave the page and open the file.
+        e.preventDefault();
+        $('drop').hidden = true;
+        if (!$('room').hidden) addFiles([...e.dataTransfer.files]);
+      });
+
+      $('pick').addEventListener('click', () => { setPicking(!site.isPicking()); });
+      $('selection-clear').addEventListener('click', () => setSelection(null));
+      $('tab-chat').addEventListener('click', () => showPane('chat'));
+      $('tab-site').addEventListener('click', () => showPane('site'));
 
       $('composer').addEventListener('submit', (e) => { e.preventDefault(); submit(); });
       text.addEventListener('keydown', (e) => {

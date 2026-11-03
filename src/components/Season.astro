@@ -9,7 +9,7 @@ const tours = TOURS.map((tour) => {
 });
 ---
 
-<section id="touren" class="section white bordered reveal season" aria-label="Touren / Saison">
+<section id="touren" data-chat-area="tours" class="section white bordered reveal season" aria-label="Touren / Saison">
   <div class="container">
     <div class="season-head">
       <div>
@@ -20,7 +20,7 @@ const tours = TOURS.map((tour) => {
         <h2 data-i18n="seasonTitle">{t.seasonTitle}</h2>
         <p class="lead" data-i18n="seasonBody">{t.seasonBody}</p>
         {SITE.brochure && (
-          <div class="season-doc">
+          <div class="season-doc" data-chat-item="site" data-chat-key="brochure">
             <a class="btn btn-green" href={SITE.brochure} target="_blank" rel="noopener" data-i18n="member.programmView">{t.member.programmView}</a>
             <a class="btn btn-ghost-dark" href={SITE.brochure} download data-i18n="member.download">{t.member.download}</a>
           </div>
@@ -38,6 +38,8 @@ const tours = TOURS.map((tour) => {
           type="button"
           class="tour-card"
           role="listitem"
+          data-chat-item="tours"
+          data-chat-key={`${tour.date}|${tour.title}`}
           data-title={tour.title}
           data-day={tour.day}
           data-month={tour.monthLabel}

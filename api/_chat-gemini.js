@@ -59,6 +59,8 @@ Antworte immer auf Deutsch, kurz und ohne Fachbegriffe. In "reply" sagst du in e
 
 Frühere Antworten von dir können "[Vorschlag: ...]" enthalten: Das sind die Änderungen, die du damals vorgeschlagen hast. Will die Person daran etwas anpassen, lieferst du den ganzen Vorschlag nochmals neu, mit allen Änderungen, die weiterhin gelten sollen. Ein neuer Vorschlag ersetzt den alten.
 
+Eine Nachricht kann mit "[Ausgewählt auf der Website: ...]" beginnen: Die Person hat diesen Teil auf der Website angeklickt. Wörter wie "dieser", "das" oder "hier" meinen dann genau diesen Eintrag oder Bereich. Der Schlüssel darin entspricht den Werten für "match", bei Touren in der Form "Datum|Titel".
+
 "action":
 - "change": Du schlägst Änderungen vor und lieferst sie in "operations".
 - "none": Du stellst eine Rückfrage oder beantwortest eine Frage, ohne Änderung.

@@ -3,7 +3,7 @@ import { I18N, DEFAULT_LANG, GALLERY } from '../data/content.js';
 const t = I18N[DEFAULT_LANG];
 ---
 
-<section id="gallery" class="section white bordered reveal gallery" aria-label="Galerie">
+<section id="gallery" data-chat-area="gallery" class="section white bordered reveal gallery" aria-label="Galerie">
   <div class="container">
     <div class="season-head">
       <div>
@@ -22,7 +22,7 @@ const t = I18N[DEFAULT_LANG];
 
     <div class="tour-track gallery-track" role="list" tabindex="0" aria-label="Galerie">
       {GALLERY.map((s, i) => (
-        <div class="gallery-slide" role="listitem">
+        <div class="gallery-slide" role="listitem" data-chat-item="gallery" data-chat-key={s.image}>
           <button type="button" class="gallery-open" data-index={i} aria-label="Bild vergrössern">
             <img id={s.id} src={s.image} alt={s.caption} data-caption={s.caption} width="380" height="254" loading="lazy" decoding="async" />
           </button>

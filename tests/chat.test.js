@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import handler from '../api/chat.js';
 import { applyOperations, COLLECTIONS, ContentError, diffContent } from '../api/_chat-content.js';
 import { cleanPageText, pickTourPages } from '../src/scripts/chat-pdf.js';
+import { marksForChanges, pickContext, pickLabel } from '../src/scripts/chat-marks.js';
 
 const TOUR = (date, title, extra = {}) => ({ date, title, img: '/assets/tours/tour-1.jpg', g1name: 'Gruppo Grappa', ...extra });
 const seed = () => ({
@@ -558,4 +559,63 @@ test('a member list that mentions kilometres is still kept back', () => {
   const r = pickTourPages(['Anna, 3012 Bern, 12 km\nBeat, 3005 Bern\nCarla, 3097 Liebefeld']);
   assert.deepEqual(r.numbers, []);
   assert.equal(r.text, '');
+});
+
+// ── markers on the website ────────────────────────────────
+const changesFor = (operations) => applyOperations(content(), operations).changes;
+
+test('changes name the website entry they belong to', () => {
+  const [del] = changesFor([{ collection: 'sponsors', op: 'delete', match: { name: 'Thömus' } }]);
+  assert.deepEqual([del.collection, del.key], ['sponsors', 'Thömus']);
+  const [redated] = changesFor([{ collection: 'tours', op: 'update', match: { date: '28. Juni', title: 'Wohlensee' }, fields: { date: '1. August' } }]);
+  assert.equal(redated.key, '28. Juni|Wohlensee', 'still on the page under the old date');
+  assert.equal(redated.afterKey, '1. August|Wohlensee');
+});
+
+test('a proposal marks the entry, or the area when it is new', () => {
+  const marks = marksForChanges(changesFor([
+    { collection: 'sponsors', op: 'delete', match: { name: 'Thömus' } },
+    { collection: 'members', op: 'add', fields: { name: 'Maria Rossi', role: 'Aktuarin' } },
+    { collection: 'site', op: 'update', fields: { heroMotto: 'Neu' } },
+  ]));
+  assert.deepEqual(marks.map((m) => [m.collection, m.key, m.tone]), [
+    ['sponsors', 'Thömus', 'delete'],
+    ['members', '', 'add'],
+    ['site', 'heroMotto', 'update'],
+  ]);
+  assert.match(marks[1].note, /Maria Rossi/);
+});
+
+test('once online, new entries are marked themselves and deleted ones by their area', () => {
+  const marks = marksForChanges(changesFor([
+    { collection: 'sponsors', op: 'delete', match: { name: 'Thömus' } },
+    { collection: 'members', op: 'add', fields: { name: 'Maria Rossi', role: 'Aktuarin' } },
+  ]), { published: true });
+  assert.deepEqual(marks.map((m) => [m.collection, m.key]), [['sponsors', ''], ['members', 'Maria Rossi']]);
+  assert.match(marks[0].note, /Thömus/);
+});
+
+test('a whole programme gets one marker around the tours', () => {
+  const operations = Array.from({ length: 30 }, (_, i) => ({ collection: 'tours', op: 'add', fields: { date: `${(i % 28) + 1}. Mai`, title: `Tour ${i}` } }));
+  const marks = marksForChanges(changesFor(operations));
+  assert.equal(marks.length, 1);
+  assert.deepEqual([marks[0].collection, marks[0].key], ['tours', '']);
+  assert.match(marks[0].note, /30/);
+});
+
+test('a clicked entry tells the model exactly what is meant', () => {
+  assert.equal(pickLabel('tours', '28. Juni|Wohlensee'), 'Tour «Wohlensee» am 28. Juni');
+  assert.equal(pickLabel('sponsors', ''), 'Bereich Sponsoren');
+  const context = pickContext({ collection: 'sponsors', key: 'Thömus', label: pickLabel('sponsors', 'Thömus') });
+  assert.match(context, /Sponsor: Thömus/);
+  assert.match(context, /collection: sponsors/);
+});
+
+test('website keys match what the components render', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const read = (name) => readFile(new URL(`../src/components/${name}.astro`, import.meta.url), 'utf8');
+  assert.match(await read('Season'), /data-chat-key=\{`\$\{tour\.date\}\|\$\{tour\.title\}`\}/);
+  assert.match(await read('Sponsors'), /data-chat-item="sponsors" data-chat-key=\{s\.name\}/);
+  assert.match(await read('Committee'), /data-chat-item="members" data-chat-key=\{m\.name\}/);
+  assert.match(await read('Gallery'), /data-chat-item="gallery" data-chat-key=\{s\.image\}/);
 });

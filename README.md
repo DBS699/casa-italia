@@ -105,6 +105,8 @@ After that: open `/admin`, “Login with GitHub”, edit → save → it commits
 
 Alles, was im CMS änderbar ist, lässt sich auch per Nachricht ändern, ohne GitHub-Konto: Touren, Komitee, Sponsoren, Galerie und Startseite (Motto, Video, Vorschaubild, Broschüre). Auf `/chat` mit dem Passwort anmelden, aufschreiben, was sich ändern soll, Dateien bei Bedarf mit dem Plus-Zeichen anhängen, den Vorschlag prüfen und veröffentlichen. Nach etwa einer Minute ist es online. Die Seite ist nirgends verlinkt und für Suchmaschinen gesperrt (`noindex`, nicht in der Sitemap).
 
+Neben dem Chat läuft die echte Website (auf dem Handy als eigener Tab). Mit «Bereich anklicken» lässt sich dort ein Sponsor, eine Tour oder ein ganzer Bereich auswählen, und der Chat weiss dann, was mit «dieser» gemeint ist. Vorschläge werden auf der Website markiert (`src/scripts/chat-site.js`, `chat-marks.js`), und sobald die neue Version online ist, lädt die Vorschau neu und zeigt die Stelle. Die Einträge sind dafür in den Komponenten mit `data-chat-item` und `data-chat-key` versehen. Dateien lassen sich auch einfach ins Fenster ziehen.
+
 Gemini macht nur Vorschläge. `api/_chat-content.js` prüft jeden Vorschlag, und ohne Klick auf «Veröffentlichen» wird nichts gespeichert. Ist ein Gemini-Modell überlastet, nimmt der Chat automatisch das nächste (`api/_chat-gemini.js`). «Rückgängig machen» stellt die letzte Chat-Änderung wieder her, aber nie eine aus dem CMS.
 
 Dateien:

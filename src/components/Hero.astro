@@ -11,7 +11,7 @@ const isVideo = /\.(mp4|webm|mov|m4v|ogg)$/i.test(heroVideo);
 const heroImage = heroPoster || (isVideo ? '' : heroVideo);
 ---
 
-<section id="hero" class="hero" aria-label="Intro">
+<section id="hero" data-chat-area="site" class="hero" aria-label="Intro">
   <!--
     Background video. The poster shows instantly; the video is then loaded and
     autoplayed (muted) — on desktop AND mobile. We only skip the fetch when the
@@ -39,7 +39,7 @@ const heroImage = heroPoster || (isVideo ? '' : heroVideo);
   <div class="scrim"></div>
   <div class="inner">
     <img class="laurel" src="/assets/laurel-cut.png" alt="Velo Club Casa d'Italia – seit 1985" />
-    <h1 lang="it">{SITE.heroMotto}</h1>
+    <h1 lang="it" data-chat-item="site" data-chat-key="heroMotto">{SITE.heroMotto}</h1>
     <p class="hero-sub" data-i18n="heroSub">{t.heroSub}</p>
     <p class="hero-intro" data-i18n="heroIntro">{t.heroIntro}</p>
     <div class="actions">
