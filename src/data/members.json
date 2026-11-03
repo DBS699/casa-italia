@@ -1,11 +1,39 @@
 {
   "members": [
-    { "name": "Salvatore Schiavano", "role": "Präsident", "photo": "" },
-    { "name": "Marco Pavesi", "role": "Vizepräsident", "photo": "" },
-    { "name": "Pasquale Scafuri", "role": "Sportchef", "photo": "" },
-    { "name": "Maurizio Passani", "role": "Material", "photo": "" },
-    { "name": "Beatrice Frey", "role": "Sekretariat", "photo": "" },
-    { "name": "Beat Aeschlimann", "role": "Kassier", "photo": "" },
-    { "name": "Francesco De Luca", "role": "Beisitzer", "photo": "" }
+    {
+      "name": "Salvatore Schiavano",
+      "role": "Präsident",
+      "photo": ""
+    },
+    {
+      "name": "Marco Pavesi",
+      "role": "Vizepräsident",
+      "photo": ""
+    },
+    {
+      "name": "Pasquale Scafuri",
+      "role": "Sportchef",
+      "photo": ""
+    },
+    {
+      "name": "Maurizio Passani",
+      "role": "Material",
+      "photo": ""
+    },
+    {
+      "name": "Beatrice Frey",
+      "role": "Sekretariat",
+      "photo": ""
+    },
+    {
+      "name": "Beat Aeschlimann",
+      "role": "Kassier",
+      "photo": ""
+    },
+    {
+      "name": "Francesco De Luca",
+      "role": "Beisitzer",
+      "photo": "/assets/uploads/chat-fb1ab6929a83919c.png"
+    }
   ]
 }
