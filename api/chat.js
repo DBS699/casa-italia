@@ -105,7 +105,6 @@ async function propose(body) {
     messages,
     content,
     attachments,
-    documents: Array.isArray(body.documents) ? body.documents.slice(0, 2) : [],
     validate: (operations) => {
       const { changes } = applyOperations(content, operations, { attachments: preview });
       return { operations, changes };

@@ -5,10 +5,9 @@ import assert from 'node:assert/strict';
 import handler from '../api/chat.js';
 import { retry } from '../api/_chat-gemini.js';
 import { applyOperations, COLLECTIONS, ContentError, diffContent, editableTexts } from '../api/_chat-content.js';
-import { cleanPageText, pickTourPages } from '../src/scripts/chat-pdf.js';
 import { marksForChanges, pickContext, pickLabel } from '../src/scripts/chat-marks.js';
 
-const TOUR = (date, title, extra = {}) => ({ date, title, img: '/assets/tours/tour-1.jpg', g1name: 'Gruppo Grappa', ...extra });
+const KOMOOT = (path) => `https://www.komoot.com/de-de/collection/${path}`;
 const TEXTS = () => ({
   de: { ctaSeason: 'Saison entdecken', nav: { club: 'Verein' }, stat: [{ n: '1985', l: 'Gegründet' }], months: ['März'], cards: [{ title: 'Alt' }] },
   fr: { ctaSeason: 'Découvrir la saison', nav: { club: 'Club' }, stat: [{ n: '1985', l: 'Fondé' }], months: ['Mars'], cards: [{ title: 'Vieux' }] },
@@ -17,13 +16,7 @@ const TEXTS = () => ({
 });
 const seed = () => ({
   'src/data/texts.json': TEXTS(),
-  'src/data/tours.json': {
-    tours: [
-      TOUR('28. Juni', 'Wohlensee', { url: 'https://www.komoot.com/de-de/tour/1', gpx: '/assets/uploads/alt.gpx' }),
-      TOUR('12. Juli', 'Sigriswil'),
-    ],
-  },
-  'src/data/komoot.json': { collections: [{ label: 'Juni', note: '', url: 'https://www.komoot.com/de-de/collection/4780382/-juni' }] },
+  'src/data/komoot.json': { collections: [{ label: 'Juni', note: '', url: KOMOOT('4780382/-juni') }, { label: 'Juli', note: '', url: KOMOOT('4776839/-juli') }] },
   'src/data/members.json': { members: [{ name: 'Salvatore Schiavano', role: 'Präsident', photo: '' }, { name: 'Rolf Muster', role: 'Kassier', photo: '' }] },
   'src/data/sponsors.json': { sponsors: [{ name: 'Thömus', url: 'https://thoemus.ch', logo: '/assets/sponsors/thoemus.jpg' }, { name: 'gäggeli siech', url: 'https://example.ch', logo: '/assets/sponsors/g.jpg' }] },
   'src/data/gallery.json': { images: [{ image: '/assets/gallery/a.jpg', caption: '' }, { image: '/assets/gallery/b.jpg', caption: '' }] },
@@ -33,7 +26,7 @@ const state = () => {
   const d = head().data;
   return asContent(d);
 };
-const asContent = (d) => ({ tours: d['src/data/tours.json'].tours, komoot: d['src/data/komoot.json'].collections, members: d['src/data/members.json'].members, sponsors: d['src/data/sponsors.json'].sponsors, gallery: d['src/data/gallery.json'].images, site: d['src/data/site.json'], texts: d['src/data/texts.json'] });
+const asContent = (d) => ({ komoot: d['src/data/komoot.json'].collections, members: d['src/data/members.json'].members, sponsors: d['src/data/sponsors.json'].sponsors, gallery: d['src/data/gallery.json'].images, site: d['src/data/site.json'], texts: d['src/data/texts.json'] });
 
 // ── fake GitHub + Gemini ──────────────────────────────────
 let repo;
@@ -199,8 +192,8 @@ test('upload tokens need a login and only allow video and PDF', async () => {
 // ── proposing ─────────────────────────────────────────────
 test('a question changes nothing', async () => {
   const cookie = await session();
-  geminiAnswers.push({ reply: 'Am 12. Juli ist die Sigriswil-Runde.', action: 'none' });
-  const r = await post(say('Was ist im Juli?'), { cookie });
+  geminiAnswers.push({ reply: 'Die Touren pflegst du auf Komoot.', action: 'none' });
+  const r = await post(say('Wie trage ich eine Tour ein?'), { cookie });
   assert.equal(r.data.proposal, null);
   assert.equal(repo.commits.length, 1);
 });
@@ -210,8 +203,8 @@ test('the model sees every CMS area', async () => {
   geminiAnswers.push({ reply: 'Gut.', action: 'none' });
   await post(say('Hallo'), { cookie });
   const system = repo.calls[0].gemini.systemInstruction.parts[0].text;
-  for (const text of ['Sigriswil', 'Rolf Muster', 'gäggeli siech', '/assets/gallery/a.jpg', 'Passione su due ruote']) assert.ok(system.includes(text), text);
-  assert.ok(!system.includes('alt.gpx'), 'old GPX paths are not offered');
+  for (const text of ['4776839/-juli', 'Rolf Muster', 'gäggeli siech', '/assets/gallery/a.jpg', 'Passione su due ruote']) assert.ok(system.includes(text), text);
+  assert.match(system, /user\/veloclubcasa/, 'the model knows tours are kept on Komoot');
 });
 
 test('removing a sponsor is a proposal first, then a commit of only that file', async () => {
@@ -292,12 +285,12 @@ test('a schema the service refuses does not take the chat down', async () => {
 
 test('the model gets one chance to fix an invalid proposal', async () => {
   const cookie = await session();
-  const bad = { reply: 'x', action: 'change', operations: [{ collection: 'tours', op: 'add', fields: { date: '31. Februar', title: 'X' } }] };
-  const good = { reply: 'y', action: 'change', operations: [{ collection: 'tours', op: 'add', fields: { date: '28. Februar', title: 'X' } }] };
+  const bad = { reply: 'x', action: 'change', operations: [{ collection: 'members', op: 'add', fields: [{ name: 'name', value: 'Maria Rossi' }] }] };
+  const good = { reply: 'y', action: 'change', operations: [{ collection: 'members', op: 'add', fields: [{ name: 'name', value: 'Maria Rossi' }, { name: 'role', value: 'Aktuarin' }] }] };
   geminiAnswers.push(bad, good);
-  const r = await post(say('Neue Tour'), { cookie });
-  assert.equal(r.data.proposal.changes[0].title, 'X · 28. Februar');
-  assert.match(repo.calls[1].gemini.contents.at(-1).parts[0].text, /31\. Februar/);
+  const r = await post(say('Maria Rossi ins Komitee'), { cookie });
+  assert.equal(r.data.proposal.changes[0].title, 'Maria Rossi');
+  assert.match(repo.calls[1].gemini.contents.at(-1).parts[0].text, /Funktion/);
 });
 
 test('two invalid proposals end in a message, never a change', async () => {
@@ -312,7 +305,7 @@ test('two invalid proposals end in a message, never a change', async () => {
 test('garbage from the model is an error, not a change', async () => {
   const cookie = await session();
   geminiAnswers.push('das ist kein json');
-  const r = await post(say('Neue Tour'), { cookie });
+  const r = await post(say('Neuer Sponsor'), { cookie });
   assert.equal(r.status, 502);
   assert.equal(repo.commits.length, 1);
 });
@@ -350,34 +343,32 @@ test('a key problem does not silently try other models', async () => {
   assert.equal(repo.calls.length, 1);
 });
 
-test('PDF text reaches the model only with the message it belongs to', async () => {
+test('an attached PDF reaches the model by name only', async () => {
   const cookie = await session();
   geminiAnswers.push({ reply: 'Gut.', action: 'none' });
-  await post(say('Touren eintragen', { documents: [{ name: 'prog.pdf', text: 'KM 50/HM 547' }], attachments: [{ id: 'datei1', kind: 'pdf', name: 'prog.pdf' }] }), { cookie });
+  await post(say('Neues Programm', { documents: [{ name: 'prog.pdf', text: 'Anna Muster, 3012 Bern' }], attachments: [{ id: 'datei1', kind: 'pdf', name: 'prog.pdf' }] }), { cookie });
   const { gemini } = repo.calls[0];
-  assert.match(gemini.contents.at(-1).parts[1].text, /KM 50\/HM 547/);
+  assert.equal(gemini.contents.at(-1).parts.length, 1);
+  assert.doesNotMatch(JSON.stringify(gemini), /Anna Muster/);
   assert.match(gemini.systemInstruction.parts[0].text, /@datei1/);
 });
 
 // ── publishing ────────────────────────────────────────────
-test('publishing commits the change, in date order, keeping old fields', async () => {
+test('publishing commits the change as the token owner', async () => {
   const cookie = await session();
   const operations = [
-    { collection: 'tours', op: 'add', fields: { date: '5. Juli', title: 'Gurnigel', distance: '85 km', url: 'https://www.komoot.com/de-de/tour/819535385' } },
-    { collection: 'tours', op: 'update', match: { date: '28. Juni', title: 'Wohlensee' }, fields: { meet: '08:00 · Casa' } },
+    { collection: 'komoot', op: 'add', fields: { label: 'August', url: KOMOOT('4780383/-august') } },
+    { collection: 'komoot', op: 'update', match: { label: 'Juni' }, fields: { note: 'Saisonmitte' } },
   ];
   const r = await post(change(operations), { cookie });
   assert.equal(r.status, 200);
-  const { tours } = state();
-  assert.deepEqual(tours.map((t) => t.title), ['Wohlensee', 'Gurnigel', 'Sigriswil']);
-  assert.equal(tours[0].gpx, '/assets/uploads/alt.gpx');
-  assert.equal(tours[0].meet, '08:00 · Casa');
-  assert.equal(tours[1].g1name, 'Gruppo Grappa');
-  assert.equal(tours[1].g2name, '');
-  assert.ok(tours[1].img.startsWith('/assets/tours/'));
+  const { komoot } = state();
+  assert.deepEqual(komoot.map((c) => c.label), ['Juni', 'Juli', 'August']);
+  assert.equal(komoot[0].note, 'Saisonmitte');
+  assert.equal(komoot[2].note, '');
   assert.match(head().message, /^Chat: /);
   assert.equal(head().author, undefined, 'commit author must stay the token owner');
-  assert.deepEqual(head().files, ['src/data/tours.json']);
+  assert.deepEqual(head().files, ['src/data/komoot.json']);
 });
 
 test('one proposal can touch several areas in one commit', async () => {
@@ -397,28 +388,29 @@ test('one proposal can touch several areas in one commit', async () => {
   assert.deepEqual(head().files.sort(), ['src/data/gallery.json', 'src/data/members.json', 'src/data/site.json']);
 });
 
-test('lists can be reordered, tours cannot', async () => {
+test('lists can be reordered', async () => {
   const cookie = await session();
   assert.equal((await post(change([{ collection: 'sponsors', op: 'move', match: { name: 'gäggeli siech' }, position: 1 }]), { cookie })).status, 200);
   assert.deepEqual(state().sponsors.map((s) => s.name), ['gäggeli siech', 'Thömus']);
-  const r = await post(change([{ collection: 'tours', op: 'move', match: { date: '12. Juli', title: 'Sigriswil' }, position: 1 }]), { cookie });
-  assert.equal(r.status, 422);
+  assert.equal((await post(change([{ collection: 'komoot', op: 'move', match: { label: 'Juli' }, position: 1 }]), { cookie })).status, 200);
+  assert.deepEqual(state().komoot.map((c) => c.label), ['Juli', 'Juni']);
 });
 
 test('publishing re-checks the operations on the server', async () => {
   const cookie = await session();
-  const tour = (fields) => ({ collection: 'tours', op: 'add', fields: { date: '5. Juli', title: 'X', ...fields } });
+  const folder = (fields) => ({ collection: 'komoot', op: 'add', fields: { label: 'August', url: KOMOOT('4780383/-august'), ...fields } });
+  const photo = (value) => ({ collection: 'members', op: 'update', match: { name: 'Rolf Muster' }, fields: { photo: value } });
   for (const op of [
-    tour({ url: 'https://evil.example/tour/1' }),
-    tour({ url: 'javascript:alert(1)' }),
-    tour({ garmin: 'http://connect.garmin.com/modern/course/1' }),
-    tour({ img: 'https://evil.example/a.jpg' }),
-    tour({ img: '/assets/../secret.jpg' }),
-    tour({ img: '/assets/a.svg' }),
-    tour({ img: BLOB }),
-    tour({ date: 'irgendwann' }),
-    tour({ title: 'y'.repeat(121) }),
-    { collection: 'tours', op: 'add', fields: { title: 'ohne Datum' } },
+    folder({ url: 'https://evil.example/collection/1' }),
+    folder({ url: 'javascript:alert(1)' }),
+    folder({ url: 'http://www.komoot.com/collection/1' }),
+    folder({ label: '' }),
+    folder({ label: 'y'.repeat(81) }),
+    photo('https://evil.example/a.jpg'),
+    photo('/assets/../secret.jpg'),
+    photo('/assets/a.svg'),
+    photo(BLOB),
+    { collection: 'tours', op: 'add', fields: { date: '5. Juli', title: 'Touren gibt es hier nicht mehr' } },
     { collection: 'sponsors', op: 'add', fields: { name: 'Ohne Logo', url: 'https://x.ch' } },
     { collection: 'sponsors', op: 'add', fields: { name: 'Link', url: 'javascript:alert(1)', logo: '/assets/a.jpg' } },
     { collection: 'members', op: 'add', fields: { name: 'Ohne Funktion' } },
@@ -439,17 +431,17 @@ test('publishing re-checks the operations on the server', async () => {
 
 test('fields outside the list are ignored', async () => {
   const cookie = await session();
-  await post(change([{ collection: 'tours', op: 'add', fields: { date: '5. Juli', title: 'X', gpx: '/x.gpx', evil: 'y', logo: '/a.jpg' } }]), { cookie });
-  const tour = state().tours.find((t) => t.title === 'X');
-  assert.equal(tour.gpx, undefined);
-  assert.equal(tour.evil, undefined);
-  assert.equal(tour.logo, undefined);
+  await post(change([{ collection: 'komoot', op: 'add', fields: { label: 'X', url: KOMOOT('1'), gpx: '/x.gpx', evil: 'y', logo: '/a.jpg' } }]), { cookie });
+  const folder = state().komoot.find((c) => c.label === 'X');
+  assert.equal(folder.gpx, undefined);
+  assert.equal(folder.evil, undefined);
+  assert.equal(folder.logo, undefined);
 });
 
 test('a CMS commit at the same moment does not get overwritten', async () => {
   const cookie = await session();
   moveHeadOnce = true;
-  const r = await post(change([{ collection: 'tours', op: 'delete', match: { date: '12. Juli', title: 'Sigriswil' } }]), { cookie });
+  const r = await post(change([{ collection: 'komoot', op: 'delete', match: { label: 'Juli' } }]), { cookie });
   assert.equal(r.status, 200);
   assert.equal(head().parent, 'cms');
 });
@@ -487,7 +479,7 @@ test('several images can land in the gallery in one commit', async () => {
 test('files that are not images are refused as images', async () => {
   const cookie = await session();
   const svg = Buffer.from('<svg onload="alert(1)"/>').toString('base64');
-  const operations = [{ collection: 'tours', op: 'update', match: { date: '12. Juli', title: 'Sigriswil' }, fields: { img: '@datei1' } }];
+  const operations = [{ collection: 'members', op: 'update', match: { name: 'Rolf Muster' }, fields: { photo: '@datei1' } }];
   assert.equal((await post(change(operations, [{ id: 'datei1', kind: 'image', base64: svg }]), { cookie })).status, 422);
   assert.equal(repo.commits.length, 1);
 });
@@ -531,7 +523,7 @@ test('undo restores every area the last change touched', async () => {
 
 test('asking in words reaches the same undo preview', async () => {
   const cookie = await session();
-  await post(change([{ collection: 'tours', op: 'delete', match: { date: '12. Juli', title: 'Sigriswil' } }]), { cookie });
+  await post(change([{ collection: 'komoot', op: 'delete', match: { label: 'Juli' } }]), { cookie });
   geminiAnswers.push({ reply: 'Ich mache das rückgängig.', action: 'undo' });
   const r = await post(say('Mach das rückgängig'), { cookie });
   assert.equal(r.data.proposal.type, 'undo');
@@ -549,7 +541,7 @@ test('CMS edits are never undone from the chat', async () => {
 
 test('a stale undo is refused when something changed in between', async () => {
   const cookie = await session();
-  await post(change([{ collection: 'tours', op: 'delete', match: { date: '12. Juli', title: 'Sigriswil' } }]), { cookie });
+  await post(change([{ collection: 'komoot', op: 'delete', match: { label: 'Juli' } }]), { cookie });
   const sha = head().sha;
   await post(change([{ collection: 'members', op: 'add', fields: { name: 'Neu', role: 'Beisitz' } }]), { cookie });
   const r = await post({ action: 'publish', proposal: { type: 'undo', commit: sha } }, { cookie });
@@ -558,87 +550,26 @@ test('a stale undo is refused when something changed in between', async () => {
 
 // ── rules ─────────────────────────────────────────────────
 const content = () => asContent(seed());
-const addTour = (fields) => applyOperations(content(), [{ collection: 'tours', op: 'add', fields: { date: '1. Mai', title: 'X', ...fields } }]).state.tours;
 
 test('the chat offers the CMS collections plus the texts', () => {
-  assert.deepEqual(Object.keys(COLLECTIONS).sort(), ['gallery', 'komoot', 'members', 'site', 'sponsors', 'texts', 'tours']);
+  assert.deepEqual(Object.keys(COLLECTIONS).sort(), ['gallery', 'komoot', 'members', 'site', 'sponsors', 'texts']);
   assert.deepEqual(Object.keys(COLLECTIONS.site.fields), ['heroMotto', 'heroVideo', 'heroPoster', 'brochure']);
   assert.deepEqual(Object.keys(COLLECTIONS.sponsors.fields), ['name', 'url', 'logo']);
   assert.deepEqual(Object.keys(COLLECTIONS.members.fields), ['name', 'role', 'photo']);
   assert.deepEqual(Object.keys(COLLECTIONS.gallery.fields), ['image', 'caption']);
 });
 
-test('dates are normalized and months checked', () => {
-  const dated = (date) => addTour({ date })[0].date;
-  assert.equal(dated('05. märz'), '5. März');
-  assert.equal(dated('29. Februar'), '29. Februar');
-  assert.throws(() => dated('31. April'), ContentError);
-  assert.throws(() => dated('2026-03-14'), ContentError);
-});
-
-test('komoot links with locale and share token pass, others not', () => {
-  const link = (url) => addTour({ url }).find((t) => t.title === 'X').url;
-  assert.ok(link('https://www.komoot.com/tour/123'));
-  assert.ok(link('https://www.komoot.de/de-de/tour/123?share_token=abc&ref=wtd'));
-  assert.throws(() => link('https://www.komoot.com.evil.example/tour/1'), ContentError);
-  assert.throws(() => link('https://www.komoot.com/user/1'), ContentError);
-  assert.throws(() => link('http://www.komoot.com/tour/1'), ContentError);
-});
-
-test('a second group only appears when it has content', () => {
-  const tour = (fields) => addTour(fields).find((t) => t.title === 'X');
-  assert.equal(tour({}).g2name, '');
-  assert.equal(tour({ g2route: 'Casa-Thun-Casa' }).g2name, 'Gemeinsame Ausfahrt');
-});
-
 test('a no-op update is not offered as a change', () => {
-  const op = { collection: 'tours', op: 'update', match: { date: '12. Juli', title: 'Sigriswil' }, fields: { title: 'Sigriswil' } };
+  const op = { collection: 'komoot', op: 'update', match: { label: 'Juli' }, fields: { label: 'Juli' } };
   assert.throws(() => applyOperations(content(), [op]), /nichts zu ändern/);
-});
-
-test('re-dating a tour moves it; the input stays untouched', () => {
-  const before = content();
-  const r = applyOperations(before, [{ collection: 'tours', op: 'update', match: { date: '28. Juni', title: 'Wohlensee' }, fields: { date: '1. August' } }]);
-  assert.deepEqual(r.state.tours.map((t) => t.title), ['Sigriswil', 'Wohlensee']);
-  assert.equal(before.tours[0].date, '28. Juni');
-});
-
-test('a whole programme can be imported at once', () => {
-  const months = ['März', 'April', 'Mai', 'Juni', 'Juli', 'August'];
-  const operations = Array.from({ length: 30 }, (_, i) => ({ collection: 'tours', op: 'add', fields: { date: `${(i % 28) + 1}. ${months[i % 6]}`, title: `Tour ${i}` } }));
-  const { state: s, changes } = applyOperations(content(), operations);
-  assert.equal(changes.length, 30);
-  assert.equal(s.tours.length, 32);
 });
 
 test('diffContent describes what a restore would do', () => {
   const a = content();
-  const b = { ...a, tours: a.tours.slice(0, 1), sponsors: [...a.sponsors].reverse() };
+  const b = { ...a, komoot: a.komoot.slice(0, 1), sponsors: [...a.sponsors].reverse() };
   const changes = diffContent(b, a);
-  assert.deepEqual(changes.map((c) => [c.area, c.kind]), [['Touren', 'add'], ['Sponsoren', 'move']]);
-});
-
-// ── programme PDF ─────────────────────────────────────────
-test('split-up digits from the PDF are put back together', () => {
-  assert.equal(cleanPageText('0 1 .0 3 .20 2 6   gruppo   grappa'), '01.03.2026 gruppo grappa');
-  assert.equal(cleanPageText('März :   Treffpunkt   9 . 3 0 Uhr'), 'März : Treffpunkt 9.30 Uhr');
-  assert.equal(cleanPageText('KM 5 0 /HM   5 47'), 'KM 50 /HM 547');
-});
-
-test('member lists never leave the browser, tour pages do', () => {
-  const members = 'Anna Muster, Weg 1, 3012 Bern\nBeat Muster, Gasse 2, 3005 Bern\nCarla Muster, Platz 3, 3097 Liebefeld';
-  const meeting = 'Treffpunkt für die Sonntagsausfahrten: Brunnen beim Kreisel';
-  const tours = 'März : Treffpunkt 9 . 3 0 Uhr\n0 1 .0 3 .20 2 6 gruppo grappa\nCasa - Bösingen - Casa\nKM 5 0 /HM 547\n0 8 .03.2026 Casa - Aaretal - Casa\nKM 50/HM 547\n1 5 .03.2026 Casa - Thun - Casa\nKM 53/HM 750';
-  const r = pickTourPages(['Titelseite', members, meeting, tours, 'Generalversammlung 2026']);
-  assert.deepEqual(r.numbers, [3, 4]);
-  assert.ok(!r.text.includes('Muster'));
-  assert.match(r.text, /01\.03\.2026/);
-});
-
-test('a member list that mentions kilometres is still kept back', () => {
-  const r = pickTourPages(['Anna, 3012 Bern, 12 km\nBeat, 3005 Bern\nCarla, 3097 Liebefeld']);
-  assert.deepEqual(r.numbers, []);
-  assert.equal(r.text, '');
+  assert.deepEqual(changes.map((c) => [c.area, c.kind]), [['Touren (Komoot-Ordner)', 'add'], ['Sponsoren', 'move']]);
+  assert.equal(a.komoot.length, 2, 'the input stays untouched');
 });
 
 // ── markers on the website ────────────────────────────────
@@ -647,9 +578,9 @@ const changesFor = (operations) => applyOperations(content(), operations).change
 test('changes name the website entry they belong to', () => {
   const [del] = changesFor([{ collection: 'sponsors', op: 'delete', match: { name: 'Thömus' } }]);
   assert.deepEqual([del.collection, del.key], ['sponsors', 'Thömus']);
-  const [redated] = changesFor([{ collection: 'tours', op: 'update', match: { date: '28. Juni', title: 'Wohlensee' }, fields: { date: '1. August' } }]);
-  assert.equal(redated.key, '28. Juni|Wohlensee', 'still on the page under the old date');
-  assert.equal(redated.afterKey, '1. August|Wohlensee');
+  const [renamed] = changesFor([{ collection: 'komoot', op: 'update', match: { label: 'Juni' }, fields: { label: 'Juni 2027' } }]);
+  assert.equal(renamed.key, 'Juni', 'still on the page under the old name');
+  assert.equal(renamed.afterKey, 'Juni 2027');
 });
 
 test('a proposal marks the entry, or the area when it is new', () => {
@@ -675,16 +606,17 @@ test('once online, new entries are marked themselves and deleted ones by their a
   assert.match(marks[0].note, /Thömus/);
 });
 
-test('a whole programme gets one marker around the tours', () => {
-  const operations = Array.from({ length: 30 }, (_, i) => ({ collection: 'tours', op: 'add', fields: { date: `${(i % 28) + 1}. Mai`, title: `Tour ${i}` } }));
+test('many changes in one area get one marker around it', () => {
+  const operations = Array.from({ length: 8 }, (_, i) => ({ collection: 'gallery', op: 'add', fields: { image: `/assets/gallery/neu-${i}.jpg` } }));
   const marks = marksForChanges(changesFor(operations));
   assert.equal(marks.length, 1);
-  assert.deepEqual([marks[0].collection, marks[0].key], ['tours', '']);
-  assert.match(marks[0].note, /30/);
+  assert.deepEqual([marks[0].collection, marks[0].key], ['gallery', '']);
+  assert.match(marks[0].note, /8/);
 });
 
 test('a clicked entry tells the model exactly what is meant', () => {
-  assert.equal(pickLabel('tours', '28. Juni|Wohlensee'), 'Tour «Wohlensee» am 28. Juni');
+  assert.equal(pickLabel('komoot', 'Juni'), 'Komoot-Ordner «Juni»');
+  assert.equal(pickLabel('komoot', ''), 'Bereich Touren');
   assert.equal(pickLabel('sponsors', ''), 'Bereich Sponsoren');
   const context = pickContext({ collection: 'sponsors', key: 'Thömus', label: pickLabel('sponsors', 'Thömus') });
   assert.match(context, /Sponsor: Thömus/);
@@ -694,7 +626,7 @@ test('a clicked entry tells the model exactly what is meant', () => {
 test('website keys match what the components render', async () => {
   const { readFile } = await import('node:fs/promises');
   const read = (name) => readFile(new URL(`../src/components/${name}.astro`, import.meta.url), 'utf8');
-  assert.match(await read('Season'), /data-chat-key=\{`\$\{tour\.date\}\|\$\{tour\.title\}`\}/);
+  assert.match(await read('Season'), /data-chat-item="komoot"\s+data-chat-key=\{card\.label\}/);
   assert.match(await read('Sponsors'), /data-chat-item="sponsors" data-chat-key=\{s\.name\}/);
   assert.match(await read('Committee'), /data-chat-item="members" data-chat-key=\{m\.name\}/);
   assert.match(await read('Gallery'), /data-chat-item="gallery" data-chat-key=\{s\.image\}/);
@@ -746,9 +678,10 @@ test('texts cannot be emptied, added, deleted or invented', () => {
 });
 
 test('komoot folders take collection links only', () => {
-  const add = (url) => applyOperations(content(), [{ collection: 'komoot', op: 'add', fields: { label: 'Juli', url } }]);
-  const { state: next } = add('https://www.komoot.com/de-de/collection/4776839/-juli');
-  assert.deepEqual(next.komoot.map((c) => c.label), ['Juni', 'Juli']);
+  const add = (url) => applyOperations(content(), [{ collection: 'komoot', op: 'add', fields: { label: 'August', url } }]);
+  const { state: next } = add(KOMOOT('4780383/-august'));
+  assert.deepEqual(next.komoot.map((c) => c.label), ['Juni', 'Juli', 'August']);
+  assert.ok(add('https://www.komoot.com/collection/4780383'));
   assert.throws(() => add('https://www.komoot.com/de-de/tour/819535385'), /kein passender Link/);
   assert.throws(() => add('https://example.ch/collection/1'), /kein passender Link/);
 });
@@ -791,7 +724,8 @@ test('every text on offer is really used by a component', async () => {
   const real = JSON.parse(await readFile(new URL('../src/data/texts.json', import.meta.url), 'utf8'));
   for (const { key, de, fr, it, en } of editableTexts(real)) {
     assert.ok(de && fr && it && en, `all languages for ${key}`);
-    const inSource = sources.includes(`data-i18n="${key}"`) || /^(nav|stat)\./.test(key) || /^join\.(sending|success|error)$/.test(key);
+    // Texts the scripts fill in are named in quotes there.
+    const inSource = sources.includes(`data-i18n="${key}"`) || sources.includes(`'${key}'`) || /^(nav|stat)\./.test(key) || /^join\.(sending|success|error)$/.test(key);
     assert.ok(inSource, `${key} is not on the website`);
   }
 });

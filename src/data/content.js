@@ -1,13 +1,12 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Content model. Structured, club-editable content lives in JSON files in this
-// folder (members/sponsors/tours/gallery/site.json) — these are the collections
+// folder (members/sponsors/komoot/gallery/site.json) — these are the collections
 // the Sveltia CMS edits, and this module simply reads & adapts them for the
 // components. Translatable UI prose is in texts.json (edited by the chat, not the CMS).
 // ─────────────────────────────────────────────────────────────────────────────
 
 import membersData from './members.json';
 import sponsorsData from './sponsors.json';
-import toursData from './tours.json';
 import galleryData from './gallery.json';
 import siteData from './site.json';
 import komootData from './komoot.json';
@@ -48,10 +47,8 @@ export const SPONSORS = sponsorsData.sponsors.map((s, i) => ({
   name: s.name, url: s.url, src: s.logo, slot: 'vcsp' + (i + 1),
 }));
 
-// Season tours — date, title, optional link, image (from tours.json; CMS-editable).
-export const TOURS = toursData.tours;
-
-// Komoot collections, one link per month under the tours (from komoot.json; CMS-editable).
+// Komoot collections, one card per month in the season (from komoot.json; CMS-editable).
+// The tours themselves live on Komoot and are loaded in the browser (scripts/komoot.js).
 export const KOMOOT = komootData.collections;
 
 // Gallery images (from gallery.json; CMS-editable).

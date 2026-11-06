@@ -57,15 +57,19 @@
     "next": {
       "kicker": "Nächste Ausfahrt",
       "distance": "Distanz",
-      "elevation": "Höhenmeter",
-      "meet": "Treffpunkt",
       "cta": "Ganze Saison"
     },
     "seasonKicker": "Saison 2026",
     "seasonTitle": "Acht Monate unterwegs.",
     "seasonBody": "An den meisten Sonntagen fahren wir in zwei Gruppen – eine sportliche und eine gemütliche. Im Tour-Fenster findest du beide Strecken; manchmal fahren wir alle gemeinsam.",
-    "komootTitle": "Alle Routen auf Komoot",
-    "komootBody": "Pro Monat ein Ordner mit allen Touren. Ansehen geht ohne Konto, mit einem eigenen Komoot-Konto kannst du die Routen auch als GPX herunterladen.",
+    "komoot": {
+      "open": "Auf Komoot öffnen",
+      "rides": "Ausfahrten",
+      "ride": "Ausfahrt",
+      "soon": "Touren folgen bald",
+      "route": "Route auf Komoot",
+      "hint": "Die Touren stehen im Komoot-Konto des Vereins. Ansehen geht ohne Konto, mit einem eigenen Komoot-Konto kannst du die Routen auch als GPX herunterladen."
+    },
     "months": [
       "März",
       "April",
@@ -186,15 +190,19 @@
     "next": {
       "kicker": "Prochaine sortie",
       "distance": "Distance",
-      "elevation": "Dénivelé",
-      "meet": "Rendez-vous",
       "cta": "Toute la saison"
     },
     "seasonKicker": "Saison 2026",
     "seasonTitle": "Huit mois sur les routes.",
     "seasonBody": "La plupart des dimanches, nous roulons en deux groupes – un sportif et un tranquille. Les deux parcours figurent dans chaque sortie ; parfois nous roulons tous ensemble.",
-    "komootTitle": "Tous les parcours sur Komoot",
-    "komootBody": "Un dossier par mois avec toutes les sorties. Consultation sans compte ; avec ton propre compte Komoot, tu peux aussi télécharger les parcours en GPX.",
+    "komoot": {
+      "open": "Ouvrir sur Komoot",
+      "rides": "sorties",
+      "ride": "sortie",
+      "soon": "Parcours bientôt en ligne",
+      "route": "Parcours sur Komoot",
+      "hint": "Les parcours sont sur le compte Komoot du club. Consultation sans compte ; avec ton propre compte Komoot, tu peux aussi les télécharger en GPX."
+    },
     "months": [
       "Mars",
       "Avril",
@@ -315,15 +323,19 @@
     "next": {
       "kicker": "Prossima uscita",
       "distance": "Distanza",
-      "elevation": "Dislivello",
-      "meet": "Ritrovo",
       "cta": "Tutta la stagione"
     },
     "seasonKicker": "Stagione 2026",
     "seasonTitle": "Otto mesi in viaggio.",
     "seasonBody": "Quasi ogni domenica pedaliamo in due gruppi – uno sportivo e uno tranquillo. Trovi entrambi i percorsi in ogni uscita; a volte usciamo tutti insieme.",
-    "komootTitle": "Tutti i percorsi su Komoot",
-    "komootBody": "Una cartella al mese con tutte le uscite. Si possono vedere senza account; con un tuo account Komoot puoi anche scaricare i percorsi in GPX.",
+    "komoot": {
+      "open": "Apri su Komoot",
+      "rides": "uscite",
+      "ride": "uscita",
+      "soon": "Percorsi in arrivo",
+      "route": "Percorso su Komoot",
+      "hint": "I percorsi sono sull'account Komoot del club. Si possono vedere senza account; con un tuo account Komoot puoi anche scaricarli in GPX."
+    },
     "months": [
       "Marzo",
       "Aprile",
@@ -444,15 +456,19 @@
     "next": {
       "kicker": "Next ride",
       "distance": "Distance",
-      "elevation": "Elevation",
-      "meet": "Meeting point",
       "cta": "Full season"
     },
     "seasonKicker": "Season 2026",
     "seasonTitle": "Eight months on the road.",
     "seasonBody": "On most Sundays we ride in two groups – a sporty one and an easy-going one. Both routes are shown for each ride; sometimes we all ride together.",
-    "komootTitle": "All routes on Komoot",
-    "komootBody": "One folder per month with every ride. You can view them without an account; with your own Komoot account you can also download the routes as GPX.",
+    "komoot": {
+      "open": "Open on Komoot",
+      "rides": "rides",
+      "ride": "ride",
+      "soon": "Routes coming soon",
+      "route": "Route on Komoot",
+      "hint": "The routes are on the club's Komoot account. You can view them without an account; with your own Komoot account you can also download them as GPX."
+    },
     "months": [
       "March",
       "April",

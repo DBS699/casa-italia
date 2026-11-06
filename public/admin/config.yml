@@ -36,47 +36,17 @@ collections:
           - { name: heroPoster, label: "Video-Vorschaubild", widget: image }
           - { name: brochure, label: "Broschüre / Tourenprogramm (PDF)", widget: file, required: false, default: "" }
 
-  - name: tours
-    label: "Touren"
-    files:
-      - name: tours
-        label: "Touren"
-        file: "src/data/tours.json"
-        fields:
-          - name: tours
-            label: "Touren"
-            label_singular: "Tour"
-            widget: list
-            summary: "{{fields.date}} — {{fields.title}}"
-            fields:
-              - { name: date, label: "Datum", widget: string, hint: "z. B. 28. Juni" }
-              - { name: title, label: "Titel", widget: string }
-              - { name: img, label: "Bild", widget: image }
-              - { name: description, label: "Beschreibung (optional)", widget: text, required: false, default: "" }
-              - { name: meet, label: "Treffpunkt (Zeit · Ort)", widget: string, required: false, default: "" }
-              - { name: g1name, label: "Gruppe 1 – Name", widget: string, required: false, default: "Gruppo Grappa" }
-              - { name: g1route, label: "Gruppe 1 – Route", widget: string, required: false, default: "" }
-              - { name: distance, label: "Gruppe 1 – Distanz", widget: string, required: false, default: "" }
-              - { name: elevation, label: "Gruppe 1 – Höhenmeter", widget: string, required: false, default: "" }
-              - { name: url, label: "Gruppe 1 – Komoot-Link (optional)", widget: string, required: false, default: "", hint: "Link der öffentlichen Komoot-Tour einfügen – die Karte erscheint automatisch." }
-              - { name: garmin, label: "Gruppe 1 – Garmin-Connect-Link (optional)", widget: string, required: false, default: "", hint: "Link zur Strecke in Garmin Connect einfügen." }
-              - { name: g2name, label: "Gruppe 2 – Name (leer lassen wenn nur eine Gruppe)", widget: string, required: false, default: "Gemeinsame Ausfahrt" }
-              - { name: g2route, label: "Gruppe 2 – Route", widget: string, required: false, default: "" }
-              - { name: g2distance, label: "Gruppe 2 – Distanz", widget: string, required: false, default: "" }
-              - { name: g2elevation, label: "Gruppe 2 – Höhenmeter", widget: string, required: false, default: "" }
-              - { name: g2url, label: "Gruppe 2 – Komoot-Link (optional)", widget: string, required: false, default: "", hint: "Link der öffentlichen Komoot-Tour einfügen – die Karte erscheint automatisch." }
-              - { name: g2garmin, label: "Gruppe 2 – Garmin-Connect-Link (optional)", widget: string, required: false, default: "", hint: "Link zur Strecke in Garmin Connect einfügen." }
-
   - name: komoot
-    label: "Komoot-Ordner"
+    label: "Touren (Komoot)"
     files:
       - name: komoot
-        label: "Komoot-Ordner (Links unter den Touren)"
+        label: "Touren: Komoot-Ordner pro Monat"
         file: "src/data/komoot.json"
         fields:
           - name: collections
             label: "Ordner"
             label_singular: "Ordner"
+            hint: "Die Touren selbst pflegst du im Komoot-Konto des Vereins. Die Website zeigt pro Ordner eine Karte mit der ersten Tour und alle Touren im Fenster; Änderungen auf Komoot erscheinen nach rund 10 Minuten."
             widget: list
             summary: "{{fields.label}}"
             fields:

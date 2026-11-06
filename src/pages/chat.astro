@@ -54,7 +54,7 @@ import '../styles/global.css';
         <div class="chat-site" id="site-pane">
           <div class="chat-site-bar">
             <button type="button" class="chat-secondary" id="pick">Bereich anklicken</button>
-            <span class="chat-site-hint" id="site-hint">Klick auf «Bereich anklicken» und dann auf einen Sponsor, eine Tour, ein Bild oder einen Text.</span>
+            <span class="chat-site-hint" id="site-hint">Klick auf «Bereich anklicken» und dann auf einen Sponsor, einen Touren-Monat, ein Bild oder einen Text.</span>
           </div>
           <iframe id="site" title="Vorschau der Website"></iframe>
         </div>
@@ -63,10 +63,10 @@ import '../styles/global.css';
           <div class="chat-log" id="log" aria-live="polite">
             <div class="chat-welcome" id="welcome">
               <h1>Was möchtest du ändern?</h1>
-              <p>Touren, Komitee, Sponsoren, Galerie, Startseite und alle Texte in vier Sprachen: Schreib es einfach auf. Bilder, ein Video oder das Tourenprogramm als PDF ziehst du einfach hierher. Du siehst auf der Website, was sich wo ändert, und online geht erst, was du bestätigst.</p>
+              <p>Komitee, Sponsoren, Galerie, Startseite, die Komoot-Ordner der Touren und alle Texte in vier Sprachen: Schreib es einfach auf. Bilder, ein Video oder das Tourenprogramm als PDF ziehst du einfach hierher. Die Touren selbst pflegst du im Komoot-Konto des Vereins. Du siehst auf der Website, was sich wo ändert, und online geht erst, was du bestätigst.</p>
               <div class="chat-examples">
-                <button type="button">Neue Tour am 14. März: Gurnigel-Runde, 85 km, Treffpunkt 8 Uhr</button>
-                <button type="button">Trage alle Touren aus dem angehängten PDF ein</button>
+                <button type="button">Wie trage ich eine neue Tour ein?</button>
+                <button type="button">Nimm das angehängte PDF als neues Tourenprogramm</button>
                 <button type="button">Neuer Sponsor mit dem angehängten Logo: Velo Muster, velomuster.ch</button>
                 <button type="button">Füge die angehängten Fotos in die Galerie ein</button>
               </div>
@@ -178,7 +178,6 @@ import '../styles/global.css';
       .chat-file .chat-file-icon { display: grid; place-items: center; background: var(--card); border: 1px solid var(--line); font-family: var(--label); font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); }
       .chat-file-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
       .chat-file-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-      .chat-file-note { color: var(--ink-light); font-size: 13px; }
       .chat-input { display: flex; align-items: flex-end; gap: 8px; }
       .chat-input textarea { flex: 1; min-width: 0; resize: none; max-height: 160px; font: inherit; font-size: 16px; line-height: 1.4; padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--card); color: var(--ink); }
       .chat-attach { flex: none; width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 6px; background: var(--card); font-size: 24px; line-height: 1; color: var(--ink-soft); cursor: pointer; position: relative; }
@@ -187,7 +186,6 @@ import '../styles/global.css';
     </style>
 
     <script>
-      import { pickTourPages } from '../scripts/chat-pdf.js';
       import { marksForChanges, pickContext } from '../scripts/chat-marks.js';
       import { createSiteView } from '../scripts/chat-site.js';
 
@@ -238,7 +236,7 @@ import '../styles/global.css';
         $('pick').textContent = on ? 'Abbrechen' : 'Bereich anklicken';
         $('site-hint').textContent = on
           ? 'Fahr über die Website und klick auf den Teil, den du ändern möchtest.'
-          : 'Klick auf «Bereich anklicken» und dann auf einen Sponsor, eine Tour, ein Bild oder einen Text.';
+          : 'Klick auf «Bereich anklicken» und dann auf einen Sponsor, einen Touren-Monat, ein Bild oder einen Text.';
       }
 
       function setSelection(pick) {
@@ -464,8 +462,7 @@ import '../styles/global.css';
           await call('publish', { proposal: { type, operations, commit }, files });
           button.textContent = 'Veröffentlicht';
           closeCard();
-          // A programme PDF has done its job once its tours are online.
-          attachments.filter((a) => used.has(a.id) || a.kind === 'pdf').forEach(forgetFile);
+          attachments.filter((a) => used.has(a.id)).forEach(forgetFile);
           renderFiles();
           messages.push({ role: 'assistant', text: 'Der Vorschlag wurde veröffentlicht.' });
           addMessage('assistant', 'Veröffentlicht.');
@@ -492,7 +489,6 @@ import '../styles/global.css';
       }
 
       function defaultMessage() {
-        if (attachments.some((a) => a.text)) return 'Bitte trage alle Touren aus diesem PDF ein.';
         return attachments.length ? 'Ich habe etwas angehängt.' : '';
       }
 
@@ -510,7 +506,6 @@ import '../styles/global.css';
         run('propose', {
           messages,
           attachments: attachments.map(({ id, kind, name }) => ({ id, kind, name })),
-          documents: attachments.filter((a) => a.text).map(({ name, text: content }) => ({ name, text: content })),
         });
       }
 
@@ -535,7 +530,6 @@ import '../styles/global.css';
           }
           const label = el('span', 'chat-file-text');
           label.appendChild(el('span', 'chat-file-name', attachment.name));
-          if (attachment.note) label.appendChild(el('span', 'chat-file-note', attachment.note));
           const remove = el('button', 'chat-link', 'Entfernen');
           remove.type = 'button';
           remove.setAttribute('aria-label', `${attachment.name} entfernen`);
@@ -576,30 +570,11 @@ import '../styles/global.css';
         return { base64: btoa(binary), preview: URL.createObjectURL(blob) };
       }
 
-      // Only the pages with tours ever reach the server; see chat-pdf.js.
-      async function readPdf(file) {
-        const [pdfjs, worker] = await Promise.all([import('pdfjs-dist'), import('pdfjs-dist/build/pdf.worker.min.mjs?url')]);
-        pdfjs.GlobalWorkerOptions.workerSrc = worker.default;
-        const doc = await pdfjs.getDocument({ data: await file.arrayBuffer() }).promise;
-        const pages = [];
-        for (let i = 1; i <= doc.numPages; i += 1) {
-          const page = await doc.getPage(i);
-          const content = await page.getTextContent();
-          pages.push(content.items.map((item) => `${item.str}${item.hasEOL ? '\n' : ' '}`).join(''));
-        }
-        await doc.destroy();
-        return pickTourPages(pages);
-      }
-
       async function prepareFile(file) {
         const base = { id: `datei${nextFileId}`, name: file.name, file };
         if (file.type === 'application/pdf' || /\.pdf$/i.test(file.name)) {
           if (file.size > MAX_UPLOAD_BYTES) throw new Error(`«${file.name}» ist zu gross (höchstens 100 MB).`);
-          const { numbers, text: content } = await readPdf(file);
-          const note = numbers.length
-            ? `Touren auf ${numbers.length} Seiten gefunden. Nur diese Seiten werden gelesen.`
-            : 'Keine Touren erkannt. Das PDF lässt sich als Broschüre verwenden.';
-          return { ...base, kind: 'pdf', text: content, note };
+          return { ...base, kind: 'pdf' };
         }
         if (file.type.startsWith('video/')) {
           if (file.size > MAX_UPLOAD_BYTES) throw new Error(`«${file.name}» ist zu gross (höchstens 100 MB).`);

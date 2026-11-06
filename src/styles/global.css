@@ -318,8 +318,6 @@ section[id], footer[id] { scroll-margin-top: 98px; }
 .tour-badge .m { font-family: var(--label); text-transform: uppercase; letter-spacing: 0.12em; font-size: 10px; font-weight: 600; color: var(--green); margin-top: 3px; }
 .tour-meta { padding: 18px 20px 22px; }
 .tour-title { font-family: var(--serif); font-weight: 400; font-size: 22px; line-height: 1.15; margin: 0; color: var(--ink); }
-.tour-link { display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; font-family: var(--label); text-transform: uppercase; letter-spacing: 0.1em; font-size: 13px; font-weight: 600; color: var(--green); }
-.tour-link .arrow { font-size: 16px; }
 
 @media (max-width: 640px) { .season-arrows { display: none; } }
 
@@ -338,41 +336,22 @@ section[id], footer[id] { scroll-margin-top: 98px; }
 .tour-modal[open]::backdrop { background: rgba(20, 19, 13, 0.55); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
 @starting-style { .tour-modal[open]::backdrop { background: rgba(20, 19, 13, 0); } }
 
-.tour-modal .tm-photo { position: relative; aspect-ratio: 16 / 9; background: var(--paper); }
-.tour-modal .tm-photo img { width: 100%; height: 100%; object-fit: cover; }
 .tour-modal .modal-body { padding: clamp(22px, 4vw, 32px); animation: tmText .45s ease .1s both; }
 @keyframes tmText { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 .tour-modal .tm-title { font-family: var(--serif); font-weight: 400; font-size: clamp(24px, 4vw, 30px); line-height: 1.12; margin: 0 0 12px; color: var(--ink); }
 .tour-modal .tm-desc { font-size: 16px; line-height: 1.7; color: var(--ink-soft); margin: 0 0 22px; text-wrap: pretty; }
-.tour-modal .tm-facts { display: flex; flex-wrap: wrap; gap: 26px; padding: 18px 0; margin: 0 0 22px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.tour-modal .tm-facts > div { display: flex; flex-direction: column; gap: 5px; }
-.tour-modal .tm-facts .k { font-family: var(--label); text-transform: uppercase; letter-spacing: 0.14em; font-size: 11px; font-weight: 600; color: var(--ink-light); }
-.tour-modal .tm-facts .v { font-family: var(--serif); font-size: 19px; color: var(--ink); }
-.tour-modal .tm-map { margin: 0 0 22px; border-radius: 6px; overflow: hidden; border: 1px solid var(--line); background: var(--paper); }
-.tour-modal .tm-map iframe { display: block; width: 100%; border: 0; height: 560px; }
 .tour-modal .tm-actions { display: flex; flex-wrap: wrap; gap: 12px; }
 
-/* Two groups per tour — switchable tabs (Gruppo Grappa / Gemeinsame Ausfahrt) */
-.tour-modal .tm-tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--line); margin: 4px 0 18px; }
-.tour-modal .tm-tab { appearance: none; background: none; border: none; cursor: pointer; padding: 10px 6px; margin-bottom: -1px; font-family: var(--label); text-transform: uppercase; letter-spacing: 0.1em; font-size: 12px; font-weight: 600; color: var(--ink-light); border-bottom: 2px solid transparent; transition: color .15s ease, border-color .15s ease; }
-.tour-modal .tm-tab:hover { color: var(--ink); }
-.tour-modal .tm-tab.is-active { color: var(--green); border-bottom-color: var(--green); }
-.tour-modal .tm-panel-name { display: block; font-family: var(--label); text-transform: uppercase; letter-spacing: 0.12em; font-size: 12px; font-weight: 600; color: var(--green); margin-bottom: 6px; }
-.tour-modal .tm-panel-facts { font-family: var(--serif); font-size: 22px; color: var(--ink); }
-.tour-modal .tm-panel-route { font-size: 14px; line-height: 1.5; color: var(--ink-soft); margin-top: 5px; text-wrap: pretty; }
-.tour-modal .tm-panel .tm-map { margin-top: 16px; }
-.tour-modal .tm-panel .tm-actions { margin-top: 16px; }
-.tour-modal .tm-meet { display: flex; align-items: baseline; gap: 12px; margin: 20px 0 0; padding-top: 16px; border-top: 1px solid var(--line); }
-.tour-modal .tm-meet .k { font-family: var(--label); text-transform: uppercase; letter-spacing: 0.14em; font-size: 11px; font-weight: 600; color: var(--ink-light); }
-.tour-modal .tm-meet .tm-meet-val { font-family: var(--serif); font-size: 18px; color: var(--ink); }
+/* No photo on top any more: the title leaves room for the close button */
+.komoot-modal { width: min(640px, calc(100% - 32px)); }
+.komoot-modal .tm-title { padding-right: 44px; }
 .tour-modal .tm-close {
   position: absolute; top: 12px; right: 12px; z-index: 2; width: 38px; height: 38px;
   border-radius: 50%; border: none; cursor: pointer; font-size: 22px; line-height: 1;
-  background: rgba(255, 255, 255, 0.92); color: var(--ink);
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 3px 12px rgba(20, 19, 13, 0.25); transition: background .2s ease;
+  background: rgba(27, 26, 22, 0.06); color: var(--ink);
+  display: flex; align-items: center; justify-content: center; transition: background .2s ease;
 }
-.tour-modal .tm-close:hover { background: #fff; }
+.tour-modal .tm-close:hover { background: rgba(27, 26, 22, 0.12); }
 
 /* Join (membership) dialog — same zoom-in as the tour modal */
 .join-modal {
@@ -415,10 +394,8 @@ section[id], footer[id] { scroll-margin-top: 98px; }
 .next-ride .nr-title { font-family: var(--serif); font-weight: 400; font-size: clamp(26px, 3.6vw, 38px); line-height: 1.1; margin: 0 0 12px; color: var(--ink); }
 .next-ride .nr-desc { font-size: 16px; line-height: 1.7; color: var(--ink-soft); margin: 0 0 22px; text-wrap: pretty; }
 .next-ride .nr-facts { display: flex; flex-wrap: wrap; gap: 22px 34px; padding: 20px 0; margin: 0 0 24px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.next-ride .nr-facts > div { display: flex; flex-direction: column; gap: 5px; }
 .next-ride .nr-facts .k { font-family: var(--label); text-transform: uppercase; letter-spacing: 0.14em; font-size: 11px; font-weight: 600; color: var(--ink-light); }
 .next-ride .nr-facts .v { font-family: var(--serif); font-size: 20px; color: var(--ink); }
-.next-ride .nr-cta { align-self: flex-start; margin-top: auto; }
 @media (max-width: 720px) {
   .next-ride .nr-card { grid-template-columns: 1fr; }
   .next-ride .nr-photo { aspect-ratio: 16 / 10; min-height: 0; }
@@ -512,24 +489,35 @@ section[id], footer[id] { scroll-margin-top: 98px; }
 /* Touren — Tourenprogramm/Broschüre buttons under the season lead (shown when a PDF is set) */
 .season-doc { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
 
-/* Touren — one Komoot collection per month, under the tour carousel */
-.komoot-block { margin-top: 48px; padding-top: 36px; border-top: 1px solid var(--line-soft); }
-.komoot-title { font-family: var(--serif); font-weight: 400; font-size: 28px; line-height: 1.15; margin: 0 0 10px; color: var(--ink); }
-.komoot-body { max-width: 620px; font-size: 16px; line-height: 1.6; color: var(--ink-soft); margin: 0 0 24px; text-wrap: pretty; }
-.komoot-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
-.komoot-list li.has-note { grid-column: span 2; }
-.komoot-list a {
-  display: grid; grid-template-columns: 1fr auto; align-items: center; column-gap: 12px; height: 100%;
-  padding: 14px 16px; border: 1px solid var(--line); border-radius: 4px; background: var(--card-warm);
-  color: var(--ink); text-decoration: none; transition: border-color .2s ease, transform .2s ease;
+/* Touren — one card per Komoot collection, the dialog lists its rides */
+.komoot-card .tour-photo img.is-map { object-position: center; }
+.komoot-card .tour-meta { display: flex; flex-direction: column; flex: 1; }
+.komoot-sub { font-size: 14px; line-height: 1.45; color: var(--ink-soft); margin: 6px 0 0; text-wrap: pretty; }
+.komoot-sub:empty { display: none; }
+.komoot-card .tour-more { margin-top: auto; padding-top: 12px; }
+.komoot-hint { max-width: 620px; font-size: 14px; line-height: 1.6; color: var(--ink-soft); margin: 20px 0 0; }
+.komoot-modal .ride-list { list-style: none; margin: 4px 0 24px; padding: 0; border-top: 1px solid var(--line); }
+.komoot-modal .ride { display: grid; grid-template-columns: 132px 1fr; gap: 16px; align-items: start; padding: 16px 0; border-bottom: 1px solid var(--line); }
+.komoot-modal .ride-map { display: block; aspect-ratio: 8 / 5; border-radius: 4px; overflow: hidden; background: var(--paper); border: 1px solid var(--line-soft); }
+.komoot-modal .ride-map img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s ease; }
+.komoot-modal .ride-map:hover img { transform: scale(1.05); }
+.komoot-modal .ride-info { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.komoot-modal .ride-date { font-family: var(--label); text-transform: uppercase; letter-spacing: 0.12em; font-size: 12px; font-weight: 600; color: var(--green); }
+.komoot-modal .ride-place { font-family: var(--serif); font-size: 21px; line-height: 1.2; color: var(--ink); }
+.komoot-modal .ride-groups { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.komoot-modal .ride-group { display: inline-flex; align-items: baseline; gap: 8px; padding: 7px 12px; border: 1px solid var(--line); border-radius: 999px; font-size: 14px; color: var(--ink); text-decoration: none; transition: border-color .2s ease, color .2s ease; }
+.komoot-modal .ride-group:hover { border-color: var(--green); color: var(--green); }
+.komoot-modal .ride-group .g { font-family: var(--label); text-transform: uppercase; letter-spacing: 0.1em; font-size: 11px; font-weight: 600; color: var(--green); }
+.komoot-modal .ride-group .arrow { color: var(--green); }
+.komoot-modal .ride-group .f { white-space: nowrap; }
+@media (max-width: 520px) {
+  .komoot-modal .ride { grid-template-columns: 72px 1fr; gap: 12px; }
+  .komoot-modal .ride-place { font-size: 19px; }
+  .komoot-modal .ride-group { gap: 6px; padding: 6px 10px; font-size: 13px; }
 }
-.komoot-list a:hover { border-color: var(--green); transform: translateY(-2px); }
-.komoot-list a:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
-.komoot-label { font-family: var(--serif); font-size: 20px; line-height: 1.2; }
-.komoot-note { grid-column: 1; font-size: 13px; line-height: 1.4; color: var(--ink-soft); margin-top: 4px; }
-.komoot-list .arrow { grid-column: 2; grid-row: 1 / span 2; color: var(--green); font-size: 18px; transition: transform .2s ease; }
-.komoot-list a:hover .arrow { transform: translateX(3px); }
-@media (max-width: 340px) { .komoot-list li.has-note { grid-column: auto; } }
+.next-ride .nr-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: auto; }
+.next-ride .nr-fact { display: flex; flex-direction: column; gap: 5px; text-decoration: none; }
+.next-ride .nr-fact:hover .v { color: var(--green); }
 
 /* Devenir membre — focused conversion section (replaces the old mixed "Aktuelles") */
 .join-cta { text-align: center; }

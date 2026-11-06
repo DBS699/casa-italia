@@ -1,15 +1,15 @@
 ---
-import { I18N, DEFAULT_LANG, TOURS, SITE, KOMOOT } from '../data/content.js';
+import { I18N, DEFAULT_LANG, SITE, KOMOOT } from '../data/content.js';
 const t = I18N[DEFAULT_LANG];
 
-// Split "04. Mai" → day "04", month "Mai" for the calendar-style date badge.
-const tours = TOURS.map((tour) => {
-  const m = String(tour.date).match(/^\s*(\d{1,2})\.?\s+(.+)$/);
-  return { ...tour, day: m ? m[1] : '', monthLabel: m ? m[2] : tour.date };
-});
+// One card per Komoot collection. Until Komoot answers (or if it doesn't) a card is a
+// plain link to its collection with a club photo; then it previews the first ride.
+const cards = KOMOOT.map((c, i) => ({ ...c, month: t.months.indexOf(c.label), photo: `/assets/tours/tour-${(i % 6) + 1}.jpg` }));
+// Texts the script writes into the cards and the dialog, in every language.
+const strings = Object.fromEntries(Object.entries(I18N).map(([lang, d]) => [lang, { komoot: d.komoot, months: d.months }]));
 ---
 
-<section id="touren" data-chat-area="tours" class="section white bordered reveal season" aria-label="Touren / Saison">
+<section id="touren" data-chat-area="komoot" class="section white bordered reveal season" aria-label="Touren / Saison">
   <div class="container">
     <div class="season-head">
       <div>
@@ -32,114 +32,64 @@ const tours = TOURS.map((tour) => {
       </div>
     </div>
 
-    <div class="tour-track" role="list" tabindex="0" aria-label="Touren der Saison">
-      {tours.map((tour) => (
-        <button
-          type="button"
-          class="tour-card"
-          role="listitem"
-          data-chat-item="tours"
-          data-chat-key={`${tour.date}|${tour.title}`}
-          data-title={tour.title}
-          data-day={tour.day}
-          data-month={tour.monthLabel}
-          data-img={tour.img}
-          data-desc={tour.description ?? ''}
-          data-meet={tour.meet ?? ''}
-          data-g1name={tour.g1name ?? ''}
-          data-g1route={tour.g1route ?? ''}
-          data-distance={tour.distance ?? ''}
-          data-elev={tour.elevation ?? ''}
-          data-g2name={tour.g2name ?? ''}
-          data-g2route={tour.g2route ?? ''}
-          data-g2dist={tour.g2distance ?? ''}
-          data-g2elev={tour.g2elevation ?? ''}
-          data-url={tour.url ?? ''}
-          data-gpx={tour.gpx ?? ''}
-          data-garmin={tour.garmin ?? ''}
-          data-g2url={tour.g2url ?? ''}
-          data-g2gpx={tour.g2gpx ?? ''}
-          data-g2garmin={tour.g2garmin ?? ''}
+    <div class="tour-track" role="group" tabindex="0" aria-label="Touren der Saison">
+      {cards.map((card) => (
+        <a
+          class="tour-card komoot-card"
+          href={card.url}
+          target="_blank"
+          rel="noopener"
+          data-komoot={card.url}
+          data-note={card.note}
+          data-chat-item="komoot"
+          data-chat-key={card.label}
         >
           <div class="tour-photo">
-            <img src={tour.img} alt={tour.title} width="800" height="520" loading="lazy" decoding="async" />
-            <span class="tour-badge"><span class="d">{tour.day}</span><span class="m">{tour.monthLabel}</span></span>
+            <img src={card.photo} alt="" width="640" height="400" loading="lazy" decoding="async" />
+            <span class="tour-badge" hidden><span class="d"></span><span class="m"></span></span>
           </div>
           <div class="tour-meta">
-            <h3 class="tour-title">{tour.title}</h3>
-            <span class="tour-more">Details <span class="arrow">→</span></span>
+            <h3 class="tour-title">
+              {card.month >= 0 ? <span data-i18n={`months.${card.month}`}>{card.label}</span> : <span>{card.label}</span>}
+            </h3>
+            <p class="komoot-sub">{card.note}</p>
+            <span class="tour-more"><span class="komoot-count"><span data-i18n="komoot.open">{t.komoot.open}</span></span> <span class="arrow">→</span></span>
           </div>
-        </button>
+        </a>
       ))}
     </div>
-
-    {KOMOOT.length > 0 && (
-      <div class="komoot-block" data-chat-area="komoot">
-        <h3 class="komoot-title" data-i18n="komootTitle">{t.komootTitle}</h3>
-        <p class="komoot-body" data-i18n="komootBody">{t.komootBody}</p>
-        <ul class="komoot-list">
-          {KOMOOT.map((c) => {
-            // Month names follow the language switch; other labels stay as written.
-            // A long note gets a double-width tile.
-            const month = t.months.indexOf(c.label);
-            return (
-              <li class={c.note?.length > 24 ? 'has-note' : ''} data-chat-item="komoot" data-chat-key={c.label}>
-                <a href={c.url} target="_blank" rel="noopener">
-                  <span class="komoot-label" data-i18n={month >= 0 ? `months.${month}` : undefined}>{c.label}</span>
-                  {c.note && <span class="komoot-note">{c.note}</span>}
-                  <span class="arrow" aria-hidden="true">→</span>
-                </a>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-    )}
+    <p class="komoot-hint" data-i18n="komoot.hint">{t.komoot.hint}</p>
   </div>
 
-  <!-- Tour detail dialog (filled on click, zooms in) -->
-  <dialog class="tour-modal" aria-labelledby="tm-title">
+  <!-- All rides of one collection (filled on click, zooms in) -->
+  <dialog class="tour-modal komoot-modal" aria-labelledby="km-title">
     <button class="tm-close" type="button" aria-label="Schliessen">×</button>
-    <div class="tm-photo">
-      <img alt="" />
-      <span class="tour-badge"><span class="d"></span><span class="m"></span></span>
-    </div>
     <div class="modal-body">
-      <h3 id="tm-title" class="tm-title"></h3>
+      <h3 id="km-title" class="tm-title"></h3>
       <p class="tm-desc"></p>
-      <div class="tm-tabs" role="tablist" hidden>
-        <button type="button" class="tm-tab" data-g="0"></button>
-        <button type="button" class="tm-tab" data-g="1"></button>
+      <ol class="ride-list"></ol>
+      <div class="tm-actions">
+        <a class="btn btn-green km-open" target="_blank" rel="noopener"><span data-i18n="komoot.open">{t.komoot.open}</span> <span class="arrow" style="font-size:16px">→</span></a>
       </div>
-      <div class="tm-panel" hidden>
-        <span class="tm-panel-name"></span>
-        <span class="tm-panel-facts"></span>
-        <div class="tm-panel-route"></div>
-        <div class="tm-map" hidden></div>
-        <div class="tm-actions">
-          <a class="btn btn-green tm-route" target="_blank" rel="noopener" hidden><span class="tm-route-label">Route ansehen</span> <span class="arrow" style="font-size:16px">→</span></a>
-          <a class="btn btn-ghost-dark tm-garmin" target="_blank" rel="noopener" hidden>In Garmin Connect öffnen</a>
-          <a class="btn btn-ghost-dark tm-gpx" download hidden>GPX herunterladen</a>
-        </div>
-      </div>
-      <div class="tm-meet"><span class="k">Treffpunkt</span><span class="tm-meet-val"></span></div>
     </div>
   </dialog>
+  <script type="application/json" id="komoot-i18n" set:html={JSON.stringify(strings)} />
 </section>
 
-<script is:inline>
-  (function () {
-    const root = document.querySelector('#touren');
-    if (!root) return;
-    const track = root.querySelector('.tour-track');
-    const dlg = root.querySelector('.tour-modal');
+<script>
+  import { komootCollections, el, translated, monthLabel, facts } from '../scripts/komoot-page.js';
 
+  const root = document.querySelector('#touren');
+  const track = root?.querySelector('.tour-track');
+  const dlg = root?.querySelector('.komoot-modal');
+
+  if (root && track && dlg) {
     // ── carousel arrows ───────────────────────────────────
     const step = () => {
       const card = track.querySelector('.tour-card');
       return card ? card.getBoundingClientRect().width + 24 : 320;
     };
-    const arrows = root.querySelectorAll('.season-arrow');
+    const arrows = root.querySelectorAll<HTMLElement>('.season-arrow');
     arrows.forEach((btn) => btn.addEventListener('click', () =>
       track.scrollBy({ left: step() * Number(btn.dataset.dir), behavior: 'smooth' })));
     const updateArrows = () => {
@@ -153,97 +103,90 @@ const tours = TOURS.map((tour) => {
     window.addEventListener('resize', updateArrows);
     updateArrows();
 
-    // ── detail dialog ─────────────────────────────────────
-    const set = (sel, val) => { const el = dlg.querySelector(sel); if (el) el.textContent = val || ''; };
-
-    // Komoot tour embed (interactive map + elevation profile) — auto-detected from a pasted komoot link.
-    // Accepts e.g. komoot.com/de-de/tour/123456 (locale optional); a share_token is kept for non-public tours.
-    const komootEmbed = (url) => {
-      try {
-        const u = new URL(url);
-        if (!/(^|\.)komoot\.(com|de)$/i.test(u.hostname)) return null;
-        const m = u.pathname.match(/\/(?:smart)?tour\/(\w+)/);
-        if (!m) return null;
-        const q = new URLSearchParams({ profile: '1' });
-        const token = u.searchParams.get('share_token');
-        if (token) q.set('share_token', token);
-        return 'https://www.komoot.com/tour/' + m[1] + '/embed?' + q;
-      } catch (e) { return null; }
+    // ── one ride in the dialog: map, date, place, a link per group ──
+    const link = (className: string, href: string) => {
+      const a = el('a', className) as HTMLAnchorElement;
+      a.href = href; a.target = '_blank'; a.rel = 'noopener';
+      return a;
     };
-    const map = dlg.querySelector('.tm-map');
-    const showMap = (src) => {
-      map.innerHTML = '';
-      if (!src) { map.hidden = true; return; }
-      const f = document.createElement('iframe');
-      f.src = src; f.title = 'Route auf Komoot';
-      map.appendChild(f);
-      map.hidden = false;
-    };
-    // ── group tabs (Grappa / Gemeinsame Ausfahrt) inside the modal ──
-    const tabsWrap = dlg.querySelector('.tm-tabs');
-    const tabs = [...dlg.querySelectorAll('.tm-tab')];
-    const panel = dlg.querySelector('.tm-panel');
-    const panelName = dlg.querySelector('.tm-panel-name');
-    const panelFacts = dlg.querySelector('.tm-panel-facts');
-    const panelRoute = dlg.querySelector('.tm-panel-route');
-    const routeBtn = dlg.querySelector('.tm-route');
-    const gpxBtn = dlg.querySelector('.tm-gpx');
-    const garminBtn = dlg.querySelector('.tm-garmin');
-    let groups = [];
-    const selectTab = (idx) => {
-      const g = groups[idx];
-      if (!g) return;
-      tabs.forEach((t, i) => t.classList.toggle('is-active', i === idx));
-      panelName.textContent = g.name || '';
-      panelName.hidden = groups.length > 1 || !g.name; // the active tab already shows the name when there are two
-      panelFacts.textContent = g.facts || '';
-      panelRoute.textContent = g.route || ''; panelRoute.hidden = !g.route;
-      if (g.url) {
-        routeBtn.href = g.url; routeBtn.hidden = false;
-        const host = (() => { try { return new URL(g.url).hostname; } catch (e) { return ''; } })();
-        routeBtn.querySelector('.tm-route-label').textContent =
-          /komoot\.(com|de)$/i.test(host) ? 'Auf Komoot ansehen'
-          : /garmin\.com$/i.test(host) ? 'In Garmin Connect öffnen'
-          : /strava\.com$/i.test(host) ? 'Auf Strava ansehen'
-          : 'Route ansehen';
-      } else { routeBtn.hidden = true; }
-      if (g.garmin) { garminBtn.href = g.garmin; garminBtn.hidden = false; } else { garminBtn.hidden = true; }
-      if (g.gpx) { gpxBtn.href = g.gpx; gpxBtn.hidden = false; } else { gpxBtn.hidden = true; }
-      showMap(komootEmbed(g.url));
-    };
-    tabs.forEach((tab, i) => tab.addEventListener('click', () => selectTab(i)));
-
-    root.querySelectorAll('.tour-card').forEach((card) => {
-      card.addEventListener('click', () => {
-        const d = card.dataset;
-        const img = dlg.querySelector('.tm-photo img');
-        img.src = d.img; img.alt = d.title;
-        set('.tm-photo .tour-badge .d', d.day);
-        set('.tm-photo .tour-badge .m', d.month);
-        set('.tm-title', d.title);
-        set('.tm-desc', d.desc);
-        // build the group list — each group becomes a tab with its own facts/route/map/links
-        groups = [];
-        if (d.g1name || d.distance || d.g1route) groups.push({ name: d.g1name, facts: [d.distance, d.elev].filter(Boolean).join(' · '), route: d.g1route, url: d.url, gpx: d.gpx, garmin: d.garmin });
-        if (d.g2name || d.g2dist || d.g2route) groups.push({ name: d.g2name, facts: [d.g2dist, d.g2elev].filter(Boolean).join(' · '), route: d.g2route, url: d.g2url, gpx: d.g2gpx, garmin: d.g2garmin });
-        tabsWrap.hidden = groups.length < 2;
-        tabs.forEach((tab, i) => {
-          if (groups[i]) { tab.textContent = groups[i].name || ('Gruppe ' + (i + 1)); tab.hidden = false; }
-          else tab.hidden = true;
-        });
-        panel.hidden = groups.length === 0;
-        if (groups.length) selectTab(0); else showMap(null);
-        set('.tm-meet-val', d.meet);
-        dlg.showModal();
+    const rideItem = (ride) => {
+      const li = el('li', 'ride');
+      const first = ride.groups[0];
+      const thumb = link('ride-map', first.url);
+      thumb.setAttribute('aria-label', ride.place);
+      if (first.map) {
+        const img = el('img') as HTMLImageElement;
+        img.src = first.map; img.alt = ''; img.loading = 'lazy';
+        thumb.append(img);
+      }
+      const info = el('div', 'ride-info');
+      if (ride.month) {
+        const date = el('span', 'ride-date');
+        date.append(el('span', 'd', `${ride.day}.`), ' ', monthLabel(ride.month));
+        info.append(date);
+      }
+      info.append(el('span', 'ride-place', ride.place));
+      const groups = el('div', 'ride-groups');
+      ride.groups.forEach((g) => {
+        const a = link('ride-group', g.url);
+        if (g.name) a.append(el('span', 'g', g.name));
+        a.append(el('span', 'f', facts(g)), el('span', 'arrow', '→'));
+        groups.append(a);
       });
+      info.append(groups);
+      li.append(thumb, info);
+      return li;
+    };
+
+    const open = (card: HTMLAnchorElement, rides) => {
+      dlg.querySelector('.tm-title').replaceChildren(card.querySelector('.tour-title span').cloneNode(true));
+      const note = dlg.querySelector<HTMLElement>('.tm-desc');
+      note.textContent = card.dataset.note || '';
+      note.hidden = !card.dataset.note;
+      dlg.querySelector('.ride-list').replaceChildren(...rides.map(rideItem));
+      dlg.querySelector<HTMLAnchorElement>('.km-open').href = card.href;
+      dlg.showModal();
+    };
+
+    // ── a card previews the first ride of its collection ──
+    const fill = (card: HTMLAnchorElement, rides) => {
+      if (!rides) return; // Komoot not reachable: the card stays a link to the collection
+      const sub = card.querySelector('.komoot-sub');
+      const count = card.querySelector('.komoot-count');
+      if (!rides.length) {
+        if (!card.dataset.note) sub.replaceChildren(translated('span', '', 'komoot.soon'));
+        return;
+      }
+      const first = rides[0];
+      const map = first.groups[0].map;
+      if (map) {
+        const img = card.querySelector('img');
+        img.src = map; img.alt = first.place;
+        img.classList.add('is-map');
+      }
+      if (first.month) {
+        const badge = card.querySelector<HTMLElement>('.tour-badge');
+        badge.querySelector('.d').textContent = String(first.day);
+        badge.querySelector('.m').replaceWith(monthLabel(first.month));
+        badge.hidden = false;
+        sub.replaceChildren(el('span', 'komoot-first', first.place));
+      }
+      count.replaceChildren(`${rides.length} `, translated('span', '', rides.length === 1 ? 'komoot.ride' : 'komoot.rides'));
+      card.addEventListener('click', (e) => {
+        if (e.metaKey || e.ctrlKey || e.shiftKey) return; // opening in a new tab still goes to Komoot
+        e.preventDefault();
+        open(card, rides);
+      });
+    };
+    komootCollections().then((all) => {
+      root.querySelectorAll<HTMLAnchorElement>('.komoot-card').forEach((card) => fill(card, all[card.dataset.komoot]));
     });
-    // stop the embedded map (and reset) whenever the dialog closes
-    dlg.addEventListener('close', () => { map.innerHTML = ''; map.hidden = true; });
+
     dlg.querySelector('.tm-close').addEventListener('click', () => dlg.close());
     // click on the backdrop (outside the dialog box) closes
     dlg.addEventListener('click', (e) => {
       const r = dlg.getBoundingClientRect();
       if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) dlg.close();
     });
-  })();
+  }
 </script>

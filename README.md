@@ -24,7 +24,7 @@ site/
 │   └── assets/                 # emblem.png, laurel(.cut).png, examples/*  (drop hero.mp4 here)
 └── src/
     ├── data/content.js         # ⭐ single source of truth — i18n (DE/FR/IT/EN),
-    │                           #    committee, sponsors, tours, news. Edit here.
+    │                           #    committee, sponsors, Komoot folders, news. Edit here.
     ├── styles/global.css       # all design tokens (colours, type, spacing) + section styles
     ├── layouts/Base.astro      # <head>, fonts, live language + mobile-menu script
     ├── components/             # Header · Hero · About · Committee · Season · News ·
@@ -63,8 +63,7 @@ Club-editable content lives in JSON in `src/data/` — the single source of trut
 
 | File | Manages |
 |---|---|
-| `tours.json` | Season tour cards (date, title, link, image) |
-| `komoot.json` | Links to the club's Komoot collections under the tours (label, note, url); month labels follow the language switch |
+| `komoot.json` | The season: one card per Komoot collection of the club (label, note, url); month labels follow the language switch |
 | `members.json` | Committee (name, role, photo) |
 | `sponsors.json` | Sponsors (name, url, logo) |
 | `gallery.json` | Gallery images |
@@ -74,13 +73,25 @@ Club-editable content lives in JSON in `src/data/` — the single source of trut
 section copy, nav, buttons) lives in `texts.json`, which the website chat edits in all four languages
 (not the CMS).
 
+## Touren (Komoot)
+
+Die Touren pflegt der Verein im Komoot-Konto https://www.komoot.com/de-de/user/veloclubcasa, in einem
+öffentlichen Ordner (Collection) pro Monat. Eine Tour heisst «7. März: Seftigen Sportivo»: Datum, Ort, Gruppe.
+Touren am gleichen Tag werden zu einer Ausfahrt mit mehreren Gruppen zusammengefasst; Touren ohne Datum
+im Namen (Biketouren) stehen einzeln. Welche Ordner auf der Website erscheinen, steht in `komoot.json`.
+
+Die Website lädt die Ordner im Browser über `/api/komoot` (`api/komoot.js`, gecacht 10 Minuten an Vercels
+Edge) und zeigt pro Ordner eine Karte mit der Karte der ersten Ausfahrt, im Fenster alle Ausfahrten, und
+oben die nächste Ausfahrt (`src/scripts/komoot.js`, `komoot-page.js`). Komoot hat keine offizielle API;
+das ist dieselbe JSON-Schnittstelle, die komoot.com selbst lädt. Ändert Komoot sie, bleibt jede Karte ein
+Link auf ihren Ordner, und «Nächste Ausfahrt» verschwindet. Lokal (ohne Function) holt der Browser die
+Daten direkt bei Komoot.
+
 ## Admin / CMS
 
 - **`/admin`** — the real CMS (**Sveltia**, Decap-compatible). Edits commit to GitHub → Vercel
   rebuilds → live. Config: `public/admin/config.yml`. Auth: GitHub OAuth via the serverless
   functions in `api/` (`/api/auth`, `/api/callback`).
-- **`/admin-demo`** — the earlier localStorage-only prototype (no server, demo password). Kept
-  as a fallback / offline preview.
 
 ### Make the CMS go live (one-time setup)
 
@@ -105,9 +116,9 @@ After that: open `/admin`, “Login with GitHub”, edit → save → it commits
 
 ## Website-Chat (`/chat`)
 
-Alles, was im CMS änderbar ist, lässt sich auch per Nachricht ändern, ohne GitHub-Konto: Touren, Komitee, Sponsoren, Galerie und Startseite (Motto, Video, Vorschaubild, Broschüre). Dazu kommen die übrigen Texte der Website in `src/data/texts.json`: Ändert sich der deutsche Text, ergänzt Gemini die Übersetzungen, und alle vier Sprachen stehen im Vorschlag. Diese Texte gibt es nur im Chat, nicht im CMS. Adresse und Kontakt-Mail stehen weiterhin im Code (`CLUB` in `src/data/content.js`). Auf `/chat` mit dem Passwort anmelden, aufschreiben, was sich ändern soll, Dateien bei Bedarf mit dem Plus-Zeichen anhängen, den Vorschlag prüfen und veröffentlichen. Nach etwa einer Minute ist es online. Die Seite ist nirgends verlinkt und für Suchmaschinen gesperrt (`noindex`, nicht in der Sitemap).
+Alles, was im CMS änderbar ist, lässt sich auch per Nachricht ändern, ohne GitHub-Konto: die Komoot-Ordner der Touren, Komitee, Sponsoren, Galerie und Startseite (Motto, Video, Vorschaubild, Broschüre). Dazu kommen die übrigen Texte der Website in `src/data/texts.json`: Ändert sich der deutsche Text, ergänzt Gemini die Übersetzungen, und alle vier Sprachen stehen im Vorschlag. Diese Texte gibt es nur im Chat, nicht im CMS. Adresse und Kontakt-Mail stehen weiterhin im Code (`CLUB` in `src/data/content.js`). Auf `/chat` mit dem Passwort anmelden, aufschreiben, was sich ändern soll, Dateien bei Bedarf mit dem Plus-Zeichen anhängen, den Vorschlag prüfen und veröffentlichen. Nach etwa einer Minute ist es online. Die Seite ist nirgends verlinkt und für Suchmaschinen gesperrt (`noindex`, nicht in der Sitemap).
 
-Neben dem Chat läuft die echte Website (auf dem Handy als eigener Tab). Mit «Bereich anklicken» lässt sich dort ein Sponsor, eine Tour oder ein ganzer Bereich auswählen, und der Chat weiss dann, was mit «dieser» gemeint ist. Vorschläge werden auf der Website markiert (`src/scripts/chat-site.js`, `chat-marks.js`), und sobald die neue Version online ist, lädt die Vorschau neu und zeigt die Stelle. Die Einträge sind dafür in den Komponenten mit `data-chat-item` und `data-chat-key` versehen. Dateien lassen sich auch einfach ins Fenster ziehen.
+Neben dem Chat läuft die echte Website (auf dem Handy als eigener Tab). Mit «Bereich anklicken» lässt sich dort ein Sponsor, ein Touren-Monat oder ein ganzer Bereich auswählen, und der Chat weiss dann, was mit «dieser» gemeint ist. Vorschläge werden auf der Website markiert (`src/scripts/chat-site.js`, `chat-marks.js`), und sobald die neue Version online ist, lädt die Vorschau neu und zeigt die Stelle. Die Einträge sind dafür in den Komponenten mit `data-chat-item` und `data-chat-key` versehen. Dateien lassen sich auch einfach ins Fenster ziehen.
 
 Gemini macht nur Vorschläge. `api/_chat-content.js` prüft jeden Vorschlag, und ohne Klick auf «Veröffentlichen» wird nichts gespeichert. Ist ein Gemini-Modell überlastet, nimmt der Chat automatisch das nächste (`api/_chat-gemini.js`). «Rückgängig machen» stellt die letzte Chat-Änderung wieder her, aber nie eine aus dem CMS.
 
@@ -115,7 +126,7 @@ Dateien:
 
 - **Bilder** werden im Browser verkleinert und landen im selben Commit in `public/assets/uploads/` (höchstens 8 pro Veröffentlichung). PNGs bleiben PNG, solange sie klein genug sind, damit Logos transparent bleiben.
 - **Video und Broschüre-PDF** gehen direkt in den Vercel-Blob-Speicher (höchstens 100 MB), weil sie nicht durch das 4,5-MB-Limit einer Function passen.
-- **Tourenprogramm als PDF:** Der Browser liest den Text und schickt nur die Seiten mit Touren an Gemini (`src/scripts/chat-pdf.js`). Die Mitgliederliste mit den Adressen bleibt im Browser. Ein PDF wird nur dann öffentlich, wenn es ausdrücklich als Broschüre gesetzt wird.
+- **Tourenprogramm als PDF:** Ein angehängtes PDF kann nur die Broschüre zum Herunterladen werden; sein Inhalt geht nicht an Gemini. Die Touren selbst stehen auf Komoot.
 
 Umgebungsvariablen in Vercel (Production, danach neu deployen):
 

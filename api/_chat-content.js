@@ -3,39 +3,9 @@
 // No network here — the model only ever proposes operations, and everything it
 // proposes passes through this file.
 
-const MONTHS = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
-const MONTH_DAYS = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-const DEFAULT_TOUR_IMAGES = [1, 2, 3, 4, 5, 6].map((n) => `/assets/tours/tour-${n}.jpg`);
-
 export const COLLECTIONS = {
-  tours: {
-    area: 'Touren',
-    file: 'src/data/tours.json',
-    listKey: 'tours',
-    match: ['date', 'title'],
-    sorted: true,
-    fields: {
-      date: { label: 'Datum', max: 30, kind: 'date', required: true },
-      title: { label: 'Titel', max: 120, required: true },
-      img: { label: 'Bild', max: 300, kind: 'image' },
-      description: { label: 'Beschreibung', max: 1000 },
-      meet: { label: 'Treffpunkt', max: 200 },
-      g1name: { label: 'Gruppe 1 – Name', max: 80 },
-      g1route: { label: 'Gruppe 1 – Route', max: 400 },
-      distance: { label: 'Gruppe 1 – Distanz', max: 40 },
-      elevation: { label: 'Gruppe 1 – Höhenmeter', max: 40 },
-      url: { label: 'Gruppe 1 – Komoot-Link', max: 500, kind: 'komoot' },
-      garmin: { label: 'Gruppe 1 – Garmin-Link', max: 500, kind: 'garmin' },
-      g2name: { label: 'Gruppe 2 – Name', max: 80 },
-      g2route: { label: 'Gruppe 2 – Route', max: 400 },
-      g2distance: { label: 'Gruppe 2 – Distanz', max: 40 },
-      g2elevation: { label: 'Gruppe 2 – Höhenmeter', max: 40 },
-      g2url: { label: 'Gruppe 2 – Komoot-Link', max: 500, kind: 'komoot' },
-      g2garmin: { label: 'Gruppe 2 – Garmin-Link', max: 500, kind: 'garmin' },
-    },
-  },
   komoot: {
-    area: 'Komoot-Ordner',
+    area: 'Touren (Komoot-Ordner)',
     file: 'src/data/komoot.json',
     listKey: 'collections',
     match: ['label'],
@@ -114,16 +84,6 @@ const MEDIA = {
 
 export class ContentError extends Error {}
 
-// "14. März" → { month: 2, day: 14 }; null when it isn't a real calendar date.
-function parseDate(value) {
-  const m = String(value).trim().match(/^(\d{1,2})\.?\s+(\p{L}+)$/u);
-  if (!m) return null;
-  const month = MONTHS.findIndex((name) => name.toLowerCase() === m[2].toLowerCase());
-  const day = Number(m[1]);
-  if (month < 0 || day < 1 || day > MONTH_DAYS[month]) return null;
-  return { month, day };
-}
-
 function checkLink(value, label, test) {
   let u;
   try { u = new URL(value); } catch (e) { throw new ContentError(`${label}: «${value}» ist kein gültiger Link.`); }
@@ -150,17 +110,8 @@ function normalizeField(spec, raw, attachments) {
   if (value.length > spec.max) throw new ContentError(`${spec.label} ist zu lang (höchstens ${spec.max} Zeichen).`);
   if (!value) return '';
   switch (spec.kind) {
-    case 'date': {
-      const d = parseDate(value);
-      if (!d) throw new ContentError(`«${value}» ist kein gültiges Datum. Erwartet wird z. B. «14. März».`);
-      return `${d.day}. ${MONTHS[d.month]}`;
-    }
-    case 'komoot':
-      return checkLink(value, spec.label, (u) => u.protocol === 'https:' && /^(www\.)?komoot\.(com|de)$/i.test(u.hostname) && /^(\/[a-z]{2}-[a-z]{2})?\/(smart)?tour\/\w+\/?$/i.test(u.pathname));
     case 'komootCollection':
       return checkLink(value, spec.label, (u) => u.protocol === 'https:' && /^(www\.)?komoot\.(com|de)$/i.test(u.hostname) && /^(\/[a-z]{2}-[a-z]{2})?\/collection\/\d+(\/[\w-]*)?\/?$/i.test(u.pathname));
-    case 'garmin':
-      return checkLink(value, spec.label, (u) => u.protocol === 'https:' && /(^|\.)garmin\.com$/i.test(u.hostname) && u.pathname.length > 1);
     case 'web':
       return checkLink(value, spec.label, (u) => /^https?:$/.test(u.protocol) && u.hostname.includes('.'));
     case 'image':
@@ -213,31 +164,14 @@ function describe(collection, before, after) {
   return out;
 }
 
-function sortKey(tour) {
-  const d = parseDate(tour.date);
-  return d ? d.month * 100 + d.day : Infinity;
-}
-
-// Tours are shown in file order, so a new or re-dated tour goes where its date belongs.
-function placeByDate(items, tour) {
-  const index = items.findIndex((t) => sortKey(t) > sortKey(tour));
-  if (index < 0) items.push(tour); else items.splice(index, 0, tour);
-}
-
 function placeAt(items, item, position) {
   const index = Number.isInteger(position) ? Math.min(Math.max(position - 1, 0), items.length) : items.length;
   items.splice(index, 0, item);
 }
 
-function newItem(name, collection, fields, count) {
+function newItem(collection, fields) {
   const item = {};
   for (const field of Object.keys(collection.fields)) item[field] = fields[field] ?? '';
-  if (name === 'tours') {
-    if (!item.img) item.img = DEFAULT_TOUR_IMAGES[count % DEFAULT_TOUR_IMAGES.length];
-    if (!item.g1name) item.g1name = 'Gruppo Grappa';
-    const hasGroup2 = item.g2route || item.g2distance || item.g2elevation || item.g2url || item.g2garmin;
-    if (!item.g2name && hasGroup2) item.g2name = 'Gemeinsame Ausfahrt';
-  }
   checkRequired(collection, item);
   return item;
 }
@@ -293,8 +227,8 @@ function applyToList(state, name, op, attachments) {
   });
 
   if (op.op === 'add') {
-    const item = newItem(name, collection, normalizeFields(collection, op.fields, attachments), items.length);
-    if (collection.sorted) placeByDate(items, item); else placeAt(items, item, op.position);
+    const item = newItem(collection, normalizeFields(collection, op.fields, attachments));
+    placeAt(items, item, op.position);
     return change('add', item, describe(collection, {}, item));
   }
   const index = findItem(items, collection, op);
@@ -304,7 +238,6 @@ function applyToList(state, name, op, attachments) {
     return change('delete', before);
   }
   if (op.op === 'move') {
-    if (collection.sorted) throw new ContentError('Touren werden automatisch nach Datum sortiert.');
     if (!Number.isInteger(op.position)) throw new ContentError('Es fehlt die neue Position.');
     items.splice(index, 1);
     placeAt(items, before, op.position);
@@ -317,8 +250,7 @@ function applyToList(state, name, op, attachments) {
     checkRequired(collection, after);
     const details = describe(collection, before, after);
     if (details.length === 0) return null;
-    items.splice(index, 1);
-    if (collection.sorted && fields.date && fields.date !== before.date) placeByDate(items, after); else items.splice(index, 0, after);
+    items.splice(index, 1, after);
     return change('update', after, details, before);
   }
   throw new ContentError(`Unbekannte Änderung: ${op.op}`);
