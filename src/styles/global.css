@@ -512,6 +512,25 @@ section[id], footer[id] { scroll-margin-top: 98px; }
 /* Touren — Tourenprogramm/Broschüre buttons under the season lead (shown when a PDF is set) */
 .season-doc { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
 
+/* Touren — one Komoot collection per month, under the tour carousel */
+.komoot-block { margin-top: 48px; padding-top: 36px; border-top: 1px solid var(--line-soft); }
+.komoot-title { font-family: var(--serif); font-weight: 400; font-size: 28px; line-height: 1.15; margin: 0 0 10px; color: var(--ink); }
+.komoot-body { max-width: 620px; font-size: 16px; line-height: 1.6; color: var(--ink-soft); margin: 0 0 24px; text-wrap: pretty; }
+.komoot-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.komoot-list li.has-note { grid-column: span 2; }
+.komoot-list a {
+  display: grid; grid-template-columns: 1fr auto; align-items: center; column-gap: 12px; height: 100%;
+  padding: 14px 16px; border: 1px solid var(--line); border-radius: 4px; background: var(--card-warm);
+  color: var(--ink); text-decoration: none; transition: border-color .2s ease, transform .2s ease;
+}
+.komoot-list a:hover { border-color: var(--green); transform: translateY(-2px); }
+.komoot-list a:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+.komoot-label { font-family: var(--serif); font-size: 20px; line-height: 1.2; }
+.komoot-note { grid-column: 1; font-size: 13px; line-height: 1.4; color: var(--ink-soft); margin-top: 4px; }
+.komoot-list .arrow { grid-column: 2; grid-row: 1 / span 2; color: var(--green); font-size: 18px; transition: transform .2s ease; }
+.komoot-list a:hover .arrow { transform: translateX(3px); }
+@media (max-width: 340px) { .komoot-list li.has-note { grid-column: auto; } }
+
 /* Devenir membre — focused conversion section (replaces the old mixed "Aktuelles") */
 .join-cta { text-align: center; }
 .join-cta-inner { max-width: 640px; margin: 0 auto; }

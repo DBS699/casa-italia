@@ -1,5 +1,5 @@
 ---
-import { I18N, DEFAULT_LANG, TOURS, SITE } from '../data/content.js';
+import { I18N, DEFAULT_LANG, TOURS, SITE, KOMOOT } from '../data/content.js';
 const t = I18N[DEFAULT_LANG];
 
 // Split "04. Mai" → day "04", month "Mai" for the calendar-style date badge.
@@ -72,6 +72,29 @@ const tours = TOURS.map((tour) => {
         </button>
       ))}
     </div>
+
+    {KOMOOT.length > 0 && (
+      <div class="komoot-block" data-chat-area="komoot">
+        <h3 class="komoot-title" data-i18n="komootTitle">{t.komootTitle}</h3>
+        <p class="komoot-body" data-i18n="komootBody">{t.komootBody}</p>
+        <ul class="komoot-list">
+          {KOMOOT.map((c) => {
+            // Month names follow the language switch; other labels stay as written.
+            // A long note gets a double-width tile.
+            const month = t.months.indexOf(c.label);
+            return (
+              <li class={c.note?.length > 24 ? 'has-note' : ''} data-chat-item="komoot" data-chat-key={c.label}>
+                <a href={c.url} target="_blank" rel="noopener">
+                  <span class="komoot-label" data-i18n={month >= 0 ? `months.${month}` : undefined}>{c.label}</span>
+                  {c.note && <span class="komoot-note">{c.note}</span>}
+                  <span class="arrow" aria-hidden="true">→</span>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    )}
   </div>
 
   <!-- Tour detail dialog (filled on click, zooms in) -->

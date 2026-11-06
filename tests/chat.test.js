@@ -23,6 +23,7 @@ const seed = () => ({
       TOUR('12. Juli', 'Sigriswil'),
     ],
   },
+  'src/data/komoot.json': { collections: [{ label: 'Juni', note: '', url: 'https://www.komoot.com/de-de/collection/4780382/-juni' }] },
   'src/data/members.json': { members: [{ name: 'Salvatore Schiavano', role: 'Präsident', photo: '' }, { name: 'Rolf Muster', role: 'Kassier', photo: '' }] },
   'src/data/sponsors.json': { sponsors: [{ name: 'Thömus', url: 'https://thoemus.ch', logo: '/assets/sponsors/thoemus.jpg' }, { name: 'gäggeli siech', url: 'https://example.ch', logo: '/assets/sponsors/g.jpg' }] },
   'src/data/gallery.json': { images: [{ image: '/assets/gallery/a.jpg', caption: '' }, { image: '/assets/gallery/b.jpg', caption: '' }] },
@@ -32,7 +33,7 @@ const state = () => {
   const d = head().data;
   return asContent(d);
 };
-const asContent = (d) => ({ tours: d['src/data/tours.json'].tours, members: d['src/data/members.json'].members, sponsors: d['src/data/sponsors.json'].sponsors, gallery: d['src/data/gallery.json'].images, site: d['src/data/site.json'], texts: d['src/data/texts.json'] });
+const asContent = (d) => ({ tours: d['src/data/tours.json'].tours, komoot: d['src/data/komoot.json'].collections, members: d['src/data/members.json'].members, sponsors: d['src/data/sponsors.json'].sponsors, gallery: d['src/data/gallery.json'].images, site: d['src/data/site.json'], texts: d['src/data/texts.json'] });
 
 // ── fake GitHub + Gemini ──────────────────────────────────
 let repo;
@@ -560,7 +561,7 @@ const content = () => asContent(seed());
 const addTour = (fields) => applyOperations(content(), [{ collection: 'tours', op: 'add', fields: { date: '1. Mai', title: 'X', ...fields } }]).state.tours;
 
 test('the chat offers the CMS collections plus the texts', () => {
-  assert.deepEqual(Object.keys(COLLECTIONS).sort(), ['gallery', 'members', 'site', 'sponsors', 'texts', 'tours']);
+  assert.deepEqual(Object.keys(COLLECTIONS).sort(), ['gallery', 'komoot', 'members', 'site', 'sponsors', 'texts', 'tours']);
   assert.deepEqual(Object.keys(COLLECTIONS.site.fields), ['heroMotto', 'heroVideo', 'heroPoster', 'brochure']);
   assert.deepEqual(Object.keys(COLLECTIONS.sponsors.fields), ['name', 'url', 'logo']);
   assert.deepEqual(Object.keys(COLLECTIONS.members.fields), ['name', 'role', 'photo']);
@@ -742,6 +743,14 @@ test('texts cannot be emptied, added, deleted or invented', () => {
   assert.throws(() => applyOperations(content(), [text('__proto__.x', { fr: 'x' })]), /gibt es nicht/);
   assert.throws(() => applyOperations(content(), [{ collection: 'texts', op: 'delete', match: { key: 'ctaSeason' } }]), ContentError);
   assert.throws(() => applyOperations(content(), [{ collection: 'texts', op: 'add', match: { key: 'neu' }, fields: { de: 'x' } }]), ContentError);
+});
+
+test('komoot folders take collection links only', () => {
+  const add = (url) => applyOperations(content(), [{ collection: 'komoot', op: 'add', fields: { label: 'Juli', url } }]);
+  const { state: next } = add('https://www.komoot.com/de-de/collection/4776839/-juli');
+  assert.deepEqual(next.komoot.map((c) => c.label), ['Juni', 'Juli']);
+  assert.throws(() => add('https://www.komoot.com/de-de/tour/819535385'), /kein passender Link/);
+  assert.throws(() => add('https://example.ch/collection/1'), /kein passender Link/);
 });
 
 test('only texts the website shows are offered', () => {

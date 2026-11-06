@@ -67,6 +67,23 @@ collections:
               - { name: g2url, label: "Gruppe 2 – Komoot-Link (optional)", widget: string, required: false, default: "", hint: "Link der öffentlichen Komoot-Tour einfügen – die Karte erscheint automatisch." }
               - { name: g2garmin, label: "Gruppe 2 – Garmin-Connect-Link (optional)", widget: string, required: false, default: "", hint: "Link zur Strecke in Garmin Connect einfügen." }
 
+  - name: komoot
+    label: "Komoot-Ordner"
+    files:
+      - name: komoot
+        label: "Komoot-Ordner (Links unter den Touren)"
+        file: "src/data/komoot.json"
+        fields:
+          - name: collections
+            label: "Ordner"
+            label_singular: "Ordner"
+            widget: list
+            summary: "{{fields.label}}"
+            fields:
+              - { name: label, label: "Bezeichnung", widget: string, hint: "z. B. Juni – Monatsnamen werden auf der Website automatisch übersetzt." }
+              - { name: note, label: "Zusatz (optional)", widget: string, required: false, default: "" }
+              - { name: url, label: "Komoot-Link der Collection", widget: string, hint: "Auf Komoot die Collection öffnen und den Link aus der Adresszeile einfügen." }
+
   - name: committee
     label: "Komitee"
     files:

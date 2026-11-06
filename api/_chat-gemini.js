@@ -95,6 +95,7 @@ Bereiche (collection), Felder und was "match" enthält:
   title: Pflicht. img, description, meet (Treffpunkt, z. B. "08:30 · Bremgarten-/Länggassstrasse").
   Gruppe 1: g1name, g1route (z. B. "Casa-Wohlensee-Casa"), distance (z. B. "87 km"), elevation (z. B. "1'234 hm"), url (Komoot-Link), garmin (Garmin-Connect-Link).
   Gruppe 2: g2name, g2route, g2distance, g2elevation, g2url, g2garmin. Fährt nur eine Gruppe, bleiben diese Felder weg.
+- komoot, die Links zu den Komoot-Ordnern (Collections) unter den Touren (match: label): label (z. B. "Juni") und url (Link zur Collection, z. B. https://www.komoot.com/de-de/collection/4780382/-juni) sind Pflicht, note (kurzer Zusatz). Monatsnamen in label übersetzt die Website selbst.
 - members, das Komitee (match: name): name und role (Funktion) sind Pflicht, photo.
 - sponsors (match: name): name, url (Webseite, mit https://) und logo sind Pflicht.
 - gallery (match: image): image ist Pflicht, caption.

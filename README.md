@@ -64,13 +64,15 @@ Club-editable content lives in JSON in `src/data/` — the single source of trut
 | File | Manages |
 |---|---|
 | `tours.json` | Season tour cards (date, title, link, image) |
+| `komoot.json` | Links to the club's Komoot collections under the tours (label, note, url); month labels follow the language switch |
 | `members.json` | Committee (name, role, photo) |
 | `sponsors.json` | Sponsors (name, url, logo) |
 | `gallery.json` | Gallery images |
 | `site.json` | Hero motto + video + poster |
 
 `content.js` reads these and the components render them. Translatable UI prose (hero intro,
-section copy, nav, news cards) stays in the `I18N` object in `content.js` (developer-managed).
+section copy, nav, buttons) lives in `texts.json`, which the website chat edits in all four languages
+(not the CMS).
 
 ## Admin / CMS
 

@@ -10,6 +10,7 @@ import sponsorsData from './sponsors.json';
 import toursData from './tours.json';
 import galleryData from './gallery.json';
 import siteData from './site.json';
+import komootData from './komoot.json';
 import textsData from './texts.json';
 
 export const LANGS = [
@@ -23,7 +24,7 @@ export const DEFAULT_LANG = 'de';
 
 // Club identity / real data (HANDOFF "Real").
 export const CLUB = {
-  email: 'vorstand@veloclubcasaitalia.ch',
+  email: 'veloclub-casa@proton.me',
   address: { line1: 'Bühlstrasse 57', line2: '3012 Bern', country: 'Schweiz' },
   adminUrl: '/admin',
   // Footer social icons render only for the channels you fill in here.
@@ -50,6 +51,9 @@ export const SPONSORS = sponsorsData.sponsors.map((s, i) => ({
 // Season tours — date, title, optional link, image (from tours.json; CMS-editable).
 export const TOURS = toursData.tours;
 
+// Komoot collections, one link per month under the tours (from komoot.json; CMS-editable).
+export const KOMOOT = komootData.collections;
+
 // Gallery images (from gallery.json; CMS-editable).
 export const GALLERY = galleryData.images.map((g, i) => ({ image: g.image, caption: g.caption || '', id: 'vcgal' + (i + 1) }));
 
@@ -59,9 +63,9 @@ export const SITE = siteData;
 // News cards → destination links (language-independent). No old-site links:
 // rankings & brochure currently route to the club e-mail until new targets exist.
 export const NEWS_LINKS = {
-  '01': 'mailto:vorstand@veloclubcasaitalia.ch?subject=Mitgliedschaft',
-  '02': 'mailto:vorstand@veloclubcasaitalia.ch?subject=Rangliste',
-  '03': 'mailto:vorstand@veloclubcasaitalia.ch?subject=Brosch%C3%BCre',
+  '01': 'mailto:veloclub-casa@proton.me?subject=Mitgliedschaft',
+  '02': 'mailto:veloclub-casa@proton.me?subject=Rangliste',
+  '03': 'mailto:veloclub-casa@proton.me?subject=Brosch%C3%BCre',
 };
 
 // All translatable text, per language (from texts.json; the website chat edits it).

@@ -34,6 +34,17 @@ export const COLLECTIONS = {
       g2garmin: { label: 'Gruppe 2 – Garmin-Link', max: 500, kind: 'garmin' },
     },
   },
+  komoot: {
+    area: 'Komoot-Ordner',
+    file: 'src/data/komoot.json',
+    listKey: 'collections',
+    match: ['label'],
+    fields: {
+      label: { label: 'Bezeichnung', max: 80, required: true },
+      note: { label: 'Zusatz', max: 200 },
+      url: { label: 'Komoot-Link der Collection', max: 500, kind: 'komootCollection', required: true },
+    },
+  },
   members: {
     area: 'Komitee',
     file: 'src/data/members.json',
@@ -146,6 +157,8 @@ function normalizeField(spec, raw, attachments) {
     }
     case 'komoot':
       return checkLink(value, spec.label, (u) => u.protocol === 'https:' && /^(www\.)?komoot\.(com|de)$/i.test(u.hostname) && /^(\/[a-z]{2}-[a-z]{2})?\/(smart)?tour\/\w+\/?$/i.test(u.pathname));
+    case 'komootCollection':
+      return checkLink(value, spec.label, (u) => u.protocol === 'https:' && /^(www\.)?komoot\.(com|de)$/i.test(u.hostname) && /^(\/[a-z]{2}-[a-z]{2})?\/collection\/\d+(\/[\w-]*)?\/?$/i.test(u.pathname));
     case 'garmin':
       return checkLink(value, spec.label, (u) => u.protocol === 'https:' && /(^|\.)garmin\.com$/i.test(u.hostname) && u.pathname.length > 1);
     case 'web':
