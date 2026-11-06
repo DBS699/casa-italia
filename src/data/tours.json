@@ -10,14 +10,14 @@
       "g1route": "Casa-Wohlensee-Schiffenensee-Casa",
       "distance": "87 km",
       "elevation": "1'234 hm",
-      "url": "https://www.komoot.com/de-de/tour/819535385",
-      "gpx": "/assets/uploads/casa-italia-testroute.gpx",
+      "url": "",
+      "gpx": "",
       "g2name": "Gemeinsame Ausfahrt",
       "g2route": "Casa-Courtepin-Casa",
       "g2distance": "71 km",
       "g2elevation": "880 hm",
-      "g2url": "https://www.komoot.com/de-de/tour/819535385",
-      "g2gpx": "/assets/uploads/casa-italia-testroute.gpx"
+      "g2url": "",
+      "g2gpx": ""
     },
     {
       "date": "12. Juli",
@@ -29,13 +29,13 @@
       "g1route": "Casa-Heiligenschwendi-Sigriswil-Casa",
       "distance": "90 km",
       "elevation": "1'102 hm",
-      "url": "https://www.komoot.com/de-de/tour/819535385",
+      "url": "",
       "gpx": "",
       "g2name": "Gemeinsame Ausfahrt",
       "g2route": "Casa-Thunersee-Casa",
       "g2distance": "107 km",
       "g2elevation": "800 hm",
-      "g2url": "https://www.komoot.com/de-de/tour/819535385"
+      "g2url": ""
     },
     {
       "date": "19. Juli",
