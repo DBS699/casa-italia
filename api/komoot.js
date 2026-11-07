@@ -1,6 +1,6 @@
 // The club's Komoot collections, slimmed down and cached at Vercel's edge: visitors load
 // a few KB once instead of each fetching Komoot's full data for every collection.
-// GET /api/komoot?ids=4776834,4780379 → { collections: { "4776834": [rides] | null } }
+// GET /api/komoot?ids=4776834,4780379 → { collections: { "4776834": { cover, rides } | null } }
 import { loadCollection } from '../src/scripts/komoot.js';
 
 export default async function handler(req, res) {
@@ -16,7 +16,7 @@ export default async function handler(req, res) {
       return [id, null];
     }
   }));
-  const failed = entries.some(([, rides]) => rides === null);
+  const failed = entries.some(([, collection]) => collection === null);
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
   // Changes on Komoot show up within ten minutes; a failure is retried after one.
   res.setHeader('Cache-Control', failed ? 'public, s-maxage=60' : 'public, s-maxage=600, stale-while-revalidate=86400');

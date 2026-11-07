@@ -38,10 +38,11 @@ test('same group name twice keeps the full names', () => {
 test('the next ride wraps into next year once the season is over', () => {
   const march = ridesFrom([tour(1, '7. März: A'), tour(2, '14. März: B')]);
   const june = ridesFrom([tour(3, '6. Juni: C')]);
-  assert.equal(nextRide({ a: march, b: june }, new Date(2026, 10, 6)).place, 'A');
-  assert.equal(nextRide({ a: march, b: june }, new Date(2026, 2, 8)).place, 'B');
-  assert.equal(nextRide({ a: march, b: june }, new Date(2026, 2, 14)).place, 'B', 'today still counts');
-  assert.equal(nextRide({ a: null, b: [] }), null);
+  const all = { a: { cover: null, rides: march }, b: { cover: null, rides: june } };
+  assert.equal(nextRide(all, new Date(2026, 10, 6)).place, 'A');
+  assert.equal(nextRide(all, new Date(2026, 2, 8)).place, 'B');
+  assert.equal(nextRide(all, new Date(2026, 2, 14)).place, 'B', 'today still counts');
+  assert.equal(nextRide({ a: null, b: { cover: null, rides: [] } }), null);
 });
 
 test('collection ids come from any Komoot collection link', () => {
@@ -62,11 +63,16 @@ test('the endpoint slims Komoot down and caches it', async (t) => {
   t.mock.method(globalThis, 'fetch', async (url) => {
     asked.push(url);
     if (url.includes('/666/')) return new Response('{}', { status: 500 });
+    if (url.endsWith('/4780382/cover_image')) return new Response('{}', { status: 404 });
+    if (url.endsWith('/cover_image')) return new Response(JSON.stringify({ src: 'https://img.example/c?width={width}&height={height}&crop={crop}' }));
     return new Response(JSON.stringify({ page: { totalPages: 1 }, _embedded: { items: [tour(9, '7. März: Seftigen', { path: 'x'.repeat(5000) })] } }));
   });
   const ok = await call('/api/komoot?ids=4776834,../../etc,4780382');
   assert.deepEqual(Object.keys(ok.data.collections), ['4776834', '4780382']);
-  assert.equal(ok.data.collections['4776834'][0].place, 'Seftigen');
+  assert.equal(ok.data.collections['4776834'].rides[0].place, 'Seftigen');
+  assert.equal(ok.data.collections['4776834'].cover, 'https://img.example/c?width=800&height=500&crop=true');
+  assert.equal(ok.data.collections['4780382'].cover, null, 'a collection without a photo still has its rides');
+  assert.equal(ok.data.collections['4780382'].rides.length, 1);
   assert.ok(!JSON.stringify(ok.data).includes('xxxx'), 'only what the page shows');
   assert.match(ok.headers['Cache-Control'], /s-maxage=600/);
   assert.ok(asked.every((u) => u.startsWith('https://api.komoot.de/v007/collections/')));

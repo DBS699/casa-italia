@@ -15,7 +15,7 @@ async function loadAll(ids) {
   return Object.fromEntries(await Promise.all(ids.map(async (id) => [id, await loadCollection(id).catch(() => null)])));
 }
 
-// { [collection url]: rides | null } for every collection card on the page.
+// { [collection url]: { cover, rides } | null } for every collection card on the page.
 export function komootCollections() {
   if (!loading) {
     const urls = [...new Set([...document.querySelectorAll('[data-komoot]')].map((el) => el.getAttribute('data-komoot')))];

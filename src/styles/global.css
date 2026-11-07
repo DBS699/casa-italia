@@ -490,7 +490,6 @@ section[id], footer[id] { scroll-margin-top: 98px; }
 .season-doc { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
 
 /* Touren — one card per Komoot collection, the dialog lists its rides */
-.komoot-card .tour-photo img.is-map { object-position: center; }
 .komoot-card .tour-meta { display: flex; flex-direction: column; flex: 1; }
 .komoot-sub { font-size: 14px; line-height: 1.45; color: var(--ink-soft); margin: 6px 0 0; text-wrap: pretty; }
 .komoot-sub:empty { display: none; }

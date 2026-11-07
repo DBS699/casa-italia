@@ -17,14 +17,16 @@ export function collectionId(url) {
   }
 }
 
+// Komoot image links are templates for the size.
+const sized = (src, width, height) => src.replace('{width}', width).replace('{height}', height).replace('{crop}', 'true');
+
 function tourOf(item) {
-  const map = item.map_image?.src || '';
   return {
     name: String(item.name ?? '').trim(),
     km: Math.round((item.distance || 0) / 1000),
     hm: Math.round(item.elevation_up || 0),
     url: `https://www.komoot.com/tour/${item.id}`,
-    map: map.replace('{width}', '640').replace('{height}', '400').replace('{crop}', 'true'),
+    map: item.map_image?.src ? sized(item.map_image.src, 640, 400) : '',
   };
 }
 
@@ -64,7 +66,20 @@ export function ridesFrom(items) {
   return [...rides, ...undated];
 }
 
+// The photo Rolf picked for the collection; a collection without one simply has none.
+async function loadCover(id, fetchImpl) {
+  try {
+    const r = await fetchImpl(`${API}${id}/cover_image`);
+    const { src } = r.ok ? await r.json() : {};
+    return src ? sized(src, 800, 500) : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+// { cover, rides } of one collection.
 export async function loadCollection(id, fetchImpl = (url) => fetch(url)) {
+  const cover = loadCover(id, fetchImpl);
   const items = [];
   for (let page = 0; page < 5; page += 1) {
     const r = await fetchImpl(`${API}${id}/compilation/?limit=100&page=${page}`);
@@ -73,15 +88,15 @@ export async function loadCollection(id, fetchImpl = (url) => fetch(url)) {
     items.push(...(data._embedded?.items ?? []));
     if (page + 1 >= (data.page?.totalPages ?? 0)) break;
   }
-  return ridesFrom(items);
+  return { cover: await cover, rides: ridesFrom(items) };
 }
 
 // The next ride from today on; dates carry no year, so a past one counts for next year.
 export function nextRide(collections, today = new Date()) {
   const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
   let best = null;
-  for (const rides of Object.values(collections)) {
-    for (const ride of rides ?? []) {
+  for (const collection of Object.values(collections)) {
+    for (const ride of collection?.rides ?? []) {
       if (!ride.month) continue;
       const date = new Date(start.getFullYear(), ride.month - 1, ride.day);
       if (date < start) date.setFullYear(date.getFullYear() + 1);

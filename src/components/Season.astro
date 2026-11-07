@@ -148,22 +148,19 @@ const strings = Object.fromEntries(Object.entries(I18N).map(([lang, d]) => [lang
       dlg.showModal();
     };
 
-    // ── a card previews the first ride of its collection ──
-    const fill = (card: HTMLAnchorElement, rides) => {
-      if (!rides) return; // Komoot not reachable: the card stays a link to the collection
+    // ── a card shows the collection's photo on Komoot and its first ride ──
+    const fill = (card: HTMLAnchorElement, collection) => {
+      if (!collection) return; // Komoot not reachable: the card stays a link to the collection
+      const { cover, rides } = collection;
       const sub = card.querySelector('.komoot-sub');
       const count = card.querySelector('.komoot-count');
+      const photo = cover || rides[0]?.groups[0].map;
+      if (photo) card.querySelector('img').src = photo;
       if (!rides.length) {
         if (!card.dataset.note) sub.replaceChildren(translated('span', '', 'komoot.soon'));
         return;
       }
       const first = rides[0];
-      const map = first.groups[0].map;
-      if (map) {
-        const img = card.querySelector('img');
-        img.src = map; img.alt = first.place;
-        img.classList.add('is-map');
-      }
       if (first.month) {
         const badge = card.querySelector<HTMLElement>('.tour-badge');
         badge.querySelector('.d').textContent = String(first.day);
