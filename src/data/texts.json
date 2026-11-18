@@ -63,7 +63,7 @@
     "newsKicker": "Aktuell",
     "newsTitle": "Neues aus dem Club.",
     "komiteeKicker": "Vorstand",
-    "komiteeTitle": "Wer den Verein lenkt.",
+    "komiteeTitle": "Wer den Verein am Laufen hält",
     "komiteeBody": "Sieben ehrenamtliche Köpfe halten den Velo-Club am Laufen – von der Tourenplanung bis zur Festwirtschaft.",
     "roles": [
       "Präsident",
@@ -178,7 +178,7 @@
     "newsKicker": "Actualités",
     "newsTitle": "Du nouveau au club.",
     "komiteeKicker": "Comité",
-    "komiteeTitle": "Celles et ceux qui mènent le club.",
+    "komiteeTitle": "Celles et ceux qui font tourner le club",
     "komiteeBody": "Sept bénévoles font tourner le vélo-club – de la planification des sorties à la buvette.",
     "roles": [
       "Président",
@@ -293,7 +293,7 @@
     "newsKicker": "Novità",
     "newsTitle": "Novità dal club.",
     "komiteeKicker": "Comitato",
-    "komiteeTitle": "Chi guida il club.",
+    "komiteeTitle": "Chi manda avanti il club",
     "komiteeBody": "Sette volontari mandano avanti il velo-club – dalla pianificazione delle uscite alla festa.",
     "roles": [
       "Presidente",
@@ -408,7 +408,7 @@
     "newsKicker": "News",
     "newsTitle": "News from the club.",
     "komiteeKicker": "Board",
-    "komiteeTitle": "The people who run the club.",
+    "komiteeTitle": "The people who keep the club running",
     "komiteeBody": "Seven volunteers keep the velo-club rolling – from planning tours to running the festivities.",
     "roles": [
       "President",
