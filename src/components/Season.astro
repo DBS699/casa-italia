@@ -26,13 +26,9 @@ const strings = Object.fromEntries(Object.entries(I18N).map(([lang, d]) => [lang
           </div>
         )}
       </div>
-      <div class="season-arrows" aria-hidden="true">
-        <button type="button" class="season-arrow" data-dir="-1" aria-label="Vorherige Touren">‹</button>
-        <button type="button" class="season-arrow" data-dir="1" aria-label="Weitere Touren">›</button>
-      </div>
     </div>
 
-    <div class="tour-track" role="group" tabindex="0" aria-label="Touren der Saison">
+    <div class="komoot-grid">
       {cards.map((card) => (
         <a
           class="tour-card komoot-card"
@@ -80,29 +76,9 @@ const strings = Object.fromEntries(Object.entries(I18N).map(([lang, d]) => [lang
   import { komootCollections, el, translated, monthLabel, facts } from '../scripts/komoot-page.js';
 
   const root = document.querySelector('#touren');
-  const track = root?.querySelector('.tour-track');
   const dlg = root?.querySelector('.komoot-modal');
 
-  if (root && track && dlg) {
-    // ── carousel arrows ───────────────────────────────────
-    const step = () => {
-      const card = track.querySelector('.tour-card');
-      return card ? card.getBoundingClientRect().width + 24 : 320;
-    };
-    const arrows = root.querySelectorAll<HTMLElement>('.season-arrow');
-    arrows.forEach((btn) => btn.addEventListener('click', () =>
-      track.scrollBy({ left: step() * Number(btn.dataset.dir), behavior: 'smooth' })));
-    const updateArrows = () => {
-      const max = track.scrollWidth - track.clientWidth - 2;
-      arrows.forEach((b) => {
-        const atEdge = Number(b.dataset.dir) < 0 ? track.scrollLeft <= 2 : track.scrollLeft >= max;
-        b.classList.toggle('is-disabled', atEdge || max <= 0);
-      });
-    };
-    track.addEventListener('scroll', updateArrows, { passive: true });
-    window.addEventListener('resize', updateArrows);
-    updateArrows();
-
+  if (root && dlg) {
     // ── one ride in the dialog: map, date, place, a link per group ──
     const link = (className: string, href: string) => {
       const a = el('a', className) as HTMLAnchorElement;

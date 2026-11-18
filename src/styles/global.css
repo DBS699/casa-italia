@@ -490,6 +490,22 @@ section[id], footer[id] { scroll-margin-top: 98px; }
 .season-doc { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
 
 /* Touren — one card per Komoot collection, the dialog lists its rides */
+/* all collections at once: 5 × 2 on wide screens, 2 per row below */
+.komoot-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 18px; }
+.komoot-grid .tour-card { flex: none; }
+.komoot-grid .tour-meta { padding: 14px 16px 16px; }
+.komoot-grid .tour-title { font-size: 20px; }
+.komoot-grid .tour-badge { top: 10px; left: 10px; min-width: 44px; padding: 6px 8px; }
+.komoot-grid .tour-badge .d { font-size: 20px; }
+.komoot-grid .tour-more { font-size: 11px; }
+@media (max-width: 960px) { .komoot-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) {
+  .komoot-grid { gap: 12px; }
+  .komoot-grid .tour-meta { padding: 12px 12px 14px; }
+  .komoot-grid .tour-title { font-size: 18px; }
+  .komoot-grid .komoot-sub { font-size: 13px; }
+  .komoot-grid .tour-more { letter-spacing: 0.06em; gap: 6px; }
+}
 .komoot-card .tour-meta { display: flex; flex-direction: column; flex: 1; }
 .komoot-sub { font-size: 14px; line-height: 1.45; color: var(--ink-soft); margin: 6px 0 0; text-wrap: pretty; }
 .komoot-sub:empty { display: none; }
