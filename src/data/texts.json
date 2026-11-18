@@ -2,7 +2,7 @@
   "de": {
     "nav": {
       "club": "Verein",
-      "komitee": "Komitee",
+      "komitee": "Vorstand",
       "touren": "Touren",
       "galerie": "Galerie",
       "sponsoren": "Sponsoren",
@@ -401,7 +401,7 @@
   "en": {
     "nav": {
       "club": "Club",
-      "komitee": "Committee",
+      "komitee": "Board",
       "touren": "Tours",
       "galerie": "Gallery",
       "sponsoren": "Sponsors",
