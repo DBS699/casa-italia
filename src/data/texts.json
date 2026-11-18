@@ -62,7 +62,7 @@
     ],
     "newsKicker": "Aktuell",
     "newsTitle": "Neues aus dem Club.",
-    "komiteeKicker": "Komitee",
+    "komiteeKicker": "Vorstand",
     "komiteeTitle": "Wer den Verein lenkt.",
     "komiteeBody": "Sieben ehrenamtliche Köpfe halten den Velo-Club am Laufen – von der Tourenplanung bis zur Festwirtschaft.",
     "roles": [
@@ -407,7 +407,7 @@
     ],
     "newsKicker": "News",
     "newsTitle": "News from the club.",
-    "komiteeKicker": "Committee",
+    "komiteeKicker": "Board",
     "komiteeTitle": "The people who run the club.",
     "komiteeBody": "Seven volunteers keep the velo-club rolling – from planning tours to running the festivities.",
     "roles": [
