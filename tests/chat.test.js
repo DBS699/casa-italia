@@ -16,6 +16,7 @@ const TEXTS = () => ({
 });
 const seed = () => ({
   'src/data/texts.json': TEXTS(),
+  'src/data/news.json': { news: [{ date: '2026-11-18', title: 'Neue Adresse', text: 'Schreib uns.', image: '', link: '' }] },
   'src/data/komoot.json': { collections: [{ label: 'Juni', note: '', url: KOMOOT('4780382/-juni') }, { label: 'Juli', note: '', url: KOMOOT('4776839/-juli') }] },
   'src/data/members.json': { members: [{ name: 'Salvatore Schiavano', role: 'Präsident', photo: '' }, { name: 'Rolf Muster', role: 'Kassier', photo: '' }] },
   'src/data/sponsors.json': { sponsors: [{ name: 'Thömus', url: 'https://thoemus.ch', logo: '/assets/sponsors/thoemus.jpg' }, { name: 'gäggeli siech', url: 'https://example.ch', logo: '/assets/sponsors/g.jpg' }] },
@@ -26,7 +27,7 @@ const state = () => {
   const d = head().data;
   return asContent(d);
 };
-const asContent = (d) => ({ komoot: d['src/data/komoot.json'].collections, members: d['src/data/members.json'].members, sponsors: d['src/data/sponsors.json'].sponsors, gallery: d['src/data/gallery.json'].images, site: d['src/data/site.json'], texts: d['src/data/texts.json'] });
+const asContent = (d) => ({ news: d['src/data/news.json'].news, komoot: d['src/data/komoot.json'].collections, members: d['src/data/members.json'].members, sponsors: d['src/data/sponsors.json'].sponsors, gallery: d['src/data/gallery.json'].images, site: d['src/data/site.json'], texts: d['src/data/texts.json'] });
 
 // ── fake GitHub + Gemini ──────────────────────────────────
 let repo;
@@ -552,7 +553,7 @@ test('a stale undo is refused when something changed in between', async () => {
 const content = () => asContent(seed());
 
 test('the chat offers the CMS collections plus the texts', () => {
-  assert.deepEqual(Object.keys(COLLECTIONS).sort(), ['gallery', 'komoot', 'members', 'site', 'sponsors', 'texts']);
+  assert.deepEqual(Object.keys(COLLECTIONS).sort(), ['gallery', 'komoot', 'members', 'news', 'site', 'sponsors', 'texts']);
   assert.deepEqual(Object.keys(COLLECTIONS.site.fields), ['heroMotto', 'heroVideo', 'heroPoster', 'brochure']);
   assert.deepEqual(Object.keys(COLLECTIONS.sponsors.fields), ['name', 'url', 'logo']);
   assert.deepEqual(Object.keys(COLLECTIONS.members.fields), ['name', 'role', 'photo']);
@@ -630,6 +631,7 @@ test('website keys match what the components render', async () => {
   assert.match(await read('Sponsors'), /data-chat-item="sponsors" data-chat-key=\{s\.name\}/);
   assert.match(await read('Committee'), /data-chat-item="members" data-chat-key=\{m\.name\}/);
   assert.match(await read('Gallery'), /data-chat-item="gallery" data-chat-key=\{s\.image\}/);
+  assert.match(await read('News'), /data-chat-item="news" data-chat-key=\{n\.title\}/);
 });
 
 // ── website texts ─────────────────────────────────────────
@@ -684,6 +686,16 @@ test('komoot folders take collection links only', () => {
   assert.ok(add('https://www.komoot.com/collection/4780383'));
   assert.throws(() => add('https://www.komoot.com/de-de/tour/819535385'), /kein passender Link/);
   assert.throws(() => add('https://example.ch/collection/1'), /kein passender Link/);
+});
+
+test('news need a real date and keep their paragraphs', () => {
+  const add = (fields) => applyOperations(content(), [{ collection: 'news', op: 'add', fields: { title: 'Saisonstart', ...fields } }]);
+  const { state: next } = add({ date: '2027-03-07', text: 'Wir starten.  \n\n\n\nKommt alle!', link: 'https://www.komoot.com/de-de/user/veloclubcasa' });
+  assert.deepEqual(next.news.at(-1), { date: '2027-03-07', title: 'Saisonstart', text: 'Wir starten.\n\nKommt alle!', image: '', link: 'https://www.komoot.com/de-de/user/veloclubcasa' });
+  assert.throws(() => add({ date: '7. März' }), /kein Datum/);
+  assert.throws(() => add({ date: '2027-02-30' }), /kein Datum/);
+  assert.throws(() => add({}), /Datum.*darf nicht leer/);
+  assert.throws(() => add({ date: '2027-03-07', link: 'javascript:alert(1)' }), /kein passender Link/);
 });
 
 test('only texts the website shows are offered', () => {

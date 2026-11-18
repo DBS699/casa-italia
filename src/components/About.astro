@@ -17,14 +17,6 @@ const t = I18N[DEFAULT_LANG];
       <p data-i18n="aboutBody2">{t.aboutBody2}</p>
       <p data-i18n="aboutBody3">{t.aboutBody3}</p>
       <p class="about-claim" data-i18n="aboutClaim">{t.aboutClaim}</p>
-      <div class="stats">
-        {t.stat.map((s, i) => (
-          <div class="stat">
-            <span class="n" data-i18n={`stat.${i}.n`}>{s.n}</span>
-            <span class="l" data-i18n={`stat.${i}.l`}>{s.l}</span>
-          </div>
-        ))}
-      </div>
     </div>
   </div>
 </section>

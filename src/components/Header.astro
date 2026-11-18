@@ -1,7 +1,9 @@
 ---
-import { I18N, DEFAULT_LANG, LANGS } from '../data/content.js';
+import { I18N, DEFAULT_LANG, LANGS, NEWS } from '../data/content.js';
 const t = I18N[DEFAULT_LANG];
+// «Aktuell» only when there are Meldungen (the section is left out otherwise).
 const nav = [
+  ...(NEWS.length ? [{ key: 'aktuelles', href: '#aktuell' }] : []),
   { key: 'club', href: '#club' },
   { key: 'touren', href: '#touren' },
   { key: 'galerie', href: '#gallery' },

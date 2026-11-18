@@ -91,17 +91,3 @@ export async function loadCollection(id, fetchImpl = (url) => fetch(url)) {
   return { cover: await cover, rides: ridesFrom(items) };
 }
 
-// The next ride from today on; dates carry no year, so a past one counts for next year.
-export function nextRide(collections, today = new Date()) {
-  const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  let best = null;
-  for (const collection of Object.values(collections)) {
-    for (const ride of collection?.rides ?? []) {
-      if (!ride.month) continue;
-      const date = new Date(start.getFullYear(), ride.month - 1, ride.day);
-      if (date < start) date.setFullYear(date.getFullYear() + 1);
-      if (!best || date < best.date) best = { date, ride };
-    }
-  }
-  return best?.ride ?? null;
-}

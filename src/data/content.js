@@ -1,6 +1,6 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Content model. Structured, club-editable content lives in JSON files in this
-// folder (members/sponsors/komoot/gallery/site.json) — these are the collections
+// folder (news/members/sponsors/komoot/gallery/site.json) — these are the collections
 // the Sveltia CMS edits, and this module simply reads & adapts them for the
 // components. Translatable UI prose is in texts.json (edited by the chat, not the CMS).
 // ─────────────────────────────────────────────────────────────────────────────
@@ -10,6 +10,7 @@ import sponsorsData from './sponsors.json';
 import galleryData from './gallery.json';
 import siteData from './site.json';
 import komootData from './komoot.json';
+import newsData from './news.json';
 import textsData from './texts.json';
 
 export const LANGS = [
@@ -50,6 +51,11 @@ export const SPONSORS = sponsorsData.sponsors.map((s, i) => ({
 // Komoot collections, one card per month in the season (from komoot.json; CMS-editable).
 // The tours themselves live on Komoot and are loaded in the browser (scripts/komoot.js).
 export const KOMOOT = komootData.collections;
+
+// News in «Aktuell», newest first (from news.json; CMS- and chat-editable). German only.
+export const NEWS = newsData.news
+  .map((n, i) => ({ ...n, order: i }))
+  .sort((a, b) => String(b.date).localeCompare(String(a.date)) || a.order - b.order);
 
 // Gallery images (from gallery.json; CMS-editable).
 export const GALLERY = galleryData.images.map((g, i) => ({ image: g.image, caption: g.caption || '', id: 'vcgal' + (i + 1) }));

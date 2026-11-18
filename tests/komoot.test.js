@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import handler from '../api/komoot.js';
-import { collectionId, nextRide, ridesFrom } from '../src/scripts/komoot.js';
+import { collectionId, ridesFrom } from '../src/scripts/komoot.js';
 
 const tour = (id, name, extra = {}) => ({
   type: 'tour_planned', status: 'public', id, name, distance: 52400, elevation_up: 548.4,
@@ -33,16 +33,6 @@ test('private tours, highlights and impossible dates stay out or undated', () =>
 test('same group name twice keeps the full names', () => {
   const [ride] = ridesFrom([tour(1, '4. Mai: Gurnigel Sportivo'), tour(2, '4. Mai: Thun Sportivo')]);
   assert.deepEqual(ride.groups.map((g) => g.name), ['Gurnigel Sportivo', 'Thun Sportivo']);
-});
-
-test('the next ride wraps into next year once the season is over', () => {
-  const march = ridesFrom([tour(1, '7. März: A'), tour(2, '14. März: B')]);
-  const june = ridesFrom([tour(3, '6. Juni: C')]);
-  const all = { a: { cover: null, rides: march }, b: { cover: null, rides: june } };
-  assert.equal(nextRide(all, new Date(2026, 10, 6)).place, 'A');
-  assert.equal(nextRide(all, new Date(2026, 2, 8)).place, 'B');
-  assert.equal(nextRide(all, new Date(2026, 2, 14)).place, 'B', 'today still counts');
-  assert.equal(nextRide({ a: null, b: { cover: null, rides: [] } }), null);
 });
 
 test('collection ids come from any Komoot collection link', () => {

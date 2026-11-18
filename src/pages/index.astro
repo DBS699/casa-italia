@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import Header from '../components/Header.astro';
 import Hero from '../components/Hero.astro';
+import News from '../components/News.astro';
 import About from '../components/About.astro';
 import Committee from '../components/Committee.astro';
 import Season from '../components/Season.astro';
@@ -10,17 +11,16 @@ import Gallery from '../components/Gallery.astro';
 import Sponsors from '../components/Sponsors.astro';
 import Footer from '../components/Footer.astro';
 import JoinDialog from '../components/JoinDialog.astro';
-import NextRide from '../components/NextRide.astro';
 ---
 
 <Base>
   <Header />
   <main>
-    {/* Flow: Hero → Verein → Nächste Ausfahrt → Touren → Galerie → Mitmachen → Komitee → Sponsoren → Footer.
+    {/* Flow: Hero → Aktuell → Verein → Touren → Galerie → Mitmachen → Komitee → Sponsoren → Footer.
         Erst der Verein + das Fahren (was Besucher anzieht), dann die Conversion, danach Vertrauen (Komitee/Sponsoren). */}
     <Hero />
+    <News />
     <About />
-    <NextRide />
     <Season />
     <Gallery />
     <Membership />

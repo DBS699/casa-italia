@@ -1,7 +1,7 @@
 // What the chat page marks on the website next to it. No DOM here, so it can be tested.
 
 const SECTION_LIMIT = 6;
-const AREA_LABEL = { komoot: 'Touren', members: 'Komitee', sponsors: 'Sponsoren', gallery: 'Galerie', site: 'Startseite' };
+const AREA_LABEL = { news: 'Aktuell', komoot: 'Touren', members: 'Komitee', sponsors: 'Sponsoren', gallery: 'Galerie', site: 'Startseite' };
 const SITE_LABEL = { heroMotto: 'Motto', brochure: 'Tourenprogramm (PDF)' };
 
 function proposedMark(change) {
@@ -47,6 +47,7 @@ export function pickLabel(collection, key, shown = '') {
     const text = shown.replace(/\s+/g, ' ').trim();
     return `Text «${text.length > 40 ? `${text.slice(0, 40)} …` : text}»`;
   }
+  if (collection === 'news') return `Meldung «${key}»`;
   if (collection === 'komoot') return `Komoot-Ordner «${key}»`;
   if (collection === 'members') return `Komitee: ${key}`;
   if (collection === 'sponsors') return `Sponsor: ${key}`;

@@ -4,6 +4,19 @@
 // proposes passes through this file.
 
 export const COLLECTIONS = {
+  news: {
+    area: 'Aktuell (Meldungen)',
+    file: 'src/data/news.json',
+    listKey: 'news',
+    match: ['title'],
+    fields: {
+      date: { label: 'Datum', max: 10, kind: 'date', required: true },
+      title: { label: 'Titel', max: 120, required: true },
+      text: { label: 'Text', max: 1500, kind: 'longtext' },
+      image: { label: 'Bild', max: 300, kind: 'image' },
+      link: { label: 'Link', max: 500, kind: 'web' },
+    },
+  },
   komoot: {
     area: 'Touren (Komoot-Ordner)',
     file: 'src/data/komoot.json',
@@ -72,7 +85,7 @@ export const COLLECTIONS = {
 export const COLLECTION_NAMES = Object.keys(COLLECTIONS);
 const TEXT_LANGS = Object.keys(COLLECTIONS.texts.fields);
 // In the file but not shown anywhere on the website, so changing them would do nothing.
-const UNUSED_TEXT = /^(nav\.(aktuelles|classement)$|heroKicker$|months\.|newsKicker$|newsTitle$|roles\.|memberHint$|galleryCta$|galleryHint$|sponsorHint$|cards\.)/;
+const UNUSED_TEXT = /^(nav\.classement$|heroKicker$|months\.|roles\.|memberHint$|galleryCta$|galleryHint$|sponsorHint$|cards\.)/;
 
 const BLOB_URL = /^https:\/\/[a-z0-9]+\.public\.blob\.vercel-storage\.com\/[^\s?#]+$/i;
 export const isBlobUrl = (value) => BLOB_URL.test(String(value ?? ''));
@@ -106,12 +119,23 @@ function normalizeMedia(spec, value, attachments) {
 }
 
 function normalizeField(spec, raw, attachments) {
-  const value = String(raw ?? '').replace(/\s+/g, ' ').trim();
+  // Longer texts keep their paragraphs; everything else is one line.
+  const value = spec.kind === 'longtext'
+    ? String(raw ?? '').replace(/\r/g, '').replace(/[ \t]+/g, ' ').replace(/ ?\n ?/g, '\n').replace(/\n{3,}/g, '\n\n').trim()
+    : String(raw ?? '').replace(/\s+/g, ' ').trim();
   if (value.length > spec.max) throw new ContentError(`${spec.label} ist zu lang (höchstens ${spec.max} Zeichen).`);
   if (!value) return '';
   switch (spec.kind) {
     case 'komootCollection':
       return checkLink(value, spec.label, (u) => u.protocol === 'https:' && /^(www\.)?komoot\.(com|de)$/i.test(u.hostname) && /^(\/[a-z]{2}-[a-z]{2})?\/collection\/\d+(\/[\w-]*)?\/?$/i.test(u.pathname));
+    case 'date': {
+      const [y, m, d] = value.split('-').map(Number);
+      const date = new Date(Date.UTC(y, m - 1, d));
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || date.getUTCMonth() !== m - 1 || date.getUTCDate() !== d) {
+        throw new ContentError(`${spec.label}: «${value}» ist kein Datum (Form JJJJ-MM-TT).`);
+      }
+      return value;
+    }
     case 'web':
       return checkLink(value, spec.label, (u) => /^https?:$/.test(u.protocol) && u.hostname.includes('.'));
     case 'image':

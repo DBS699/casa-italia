@@ -6,7 +6,7 @@
       "touren": "Touren",
       "galerie": "Galerie",
       "sponsoren": "Sponsoren",
-      "aktuelles": "Aktuelles",
+      "aktuelles": "Aktuell",
       "mitmachen": "Mitmachen",
       "classement": "Rangliste"
     },
@@ -40,25 +40,6 @@
     "aboutBody2": "Jeden Sonntagvormittag treffen wir uns zu gemeinsamen Ausfahrten in der Region Bern. Von März bis Oktober mit dem Rennvelo und in den übrigen Monaten mit dem MTB abseits des Verkehrs.",
     "aboutBody3": "Nach den Ausfahrten werden die gemachten Erfahrungen und mehr in unserem Stammlokal, dem Restaurant „Casa d'Italia“, besprochen.",
     "aboutClaim": "Gemeinsam fahren, gemeinsam erleben – seit 1985!",
-    "stat": [
-      {
-        "n": "1985",
-        "l": "Gegründet"
-      },
-      {
-        "n": "Bern",
-        "l": "Heimat"
-      },
-      {
-        "n": "März–Okt",
-        "l": "Saison"
-      }
-    ],
-    "next": {
-      "kicker": "Nächste Ausfahrt",
-      "distance": "Distanz",
-      "cta": "Ganze Saison"
-    },
     "seasonKicker": "Saison 2026",
     "seasonTitle": "Acht Monate unterwegs.",
     "seasonBody": "An den meisten Sonntagen fahren wir in zwei Gruppen – eine sportliche und eine gemütliche. Im Tour-Fenster findest du beide Strecken; manchmal fahren wir alle gemeinsam.",
@@ -67,7 +48,6 @@
       "rides": "Ausfahrten",
       "ride": "Ausfahrt",
       "soon": "Touren folgen bald",
-      "route": "Route auf Komoot",
       "hint": "Die Touren stehen im Komoot-Konto des Vereins. Ansehen geht ohne Konto, mit einem eigenen Komoot-Konto kannst du die Routen auch als GPX herunterladen."
     },
     "months": [
@@ -80,8 +60,8 @@
       "September",
       "Oktober"
     ],
-    "newsKicker": "Aktuelles",
-    "newsTitle": "Mitmachen & informieren.",
+    "newsKicker": "Aktuell",
+    "newsTitle": "Neues aus dem Club.",
     "komiteeKicker": "Komitee",
     "komiteeTitle": "Wer den Verein lenkt.",
     "komiteeBody": "Sieben ehrenamtliche Köpfe halten den Velo-Club am Laufen – von der Tourenplanung bis zur Festwirtschaft.",
@@ -130,7 +110,9 @@
         "body": "Unsere Vereinsbroschüre – jetzt online durchblättern.",
         "cta": "Broschüre öffnen"
       }
-    ]
+    ],
+    "newsMore": "Mehr erfahren",
+    "newsOlder": "Ältere Meldungen"
   },
   "fr": {
     "nav": {
@@ -173,25 +155,6 @@
     "aboutBody2": "Chaque dimanche matin, nous nous retrouvons pour des sorties communes dans la région de Berne. De mars à octobre sur le vélo de route, et les autres mois en VTT, loin de la circulation.",
     "aboutBody3": "Après les sorties, nous partageons nos expériences – et bien plus – dans notre local habituel, le restaurant « Casa d'Italia ».",
     "aboutClaim": "Rouler ensemble, vivre ensemble – depuis 1985 !",
-    "stat": [
-      {
-        "n": "1985",
-        "l": "Fondé"
-      },
-      {
-        "n": "Berne",
-        "l": "Origine"
-      },
-      {
-        "n": "Mars–Oct",
-        "l": "Saison"
-      }
-    ],
-    "next": {
-      "kicker": "Prochaine sortie",
-      "distance": "Distance",
-      "cta": "Toute la saison"
-    },
     "seasonKicker": "Saison 2026",
     "seasonTitle": "Huit mois sur les routes.",
     "seasonBody": "La plupart des dimanches, nous roulons en deux groupes – un sportif et un tranquille. Les deux parcours figurent dans chaque sortie ; parfois nous roulons tous ensemble.",
@@ -200,7 +163,6 @@
       "rides": "sorties",
       "ride": "sortie",
       "soon": "Parcours bientôt en ligne",
-      "route": "Parcours sur Komoot",
       "hint": "Les parcours sont sur le compte Komoot du club. Consultation sans compte ; avec ton propre compte Komoot, tu peux aussi les télécharger en GPX."
     },
     "months": [
@@ -214,7 +176,7 @@
       "Octobre"
     ],
     "newsKicker": "Actualités",
-    "newsTitle": "Participer & s'informer.",
+    "newsTitle": "Du nouveau au club.",
     "komiteeKicker": "Comité",
     "komiteeTitle": "Celles et ceux qui mènent le club.",
     "komiteeBody": "Sept bénévoles font tourner le vélo-club – de la planification des sorties à la buvette.",
@@ -263,7 +225,9 @@
         "body": "La brochure du club, à feuilleter en ligne.",
         "cta": "Ouvrir la brochure"
       }
-    ]
+    ],
+    "newsMore": "En savoir plus",
+    "newsOlder": "Messages précédents"
   },
   "it": {
     "nav": {
@@ -306,25 +270,6 @@
     "aboutBody2": "Ogni domenica mattina ci ritroviamo per uscite insieme nella regione di Berna. Da marzo a ottobre con la bici da corsa, negli altri mesi con la MTB lontano dal traffico.",
     "aboutBody3": "Dopo le uscite, esperienze e molto altro si condividono nel nostro locale di sempre, il ristorante «Casa d'Italia».",
     "aboutClaim": "Pedalare insieme, vivere insieme – dal 1985!",
-    "stat": [
-      {
-        "n": "1985",
-        "l": "Fondato"
-      },
-      {
-        "n": "Berna",
-        "l": "Casa"
-      },
-      {
-        "n": "Mar–Ott",
-        "l": "Stagione"
-      }
-    ],
-    "next": {
-      "kicker": "Prossima uscita",
-      "distance": "Distanza",
-      "cta": "Tutta la stagione"
-    },
     "seasonKicker": "Stagione 2026",
     "seasonTitle": "Otto mesi in viaggio.",
     "seasonBody": "Quasi ogni domenica pedaliamo in due gruppi – uno sportivo e uno tranquillo. Trovi entrambi i percorsi in ogni uscita; a volte usciamo tutti insieme.",
@@ -333,7 +278,6 @@
       "rides": "uscite",
       "ride": "uscita",
       "soon": "Percorsi in arrivo",
-      "route": "Percorso su Komoot",
       "hint": "I percorsi sono sull'account Komoot del club. Si possono vedere senza account; con un tuo account Komoot puoi anche scaricarli in GPX."
     },
     "months": [
@@ -347,7 +291,7 @@
       "Ottobre"
     ],
     "newsKicker": "Novità",
-    "newsTitle": "Partecipa e informati.",
+    "newsTitle": "Novità dal club.",
     "komiteeKicker": "Comitato",
     "komiteeTitle": "Chi guida il club.",
     "komiteeBody": "Sette volontari mandano avanti il velo-club – dalla pianificazione delle uscite alla festa.",
@@ -396,7 +340,9 @@
         "body": "La brochure del club, sfogliala online.",
         "cta": "Apri la brochure"
       }
-    ]
+    ],
+    "newsMore": "Scopri di più",
+    "newsOlder": "Notizie precedenti"
   },
   "en": {
     "nav": {
@@ -405,7 +351,7 @@
       "touren": "Tours",
       "galerie": "Gallery",
       "sponsoren": "Sponsors",
-      "aktuelles": "Latest",
+      "aktuelles": "News",
       "mitmachen": "Join in",
       "classement": "Rankings"
     },
@@ -439,25 +385,6 @@
     "aboutBody2": "Every Sunday morning we meet for group rides in the Bern region. From March to October on road bikes, and in the remaining months on mountain bikes, away from traffic.",
     "aboutBody3": "After the rides, we talk over our experiences – and much more – at our regular haunt, the restaurant “Casa d'Italia”.",
     "aboutClaim": "Ride together, share the experience – since 1985!",
-    "stat": [
-      {
-        "n": "1985",
-        "l": "Founded"
-      },
-      {
-        "n": "Bern",
-        "l": "Home"
-      },
-      {
-        "n": "Mar–Oct",
-        "l": "Season"
-      }
-    ],
-    "next": {
-      "kicker": "Next ride",
-      "distance": "Distance",
-      "cta": "Full season"
-    },
     "seasonKicker": "Season 2026",
     "seasonTitle": "Eight months on the road.",
     "seasonBody": "On most Sundays we ride in two groups – a sporty one and an easy-going one. Both routes are shown for each ride; sometimes we all ride together.",
@@ -466,7 +393,6 @@
       "rides": "rides",
       "ride": "ride",
       "soon": "Routes coming soon",
-      "route": "Route on Komoot",
       "hint": "The routes are on the club's Komoot account. You can view them without an account; with your own Komoot account you can also download them as GPX."
     },
     "months": [
@@ -479,8 +405,8 @@
       "September",
       "October"
     ],
-    "newsKicker": "Latest",
-    "newsTitle": "Join in & stay informed.",
+    "newsKicker": "News",
+    "newsTitle": "News from the club.",
     "komiteeKicker": "Committee",
     "komiteeTitle": "The people who run the club.",
     "komiteeBody": "Seven volunteers keep the velo-club rolling – from planning tours to running the festivities.",
@@ -529,6 +455,8 @@
         "body": "Our club brochure – browse it online.",
         "cta": "Open brochure"
       }
-    ]
+    ],
+    "newsMore": "Learn more",
+    "newsOlder": "Earlier news"
   }
 }

@@ -1,5 +1,5 @@
-// Browser side of the Komoot tours: loads the collections once for the whole page
-// (season cards and next ride share it) and builds the bits of markup both need.
+// Browser side of the Komoot tours: loads the collections once for the page
+// and builds the bits of markup the season cards and their dialog need.
 import { collectionId, loadCollection } from './komoot.js';
 
 let loading = null;

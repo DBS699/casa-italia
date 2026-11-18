@@ -36,6 +36,26 @@ collections:
           - { name: heroPoster, label: "Video-Vorschaubild", widget: image }
           - { name: brochure, label: "Broschüre / Tourenprogramm (PDF)", widget: file, required: false, default: "" }
 
+  - name: news
+    label: "Aktuell"
+    files:
+      - name: news
+        label: "Aktuell: Meldungen"
+        file: "src/data/news.json"
+        fields:
+          - name: news
+            label: "Meldungen"
+            label_singular: "Meldung"
+            hint: "Die Website zeigt die Meldungen nach Datum, neueste zuerst. Die drei neuesten sind sofort sichtbar, ältere hinter «Ältere Meldungen»."
+            widget: list
+            summary: "{{fields.date}} · {{fields.title}}"
+            fields:
+              - { name: date, label: "Datum", widget: datetime, format: "YYYY-MM-DD", date_format: "DD.MM.YYYY", time_format: false }
+              - { name: title, label: "Titel", widget: string }
+              - { name: text, label: "Text", widget: text, required: false, default: "" }
+              - { name: image, label: "Bild (optional)", widget: image, required: false, default: "" }
+              - { name: link, label: "Link (optional)", widget: string, required: false, default: "", hint: "z. B. https://… – erscheint als «Mehr erfahren»." }
+
   - name: komoot
     label: "Touren (Komoot)"
     files:

@@ -91,6 +91,7 @@ Antworte immer als JSON in dieser Form: {"reply": "...", "action": "change", "op
 - Bei update, delete und move nennt "match" den Eintrag, mit den Werten exakt wie in den Daten unten. Die Person schreibt Namen vielleicht ungenau oder in Mundart: Nimm den passenden Eintrag aus den Daten. Ist unklar, welcher gemeint ist, frage nach. Gibt es den Eintrag nicht (mehr), sage das klar und nenne die vorhandenen Einträge, statt nach dem genauen Namen zu fragen.
 
 Bereiche (collection), Felder und was "match" enthält:
+- news, der Bereich «Aktuell» mit Meldungen des Vereins, auf der Website nach Datum sortiert, neueste zuerst (match: title): date (Form JJJJ-MM-TT; nennt die Person keines, nimm das heutige Datum) und title sind Pflicht, text (Absätze mit Leerzeile), image (Bild), link (Webseite mit https://). Meldungen gibt es nur auf Deutsch.
 - komoot, die Touren-Saison: eine Karte pro Komoot-Ordner (Collection), in dieser Reihenfolge (match: label): label (z. B. "Juni") und url (Link zur Collection, z. B. https://www.komoot.com/de-de/collection/4780382/-juni) sind Pflicht, note (kurzer Zusatz). Monatsnamen in label übersetzt die Website selbst.
 - members, das Komitee (match: name): name und role (Funktion) sind Pflicht, photo.
 - sponsors (match: name): name, url (Webseite, mit https://) und logo sind Pflicht.
