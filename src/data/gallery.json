@@ -1,19 +1,31 @@
 {
   "images": [
     {
-      "image": "/assets/gallery/gallery-1.jpg",
+      "image": "/assets/uploads/chat-227aa6b2e65b4d13.jpg",
       "caption": ""
     },
     {
-      "image": "/assets/gallery/gallery-2.jpg",
+      "image": "/assets/uploads/chat-6e1ea73e93fb0806.jpg",
       "caption": ""
     },
     {
-      "image": "/assets/gallery/gallery-3.jpg",
+      "image": "/assets/uploads/chat-cc5d87e1a6841fcc.jpg",
       "caption": ""
     },
     {
-      "image": "/assets/gallery/gallery-4.jpg",
+      "image": "/assets/uploads/chat-9efa4648401baa8d.jpg",
+      "caption": ""
+    },
+    {
+      "image": "/assets/uploads/chat-25f34b61187ff5a6.jpg",
+      "caption": ""
+    },
+    {
+      "image": "/assets/uploads/chat-89dbfaeae9de7456.jpg",
+      "caption": ""
+    },
+    {
+      "image": "/assets/uploads/chat-7abfab85686ae1fa.jpg",
       "caption": ""
     }
   ]
