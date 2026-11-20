@@ -3,14 +3,26 @@
     {
       "date": "2026-11-18",
       "title": "Unsere Touren jetzt auf Komoot",
+      "title_fr": "Nos sorties désormais sur Komoot",
+      "title_it": "Le nostre uscite ora su Komoot",
+      "title_en": "Our rides now on Komoot",
       "text": "Alle Ausfahrten der Saison findest du neu im Komoot-Konto des Vereins, nach Monaten geordnet. Ansehen geht ohne Konto; mit einem eigenen Komoot-Konto kannst du die Routen auch als GPX herunterladen.",
+      "text_fr": "Toutes les sorties de la saison se trouvent désormais sur le compte Komoot du club, classées par mois. Consultation sans compte ; avec ton propre compte Komoot, tu peux aussi télécharger les parcours en GPX.",
+      "text_it": "Tutte le uscite della stagione si trovano ora sull'account Komoot del club, ordinate per mese. Si possono vedere senza account; con un tuo account Komoot puoi anche scaricare i percorsi in GPX.",
+      "text_en": "All of the season's rides are now on the club's Komoot account, sorted by month. You can view them without an account; with your own Komoot account you can also download the routes as GPX.",
       "image": "",
       "link": "https://www.komoot.com/de-de/user/veloclubcasa"
     },
     {
       "date": "2026-11-18",
       "title": "Neue E-Mail-Adresse",
+      "title_fr": "Nouvelle adresse e-mail",
+      "title_it": "Nuovo indirizzo e-mail",
+      "title_en": "New e-mail address",
       "text": "Du erreichst den Vorstand neu unter veloclub-casa@proton.me.",
+      "text_fr": "Tu peux désormais joindre le comité à l’adresse veloclub-casa@proton.me.",
+      "text_it": "Ora puoi contattare il comitato all’indirizzo veloclub-casa@proton.me.",
+      "text_en": "You can now reach the committee at veloclub-casa@proton.me.",
       "image": "",
       "link": ""
     }

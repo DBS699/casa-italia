@@ -689,13 +689,26 @@ test('komoot folders take collection links only', () => {
 });
 
 test('news need a real date and keep their paragraphs', () => {
-  const add = (fields) => applyOperations(content(), [{ collection: 'news', op: 'add', fields: { title: 'Saisonstart', ...fields } }]);
-  const { state: next } = add({ date: '2027-03-07', text: 'Wir starten.  \n\n\n\nKommt alle!', link: 'https://www.komoot.com/de-de/user/veloclubcasa' });
-  assert.deepEqual(next.news.at(-1), { date: '2027-03-07', title: 'Saisonstart', text: 'Wir starten.\n\nKommt alle!', image: '', link: 'https://www.komoot.com/de-de/user/veloclubcasa' });
+  const titles = { title_fr: 'Début de saison', title_it: 'Inizio stagione', title_en: 'Season start' };
+  const add = (fields) => applyOperations(content(), [{ collection: 'news', op: 'add', fields: { title: 'Saisonstart', ...titles, ...fields } }]);
+  const texts = { text_fr: 'On part.', text_it: 'Si parte.', text_en: 'Off we go.' };
+  const { state: next } = add({ date: '2027-03-07', text: 'Wir starten.  \n\n\n\nKommt alle!', ...texts, link: 'https://www.komoot.com/de-de/user/veloclubcasa' });
+  assert.deepEqual(next.news.at(-1), {
+    date: '2027-03-07', title: 'Saisonstart', ...titles, text: 'Wir starten.\n\nKommt alle!', ...texts, image: '', link: 'https://www.komoot.com/de-de/user/veloclubcasa',
+  });
   assert.throws(() => add({ date: '7. März' }), /kein Datum/);
   assert.throws(() => add({ date: '2027-02-30' }), /kein Datum/);
   assert.throws(() => add({}), /Datum.*darf nicht leer/);
   assert.throws(() => add({ date: '2027-03-07', link: 'javascript:alert(1)' }), /kein passender Link/);
+});
+
+test('a news title or text never changes without its translations', () => {
+  const update = (fields) => applyOperations(content(), [{ collection: 'news', op: 'update', match: { title: 'Neue Adresse' }, fields }]);
+  assert.throws(() => update({ title: 'Neue Mail' }), /braucht es auch die Übersetzung: Titel Französisch, Titel Italienisch, Titel Englisch/);
+  assert.throws(() => update({ text: 'Schreib uns bald.', text_fr: 'Écris-nous.' }), /Text Italienisch, Text Englisch/);
+  assert.throws(() => applyOperations(content(), [{ collection: 'news', op: 'add', fields: { date: '2027-03-07', title: 'Nur Deutsch' } }]), /Übersetzung/);
+  assert.equal(update({ text_en: 'Write to us.' }).state.news[0].text_en, 'Write to us.', 'one language alone is fine');
+  assert.equal(update({ date: '2026-11-20' }).state.news[0].date, '2026-11-20', 'so is anything else');
 });
 
 test('only texts the website shows are offered', () => {

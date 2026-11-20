@@ -75,7 +75,7 @@ section copy, nav, buttons) lives in `texts.json`, which the website chat edits 
 
 ## Aktuell (Meldungen)
 
-`src/data/news.json` holds the club's Meldungen (date `YYYY-MM-DD`, title, text, optional image and link), editable in the CMS («Aktuell») and through the chat. The website shows them newest first right after the hero, three at once with the rest behind «Ältere Meldungen». Meldungen are German only. With no Meldung, the section and its «Aktuell» tab disappear.
+`src/data/news.json` holds the club's Meldungen (date `YYYY-MM-DD`, title, text, optional image and link), editable in the CMS («Aktuell») and through the chat. The website shows them newest first right after the hero, three at once with the rest behind «Ältere Meldungen». Title and text have translations (`title_fr`, `text_en`, …); an empty one shows the German. The chat always adds all three when the German changes. With no Meldung, the section and its «Aktuell» tab disappear.
 
 ## Touren (Komoot)
 

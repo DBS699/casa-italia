@@ -86,6 +86,13 @@ const jsonLd = {
             const v = resolve(dict, el.getAttribute('data-i18n'));
             if (typeof v === 'string') el.textContent = v;
           });
+          // Content with its own translations (e.g. Meldungen): { de, fr, it, en } in data-tr.
+          document.querySelectorAll('[data-tr]').forEach((el) => {
+            try {
+              const all = JSON.parse(el.getAttribute('data-tr'));
+              el.textContent = all[lang] || all[DEFAULT_LANG] || el.textContent;
+            } catch (e) {}
+          });
           document.querySelectorAll('[data-lang-btn]').forEach((b) => {
             b.setAttribute('aria-current', b.getAttribute('data-lang-btn') === lang ? 'true' : 'false');
           });
@@ -106,7 +113,7 @@ const jsonLd = {
           );
         }
         // Close the mobile panel when crossing back to desktop width.
-        const mq = window.matchMedia('(min-width: 821px)');
+        const mq = window.matchMedia('(min-width: 1241px)');
         mq.addEventListener('change', (e) => { if (e.matches && header) header.classList.remove('menu-open'); });
 
         // Scroll reveal — progressive enhancement. Content is visible by default;

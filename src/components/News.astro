@@ -29,8 +29,8 @@ const day = (iso) => {
             )}
             <div class="news-body">
               <time class="news-date" datetime={n.date}>{day(n.date)}</time>
-              <h3>{n.title}</h3>
-              {n.text && <p>{n.text}</p>}
+              <h3 data-tr={JSON.stringify(n.tr.title)}>{n.title}</h3>
+              {n.text && <p data-tr={JSON.stringify(n.tr.text)}>{n.text}</p>}
               {n.link && (
                 <a class="cta" href={n.link} target="_blank" rel="noopener"><span data-i18n="newsMore">{t.newsMore}</span> <span class="arrow">→</span></a>
               )}

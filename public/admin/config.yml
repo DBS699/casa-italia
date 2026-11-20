@@ -52,7 +52,13 @@ collections:
             fields:
               - { name: date, label: "Datum", widget: datetime, format: "YYYY-MM-DD", date_format: "DD.MM.YYYY", time_format: false }
               - { name: title, label: "Titel", widget: string }
+              - { name: title_fr, label: "Titel – Französisch", widget: string, required: false, default: "", hint: "Leer = deutscher Titel. Änderst du den deutschen Titel, pass die Übersetzungen auch an." }
+              - { name: title_it, label: "Titel – Italienisch", widget: string, required: false, default: "" }
+              - { name: title_en, label: "Titel – Englisch", widget: string, required: false, default: "" }
               - { name: text, label: "Text", widget: text, required: false, default: "" }
+              - { name: text_fr, label: "Text – Französisch", widget: text, required: false, default: "", hint: "Leer = deutscher Text." }
+              - { name: text_it, label: "Text – Italienisch", widget: text, required: false, default: "" }
+              - { name: text_en, label: "Text – Englisch", widget: text, required: false, default: "" }
               - { name: image, label: "Bild (optional)", widget: image, required: false, default: "" }
               - { name: link, label: "Link (optional)", widget: string, required: false, default: "", hint: "z. B. https://… – erscheint als «Mehr erfahren»." }
 

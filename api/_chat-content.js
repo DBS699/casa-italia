@@ -12,10 +12,18 @@ export const COLLECTIONS = {
     fields: {
       date: { label: 'Datum', max: 10, kind: 'date', required: true },
       title: { label: 'Titel', max: 120, required: true },
+      title_fr: { label: 'Titel Französisch', max: 120 },
+      title_it: { label: 'Titel Italienisch', max: 120 },
+      title_en: { label: 'Titel Englisch', max: 120 },
       text: { label: 'Text', max: 1500, kind: 'longtext' },
+      text_fr: { label: 'Text Französisch', max: 1500, kind: 'longtext' },
+      text_it: { label: 'Text Italienisch', max: 1500, kind: 'longtext' },
+      text_en: { label: 'Text Englisch', max: 1500, kind: 'longtext' },
       image: { label: 'Bild', max: 300, kind: 'image' },
       link: { label: 'Link', max: 500, kind: 'web' },
     },
+    // A new or changed German title/text brings its translations along.
+    translated: { title: ['title_fr', 'title_it', 'title_en'], text: ['text_fr', 'text_it', 'text_en'] },
   },
   komoot: {
     area: 'Touren (Komoot-Ordner)',
@@ -243,6 +251,17 @@ function applyToTexts(state, op, attachments) {
   return { area: collection.area, collection: 'texts', kind: 'update', title: textTitle(fields.de || entry.de), key, afterKey: key, fields: details };
 }
 
+// The other languages would silently stay on the old wording otherwise.
+function checkTranslations(collection, before, fields) {
+  for (const [base, langs] of Object.entries(collection.translated ?? {})) {
+    if (!fields[base] || fields[base] === before[base]) continue;
+    const missing = langs.filter((name) => !fields[name]);
+    if (missing.length) {
+      throw new ContentError(`Wenn sich «${collection.fields[base].label}» ändert, braucht es auch die Übersetzung: ${missing.map((name) => collection.fields[name].label).join(', ')}.`);
+    }
+  }
+}
+
 function applyToList(state, name, op, attachments) {
   const collection = COLLECTIONS[name];
   const items = state[name];
@@ -251,7 +270,9 @@ function applyToList(state, name, op, attachments) {
   });
 
   if (op.op === 'add') {
-    const item = newItem(collection, normalizeFields(collection, op.fields, attachments));
+    const fields = normalizeFields(collection, op.fields, attachments);
+    checkTranslations(collection, {}, fields);
+    const item = newItem(collection, fields);
     placeAt(items, item, op.position);
     return change('add', item, describe(collection, {}, item));
   }
@@ -270,6 +291,7 @@ function applyToList(state, name, op, attachments) {
   if (op.op === 'update') {
     const fields = normalizeFields(collection, op.fields, attachments);
     if (Object.keys(fields).length === 0) throw new ContentError(NOTHING_NEW);
+    checkTranslations(collection, before, fields);
     const after = { ...before, ...fields };
     checkRequired(collection, after);
     const details = describe(collection, before, after);

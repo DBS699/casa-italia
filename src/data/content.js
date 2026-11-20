@@ -52,9 +52,11 @@ export const SPONSORS = sponsorsData.sponsors.map((s, i) => ({
 // The tours themselves live on Komoot and are loaded in the browser (scripts/komoot.js).
 export const KOMOOT = komootData.collections;
 
-// News in «Aktuell», newest first (from news.json; CMS- and chat-editable). German only.
+// News in «Aktuell», newest first (from news.json; CMS- and chat-editable). Title and
+// text come in every language (title_fr, text_en, …); an empty translation shows the German.
+const inLanguages = (n, field) => Object.fromEntries(LANGS.map(({ code }) => [code, (code === DEFAULT_LANG ? '' : n[`${field}_${code}`]) || n[field] || '']));
 export const NEWS = newsData.news
-  .map((n, i) => ({ ...n, order: i }))
+  .map((n, i) => ({ ...n, order: i, tr: { title: inLanguages(n, 'title'), text: inLanguages(n, 'text') } }))
   .sort((a, b) => String(b.date).localeCompare(String(a.date)) || a.order - b.order);
 
 // Gallery images (from gallery.json; CMS-editable).
